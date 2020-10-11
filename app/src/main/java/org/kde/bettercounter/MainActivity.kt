@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
                 .setAction("Action", null).show()
         }
 
-        supportFragmentManager.beginTransaction().replace(R.id.entry_fragment, EntryFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.entry_fragment, EntryListFragment()).commit()
 
         db = Room.databaseBuilder(
             applicationContext,
