@@ -19,21 +19,33 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         val db  = AppDatabase.getInstance(application)
         val prefs =  application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
         repo = Repository(db.entryDao(), prefs)
-    }
-
-    var counters : List<String>
-        get() = repo.getCounterList()
-        set(value) = repo.setCounterList(value)
-
-    fun addCounter(value : String) {
-        repo.setCounterList(repo.getCounterList().toMutableList() + value)
-        for ((_, observer) in addCounterObservers) {
-            observer.onChanged(value)
+        viewModelScope.launch(Dispatchers.IO) {
+            for (name in repo.getCounterList()) {
+                counterMap[name] = MutableLiveData(repo.getCounter(name)) // cache it
+                for ((_, observer) in addCounterObservers) {
+                    observer.onChanged(name)
+                }
+            }
         }
     }
 
-    fun observeAddCounter(owner : LifecycleOwner, observer: Observer<String>) {
+    fun saveCounterOrder(value : List<String>) = repo.setCounterList(value)
+
+    fun addCounter(name : String) {
+        repo.setCounterList(repo.getCounterList().toMutableList() + name)
+        viewModelScope.launch(Dispatchers.IO) {
+            for ((_, observer) in addCounterObservers) {
+                counterMap[name] = MutableLiveData(repo.getCounter(name)) // cache it
+                observer.onChanged(name)
+            }
+        }
+    }
+
+    fun observeNewCounter(owner : LifecycleOwner, observer: Observer<String>) {
         addCounterObservers[owner] = observer
+        for (name in counterMap.keys) { //notify the ones we already have
+            observer.onChanged(name)
+        }
     }
 
     fun renameCounter(oldName : String, newName : String) {
@@ -61,11 +73,15 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /*suspend*/ fun getCounter(name : String) : LiveData<Counter> {
-        return counterMap.getOrElse(name) {
-            val counter = MutableLiveData(repo.getCounter(name))
-            counterMap[name] = counter
-            return counter
+    fun getCounter(name : String) : LiveData<Counter> {
+        return counterMap[name]!!
+    }
+
+    fun counterExists(name: String): Boolean = repo.getCounterList().contains(name)
+
+    fun deleteCounter(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.removeAllEntries(name)
         }
     }
 

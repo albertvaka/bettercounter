@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
                 .setTitle("Add counter")
                 .setPositiveButton("Create") { _, _ ->
                     var name = editView.findViewById<EditText>(R.id.text_edit).text.toString()
-                    if (viewModel.counters.contains(name)) {
+                    if (viewModel.counterExists(name)) {
                         Toast.makeText(this, R.string.already_exists, Toast.LENGTH_LONG).show()
                     } else {
                         viewModel.addCounter(name)

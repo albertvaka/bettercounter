@@ -25,7 +25,7 @@ class Repository(private val entryDao: EntryDao, private val sharedPref : Shared
         counters = list
     }
 
-    /*suspend*/ fun getCounter(name : String): Counter {
+    suspend fun getCounter(name : String): Counter {
         return Counter(
             name = name,
             count = entryDao.getCount(name),
@@ -46,5 +46,9 @@ class Repository(private val entryDao: EntryDao, private val sharedPref : Shared
         if (entry != null) {
             entryDao.delete(entry)
         }
+    }
+
+    suspend fun removeAllEntries(name: String) {
+        entryDao.deleteAll(name)
     }
 }

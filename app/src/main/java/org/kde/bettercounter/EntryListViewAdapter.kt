@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import java.util.*
 import kotlin.coroutines.CoroutineContext
@@ -21,12 +22,14 @@ class EntryListViewAdapter(
     CoroutineScope {
 
     private val inflater: LayoutInflater = LayoutInflater.from(owner)
-    private var counters: MutableList<String> = viewModel.counters.toMutableList()
+    private var counters: MutableList<String> = mutableListOf()
 
     init {
-        viewModel.observeAddCounter(owner, { newCounter ->
-            this.counters.add(newCounter)
-            notifyItemInserted(counters.size-1)
+        viewModel.observeNewCounter(owner, { newCounter ->
+            launch(Dispatchers.Main) {
+                counters.add(newCounter)
+                notifyItemInserted(counters.size-1)
+            }
         })
     }
 
@@ -38,16 +41,16 @@ class EntryListViewAdapter(
     override fun getItemCount(): Int = counters.size
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
-        var counter = viewModel.getCounter(counters[position])
-        counter.observe(owner, { counter ->
-            holder.onBind(counter)
+        viewModel.getCounter(counters[position]).observe(owner, {
+            holder.onBind(it)
         })
     }
 
     fun removeItem(position: Int) {
-        counters.removeAt(position)
+        var name = counters.removeAt(position)
         notifyItemRemoved(position)
-        viewModel.counters = counters
+        viewModel.deleteCounter(name)
+        viewModel.saveCounterOrder(counters)
     }
 
     fun renameItem(position: Int, newName: String) {
@@ -56,13 +59,12 @@ class EntryListViewAdapter(
             notifyItemChanged(position)
             return
         }
-        if (counters.contains(newName)) {
+        if (viewModel.counterExists(newName)) {
             Toast.makeText(owner, R.string.already_exists, Toast.LENGTH_LONG).show()
             notifyItemChanged(position)
             return
         }
         counters[position] = newName
-        viewModel.counters = counters
         viewModel.renameCounter(oldName, newName)
         notifyItemChanged(position)
     }
@@ -86,7 +88,7 @@ class EntryListViewAdapter(
     }
 
     override fun onDragEnd(viewHolder: RecyclerView.ViewHolder?) {
-        viewModel.counters = counters
+        viewModel.saveCounterOrder(counters)
     }
 
     override fun onSwipe(position: Int) {

@@ -19,4 +19,7 @@ public interface EntryDao {
 
     @Delete
     fun delete(entry : Entry);
+
+    @Query("DELETE FROM entry WHERE name = (:name)")
+    fun deleteAll(name : String);
 }
