@@ -3,4 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="already_exists">A counter with this name already exists</string>
     <string name="counter_name">Counter name</string>
+    <string name="decrease">Decrease</string>
+    <string name="increase">Increase</string>
+    <string name="never">Never</string>
 </resources>

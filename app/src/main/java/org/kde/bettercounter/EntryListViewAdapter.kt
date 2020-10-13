@@ -32,13 +32,16 @@ class EntryListViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val view = inflater.inflate(R.layout.fragment_entry, parent, false)
-        return EntryViewHolder(view)
+        return EntryViewHolder(view, viewModel)
     }
 
     override fun getItemCount(): Int = counters.size
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
-        holder.onBind(counters[position])
+        var counter = viewModel.getCounter(counters[position])
+        counter.observe(owner, { counter ->
+            holder.onBind(counter)
+        })
     }
 
     fun removeItem(position: Int) {

@@ -1,3 +1,5 @@
 package org.kde.bettercounter.persistence
 
-class Counter(var name : String, var count : Int, var lastEntry : Entry)
+import java.util.*
+
+class Counter(var name : String, var count : Int, var lastEdit : Date?)

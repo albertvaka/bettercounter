@@ -6,7 +6,7 @@ import androidx.room.*
 public interface EntryDao {
 
     @Query("SELECT * FROM entry WHERE name = (:name) ORDER BY date LIMIT 1")
-    fun getMostRecent(name : String) : Entry;
+    fun getMostRecent(name : String) : Entry?;
 
     @Query("SELECT COUNT(*) FROM entry WHERE name = (:name)")
     fun getCount(name : String) : Int;

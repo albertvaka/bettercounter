@@ -1,13 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="15dp"
+    android:background="@color/colorPrimary"
     android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/content"
-        android:layout_width="match_parent"
+    <ImageButton
+        android:id="@+id/btn_undo"
+        android:layout_width="70dp"
+        android:layout_height="match_parent"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_gravity="center"
+        android:tint="@color/colorAccent"
+        android:src="@drawable/ic_undo"
+        android:contentDescription="@string/decrease" />
+
+    <View style="@style/Divider.Vertical"/>
+
+    <LinearLayout
+        android:layout_margin="10dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dip"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:tint="#FFFFFF"
+            tools:text="Potentially long thing" />
+
+        <TextView
+            android:id="@+id/count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="5dip"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:textColor="@color/colorAccent"
+            android:textSize="24sp"
+            tools:text="0" />
+
+        <TextView
+            android:id="@+id/last_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawablePadding="5dip"
+            app:drawableTint="@color/colorAccent"
+            android:textAlignment="center"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:textColor="@color/colorAccent"
+            app:drawableStartCompat="@drawable/ic_time"
+            tools:text="yesterday" />
+    </LinearLayout>
+    <View style="@style/Divider.Vertical"/>
+    <ImageButton
+        android:id="@+id/btn_increase"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="70dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_plusone"
+
+        android:tint="@color/colorAccent"
+        android:contentDescription="@string/increase" />
+
 </LinearLayout>

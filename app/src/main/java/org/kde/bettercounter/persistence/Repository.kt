@@ -25,11 +25,11 @@ class Repository(private val entryDao: EntryDao, private val sharedPref : Shared
         counters = list
     }
 
-    suspend fun getCounter(name : String): Counter {
+    /*suspend*/ fun getCounter(name : String): Counter {
         return Counter(
             name = name,
             count = entryDao.getCount(name),
-            lastEntry =  entryDao.getMostRecent(name)
+            lastEdit =  entryDao.getMostRecent(name)?.date
         )
     }
 
@@ -37,8 +37,14 @@ class Repository(private val entryDao: EntryDao, private val sharedPref : Shared
         entryDao.renameCounter(oldName, newName)
     }
 
-    suspend fun incrementCounter(name: String) {
+    suspend fun addEntry(name: String) {
         entryDao.insert(Entry(name=name, date= Calendar.getInstance().time))
     }
 
+    suspend fun removeEntry(name: String) {
+        var entry = entryDao.getMostRecent(name)
+        if (entry != null) {
+            entryDao.delete(entry)
+        }
+    }
 }
