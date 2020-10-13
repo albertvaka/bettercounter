@@ -5,7 +5,7 @@ import androidx.room.*
 @Dao
 public interface EntryDao {
 
-    @Query("SELECT * FROM entry WHERE name = (:name) ORDER BY date LIMIT 1")
+    @Query("SELECT * FROM entry WHERE name = (:name) ORDER BY date DESC LIMIT 1")
     fun getMostRecent(name : String) : Entry?;
 
     @Query("SELECT COUNT(*) FROM entry WHERE name = (:name)")
