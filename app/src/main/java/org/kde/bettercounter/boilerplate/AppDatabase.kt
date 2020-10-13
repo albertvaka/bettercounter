@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.EntryDao
 
-@Database(entities = [Entry::class], version = 2)
+@Database(entities = [Entry::class], version = 3)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun entryDao(): EntryDao
 
@@ -21,7 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
                 return tempInstance
             }
             synchronized(this) {
-                val  db = Room.databaseBuilder(
+                val db = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java, "appdb"
                 ).build()

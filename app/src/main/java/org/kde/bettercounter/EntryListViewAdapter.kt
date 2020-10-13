@@ -24,15 +24,9 @@ class EntryListViewAdapter(
     private var counters: MutableList<String> = viewModel.counters.toMutableList()
 
     init {
-        // Only observe additions, since it's the only change that happens externally.
-        // Other changes are done by us and we don't want events when that happens,
-        // since that gave problems (eg: drag animations ended abruptly since the list
-        // content was refreshed as soon as the item was dropped).
-        viewModel.observeAddCounter(owner, { counters ->
-            counters?.let {
-                this.counters = it.toMutableList()
-                notifyDataSetChanged()
-            }
+        viewModel.observeAddCounter(owner, { newCounter ->
+            this.counters.add(newCounter)
+            notifyItemInserted(counters.size-1)
         })
     }
 

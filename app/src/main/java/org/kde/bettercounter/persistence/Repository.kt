@@ -25,6 +25,18 @@ class Repository(private val entryDao: EntryDao, private val sharedPref : Shared
         counters = list
     }
 
+    suspend fun getCounter(name : String): Counter {
+        return Counter(
+            name = name,
+            count = entryDao.getCount(name),
+            lastEntry =  entryDao.getMostRecent(name)
+        )
+    }
+
+    suspend fun renameCounter(oldName : String, newName : String) {
+        entryDao.renameCounter(oldName, newName)
+    }
+
     suspend fun incrementCounter(name: String) {
         entryDao.insert(Entry(name=name, date= Calendar.getInstance().time))
     }
