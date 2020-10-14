@@ -4,10 +4,14 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.Counter
 import org.kde.bettercounter.persistence.Repository
+import kotlin.collections.HashMap
+
 
 class ViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -25,6 +29,14 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
                 counterMap[name] = MutableLiveData(repo.getCounter(name)) // cache it
                 for ((_, observer) in addCounterObservers) {
                     observer.onChanged(name)
+                }
+            }
+
+            // periodically refresh Counter livedatas, so the UI updates the "x time ago" texts
+            while(this.isActive) { // will stop when the viewmodel is cleared
+                delay(10 * 1000) // 10 seconds
+                for (name in repo.getCounterList()) {
+                    counterMap[name]?.postValue(repo.getCounter(name))
                 }
             }
         }
