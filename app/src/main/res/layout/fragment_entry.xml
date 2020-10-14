@@ -33,7 +33,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textAppearance="?attr/textAppearanceListItem"
-            android:textColor="@color/colorAccent"
             android:textStyle="bold"
             android:tint="#FFFFFF"
             tools:text="Potentially long thing" />
@@ -45,7 +44,6 @@
             android:layout_gravity="center"
             android:layout_margin="5dip"
             android:textAppearance="?attr/textAppearanceListItem"
-            android:textColor="@color/colorAccent"
             android:textSize="24sp"
             tools:text="0" />
 
@@ -58,7 +56,6 @@
             app:drawableTint="@color/colorAccent"
             android:textAlignment="center"
             android:textAppearance="?attr/textAppearanceListItem"
-            android:textColor="@color/colorAccent"
             app:drawableStartCompat="@drawable/ic_time"
             tools:text="yesterday" />
 

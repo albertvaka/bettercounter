@@ -5,6 +5,11 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:editTextColor">@color/colorAccent</item>
+        <item name="android:textColorHint">@color/colorAccentDisabled</item>
+        <item name="colorBackgroundFloating">@color/colorPrimary</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
