@@ -30,10 +30,8 @@ class EntryListViewAdapter(
 
     init {
         viewModel.observeNewCounter(owner, { newCounter ->
-            launch(Dispatchers.Main) {
-                counters.add(newCounter)
-                notifyItemInserted(counters.size-1)
-            }
+            counters.add(newCounter)
+            notifyItemInserted(counters.size-1)
         })
     }
 

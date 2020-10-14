@@ -3,10 +3,7 @@ package org.kde.bettercounter
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.Counter
 import org.kde.bettercounter.persistence.Repository
@@ -49,7 +46,9 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             for ((_, observer) in addCounterObservers) {
                 counterMap[name] = MutableLiveData(repo.getCounter(name)) // cache it
-                observer.onChanged(name)
+                withContext(Dispatchers.Main) {
+                    observer.onChanged(name)
+                }
             }
         }
     }
