@@ -8,7 +8,8 @@
 
 ### Features
 
-- Records the date of each individual counter increase, so upcoming versions can graph your data and calculate statistics.
+- Records the date of each individual counter increase, so upcoming versions can graph your data and calculate statistics.
+- Your data is never sent to any server (except for Google auto-backup, if it's enabled).
 - Simple as hell and will stay that way.
 
 ### Screens
