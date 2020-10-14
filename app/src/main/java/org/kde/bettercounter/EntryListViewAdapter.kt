@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import java.util.*
 import kotlin.coroutines.CoroutineContext
