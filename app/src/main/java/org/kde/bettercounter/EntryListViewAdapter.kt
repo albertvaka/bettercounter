@@ -103,11 +103,11 @@ class EntryListViewAdapter(
         textEdit.setText(counters[position])
         editView.findViewById<EditText>(R.id.text_edit).text.toString()
         AlertDialog.Builder(owner)
-            .setTitle("Edit counter")
+            .setTitle(R.string.edit_counter)
             .setView(editView)
-            .setPositiveButton("Save") { _, _ -> renameItem(position, textEdit.text.toString()) }
-            .setNeutralButton("Delete") { _, _ -> removeItem(position); }
-            .setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+            .setPositiveButton(R.string.save) { _, _ -> renameItem(position, textEdit.text.toString()) }
+            .setNeutralButton(R.string.delete) { _, _ -> removeItem(position); }
+            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
             .setOnCancelListener() { notifyItemChanged(position) } // This cancels the swipe animation
             .show()
     }

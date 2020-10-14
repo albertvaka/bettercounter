@@ -31,8 +31,8 @@ class MainActivity : AppCompatActivity() {
             var editView = layoutInflater.inflate(R.layout.simple_edit_text, null)
             AlertDialog.Builder(view.context)
                 .setView(editView)
-                .setTitle("Add counter")
-                .setPositiveButton("Create") { _, _ ->
+                .setTitle(R.string.add_counter)
+                .setPositiveButton(R.string.save) { _, _ ->
                     var name = editView.findViewById<EditText>(R.id.text_edit).text.toString()
                     if (viewModel.counterExists(name)) {
                         Toast.makeText(this, R.string.already_exists, Toast.LENGTH_LONG).show()
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
                         viewModel.addCounter(name)
                     }
                 }
-                .setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+                .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
                 .setOnDismissListener { fab.visibility = View.VISIBLE }
                 .show()
         }
