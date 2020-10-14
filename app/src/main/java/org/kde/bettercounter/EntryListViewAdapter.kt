@@ -45,6 +45,7 @@ class EntryListViewAdapter(
     override fun getItemCount(): Int = counters.size
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
+        viewModel.getCounter(counters[position]).removeObservers(owner)
         viewModel.getCounter(counters[position]).observe(owner, {
             holder.onBind(it)
         })
