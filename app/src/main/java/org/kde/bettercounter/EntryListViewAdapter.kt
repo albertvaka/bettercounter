@@ -24,6 +24,10 @@ class EntryListViewAdapter(
     private val inflater: LayoutInflater = LayoutInflater.from(owner)
     private var counters: MutableList<String> = mutableListOf()
 
+    private var job: Job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+
     init {
         viewModel.observeNewCounter(owner, { newCounter ->
             launch(Dispatchers.Main) {
@@ -66,6 +70,7 @@ class EntryListViewAdapter(
         }
         counters[position] = newName
         viewModel.renameCounter(oldName, newName)
+        viewModel.saveCounterOrder(counters)
         notifyItemChanged(position)
     }
 
@@ -106,7 +111,4 @@ class EntryListViewAdapter(
             .show()
     }
 
-    private var job: Job = Job()
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
 }
