@@ -12,6 +12,7 @@ class Repository(
 ) {
 
     private var counters : List<String>
+    private var counterCache = HashMap<String, Counter>()
 
     init {
         val jsonStr = sharedPref.getString(COUNTERS_PREFS_KEY, "[]")
@@ -29,22 +30,27 @@ class Repository(
     }
 
     suspend fun getCounter(name : String): Counter {
-        return Counter(
-            name = name,
-            count = entryDao.getCount(name),
-            lastEdit =  entryDao.getMostRecent(name)?.date
-        )
+        return counterCache.getOrPut(name, {
+            Counter(
+                name = name,
+                count = entryDao.getCount(name),
+                lastEdit =  entryDao.getMostRecent(name)?.date
+            )
+        })
     }
 
     suspend fun renameCounter(oldName : String, newName : String) {
+        counterCache.remove(oldName)
         entryDao.renameCounter(oldName, newName)
     }
 
     suspend fun addEntry(name: String) {
+        counterCache.remove(name)
         entryDao.insert(Entry(name=name, date= Calendar.getInstance().time))
     }
 
     suspend fun removeEntry(name: String) {
+        counterCache.remove(name)
         val entry = entryDao.getMostRecent(name)
         if (entry != null) {
             entryDao.delete(entry)
@@ -52,6 +58,7 @@ class Repository(
     }
 
     suspend fun removeAllEntries(name: String) {
+        counterCache.remove(name)
         entryDao.deleteAll(name)
     }
 }
