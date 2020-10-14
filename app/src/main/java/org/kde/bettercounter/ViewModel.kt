@@ -19,8 +19,9 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         val db  = AppDatabase.getInstance(application)
         val prefs =  application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
         repo = Repository(db.entryDao(), prefs)
+        val initialCounters = repo.getCounterList()
         viewModelScope.launch(Dispatchers.IO) {
-            for (name in repo.getCounterList()) {
+            for (name in initialCounters) {
                 counterMap[name] = MutableLiveData(repo.getCounter(name)) // cache it
                 for ((_, observer) in addCounterObservers) {
                     observer.onChanged(name)
@@ -82,6 +83,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteCounter(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.removeAllEntries(name)
+            counterMap.remove(name)
         }
     }
 
