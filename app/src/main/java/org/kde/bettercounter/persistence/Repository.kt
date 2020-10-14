@@ -6,7 +6,10 @@ import java.util.Calendar
 
 const val COUNTERS_PREFS_KEY = "counters"
 
-class Repository(private val entryDao: EntryDao, private val sharedPref : SharedPreferences) {
+class Repository(
+    private val entryDao: EntryDao,
+    private val sharedPref : SharedPreferences
+) {
 
     private var counters : List<String>
 
@@ -42,7 +45,7 @@ class Repository(private val entryDao: EntryDao, private val sharedPref : Shared
     }
 
     suspend fun removeEntry(name: String) {
-        var entry = entryDao.getMostRecent(name)
+        val entry = entryDao.getMostRecent(name)
         if (entry != null) {
             entryDao.delete(entry)
         }

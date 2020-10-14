@@ -16,8 +16,8 @@ import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class EntryListViewAdapter(
-    var owner: AppCompatActivity,
-    var viewModel: ViewModel
+    private var owner: AppCompatActivity,
+    private var viewModel: ViewModel
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback,
     CoroutineScope {
 
@@ -52,7 +52,7 @@ class EntryListViewAdapter(
     }
 
     fun removeItem(position: Int) {
-        var name = counters.removeAt(position)
+        val name = counters.removeAt(position)
         notifyItemRemoved(position)
         viewModel.deleteCounter(name)
         viewModel.saveCounterOrder(counters)
@@ -108,7 +108,7 @@ class EntryListViewAdapter(
             .setPositiveButton(R.string.save) { _, _ -> renameItem(position, textEdit.text.toString()) }
             .setNeutralButton(R.string.delete) { _, _ -> removeItem(position); }
             .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
-            .setOnCancelListener() { notifyItemChanged(position) } // This cancels the swipe animation
+            .setOnCancelListener { notifyItemChanged(position) } // This cancels the swipe animation
             .show()
     }
 

@@ -52,7 +52,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun renameCounter(oldName : String, newName : String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.renameCounter(oldName, newName)
-            var counter = counterMap.remove(oldName)
+            val counter = counterMap.remove(oldName)
             if (counter != null) {
                 counterMap[newName] = counter
                 counter.postValue(repo.getCounter(newName))

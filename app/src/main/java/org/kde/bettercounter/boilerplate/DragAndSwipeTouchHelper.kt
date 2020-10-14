@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 class DragAndSwipeTouchHelper(private val mAdapter: ListGesturesCallback) :
     ItemTouchHelper.Callback() {
 
-    var isDragging : Boolean = false
+    private var isDragging : Boolean = false
 
     override fun isLongPressDragEnabled(): Boolean { return true }
     override fun isItemViewSwipeEnabled(): Boolean { return true }

@@ -16,7 +16,7 @@ class Converters {
         @TypeConverter
         @JvmStatic
         fun dateToTimestamp(date: Date?): Long? {
-            return date?.time?.toLong()
+            return date?.time
         }
 
         @JvmStatic

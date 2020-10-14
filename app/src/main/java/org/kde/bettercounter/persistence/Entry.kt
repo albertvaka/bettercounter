@@ -1,4 +1,4 @@
-package org.kde.bettercounter.persistence;
+package org.kde.bettercounter.persistence
 
 import androidx.room.*
 import org.kde.bettercounter.boilerplate.Converters

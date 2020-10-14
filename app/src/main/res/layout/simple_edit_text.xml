@@ -13,5 +13,6 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="4dp"
-        android:hint="@string/counter_name" />
+        android:hint="@string/counter_name"
+        android:importantForAutofill="no" />
 </LinearLayout>

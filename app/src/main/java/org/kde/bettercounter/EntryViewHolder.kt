@@ -4,14 +4,15 @@ import android.text.format.DateUtils
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.kde.bettercounter.persistence.Counter
 
 
-class EntryViewHolder(var view: View, var viewModel: ViewModel) : RecyclerView.ViewHolder(view) {
+class EntryViewHolder(
+    view: View,
+    private var viewModel: ViewModel
+) : RecyclerView.ViewHolder(view) {
+
     private val countText: TextView = view.findViewById(R.id.count)
     private val nameText: TextView = view.findViewById(R.id.name)
     private val lastEditText : TextView = view.findViewById(R.id.last_edit)
@@ -32,4 +33,5 @@ class EntryViewHolder(var view: View, var viewModel: ViewModel) : RecyclerView.V
             undoButton.isEnabled = false
         }
     }
+
 }

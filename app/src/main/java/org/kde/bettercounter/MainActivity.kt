@@ -28,12 +28,12 @@ class MainActivity : AppCompatActivity() {
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener { view ->
             fab.visibility = View.GONE
-            var editView = layoutInflater.inflate(R.layout.simple_edit_text, null)
+            val editView = layoutInflater.inflate(R.layout.simple_edit_text, null)
             AlertDialog.Builder(view.context)
                 .setView(editView)
                 .setTitle(R.string.add_counter)
                 .setPositiveButton(R.string.save) { _, _ ->
-                    var name = editView.findViewById<EditText>(R.id.text_edit).text.toString()
+                    val name = editView.findViewById<EditText>(R.id.text_edit).text.toString()
                     if (viewModel.counterExists(name)) {
                         Toast.makeText(this, R.string.already_exists, Toast.LENGTH_LONG).show()
                     } else {
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val recyclerView = findViewById<RecyclerView>(R.id.recycler)
-        var entryViewAdapter  = EntryListViewAdapter(this, viewModel)
+        val entryViewAdapter  = EntryListViewAdapter(this, viewModel)
         recyclerView.adapter = entryViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         val callback = DragAndSwipeTouchHelper(entryViewAdapter)
