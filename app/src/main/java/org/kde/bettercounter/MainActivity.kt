@@ -25,7 +25,9 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(ViewModel::class.java)
 
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        fab.setOnClickListener { view ->
+            fab.visibility = View.GONE
             var editView = layoutInflater.inflate(R.layout.simple_edit_text, null)
             AlertDialog.Builder(view.context)
                 .setView(editView)
@@ -39,6 +41,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 .setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+                .setOnDismissListener { fab.visibility = View.VISIBLE }
                 .show()
         }
 
