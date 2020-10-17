@@ -1,6 +1,8 @@
 # BetterCounter
 
-### A multi-purpose counter app
+<img src="app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" width="64">
+ 
+###  A multi-purpose counter app
 
 - Track good and bad habits
 - Track when's the last time you did something (eg: water your plants, change your bedsheets, poop...)
