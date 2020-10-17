@@ -4,7 +4,7 @@
 
 - Track good and bad habits
 - Track when's the last time you did something (eg: water your plants, change your bedsheets, poop...)
-- Count your lifes in MtG
+- Count your lives in MtG
 
 ### Features
 
