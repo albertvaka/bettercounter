@@ -30,6 +30,8 @@
         android:layout_height="match_parent"
         app:layoutManager="LinearLayoutManager"
         tools:context=".EntryListFragment"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp"
         tools:listitem="@layout/fragment_entry" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
