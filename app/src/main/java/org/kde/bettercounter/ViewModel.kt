@@ -85,8 +85,8 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getCounter(name : String) : LiveData<Counter> {
-        return counterMap[name]!!
+    fun getCounter(name : String) : LiveData<Counter>? {
+        return counterMap[name]
     }
 
     fun counterExists(name: String): Boolean = repo.getCounterList().contains(name)

@@ -42,18 +42,25 @@ class EntryListViewAdapter(
     }
 
     override fun onViewRecycled(holder: EntryViewHolder) {
-        viewModel.getCounter(holder.counter.name).removeObservers(owner)
+        val counter = holder.counter
+        if (counter != null) {
+            val liveData = viewModel.getCounter(counter.name)
+            if (liveData != null) {
+                liveData.removeObservers(owner)
+            }
+        }
         super.onViewRecycled(holder)
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
-        viewModel.getCounter(counters[position]).observe(owner, {
+        viewModel.getCounter(counters[position])?.observe(owner, {
             holder.onBind(it)
         })
     }
 
     fun removeItem(position: Int) {
         val name = counters.removeAt(position)
+        viewModel.getCounter(name)?.removeObservers(owner)
         notifyItemRemoved(position)
         viewModel.deleteCounter(name)
         viewModel.saveCounterOrder(counters)

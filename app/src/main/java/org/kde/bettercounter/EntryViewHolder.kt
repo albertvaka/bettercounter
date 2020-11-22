@@ -19,7 +19,7 @@ class EntryViewHolder(
     private val increaseButton: ImageButton = view.findViewById(R.id.btn_increase)
     private val undoButton: ImageButton = view.findViewById(R.id.btn_undo)
 
-    lateinit var  counter : Counter;
+    var counter : Counter? = null;
 
     fun onBind(counter: Counter) {
         this.counter = counter
