@@ -23,6 +23,8 @@ class EntryListViewAdapter(
     private val inflater: LayoutInflater = LayoutInflater.from(owner)
     private var counters: MutableList<String> = mutableListOf()
 
+    override fun getItemCount(): Int = counters.size
+
     private var job: Job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
@@ -39,10 +41,12 @@ class EntryListViewAdapter(
         return EntryViewHolder(view, viewModel)
     }
 
-    override fun getItemCount(): Int = counters.size
+    override fun onViewRecycled(holder: EntryViewHolder) {
+        viewModel.getCounter(holder.counter.name).removeObservers(owner)
+        super.onViewRecycled(holder)
+    }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
-        viewModel.getCounter(counters[position]).removeObservers(owner)
         viewModel.getCounter(counters[position]).observe(owner, {
             holder.onBind(it)
         })
