@@ -1,6 +1,7 @@
 package org.kde.bettercounter
 
 import android.text.format.DateUtils
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView

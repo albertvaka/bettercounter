@@ -6,6 +6,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.Counter
+import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Repository
 import kotlin.collections.HashMap
 
@@ -41,8 +42,9 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveCounterOrder(value : List<String>) = repo.setCounterList(value)
 
-    fun addCounter(name : String) {
+    fun addCounter(name : String, interval : Interval) {
         repo.setCounterList(repo.getCounterList().toMutableList() + name)
+        repo.setCounterInterval(name, interval)
         viewModelScope.launch(Dispatchers.IO) {
             for ((_, observer) in addCounterObservers) {
                 counterMap[name] = MutableLiveData(repo.getCounter(name)) // cache it
@@ -81,6 +83,17 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun decrementCounter(name : String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.removeEntry(name)
+            counterMap[name]?.postValue(repo.getCounter(name))
+        }
+    }
+
+    fun getCounterInterval(name : String) : Interval {
+        return repo.getCounterInterval(name)
+    }
+
+    fun setCounterInterval(name : String, interval : Interval) {
+        repo.setCounterInterval(name, interval)
+        viewModelScope.launch(Dispatchers.IO) {
             counterMap[name]?.postValue(repo.getCounter(name))
         }
     }

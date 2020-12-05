@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">BetterCounter</string>
+    <string name="name_cant_be_blank">Give the counter a name</string>
     <string name="already_exists">A counter with this name already exists</string>
     <string name="counter_name">Counter name</string>
+    <string name="interval">Interval</string>
     <string name="decrease">Decrease</string>
     <string name="increase">Increase</string>
     <string name="never">Never</string>
@@ -10,4 +12,10 @@
     <string name="save">Save</string>
     <string name="edit_counter">Edit counter</string>
     <string name="delete">Delete</string>
+    <string name="interval_day">Daily</string>
+    <string name="interval_week">Weekly</string>
+    <string name="interval_month">Monthly</string>
+    <string name="interval_year">Yearly</string>
+    <string name="interval_ytd">Year to date</string>
+    <string name="interval_lifetime">Lifetime</string>
 </resources>

@@ -3,6 +3,7 @@ package org.kde.bettercounter
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,16 +28,24 @@ class MainActivity : AppCompatActivity() {
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener { view ->
             fab.visibility = View.GONE
-            val editView = layoutInflater.inflate(R.layout.simple_edit_text, null)
+            val editView = layoutInflater.inflate(R.layout.edit_counter, null)
+            val spinner = editView.findViewById<Spinner>(R.id.interval_spinner)
+            val intervalAdapter = IntervalAdapter(this)
+            spinner.adapter = intervalAdapter
             AlertDialog.Builder(view.context)
                 .setView(editView)
                 .setTitle(R.string.add_counter)
                 .setPositiveButton(R.string.save) { _, _ ->
                     val name = editView.findViewById<EditText>(R.id.text_edit).text.toString()
-                    if (viewModel.counterExists(name)) {
+                    if (name.isBlank()) {
+                        Toast.makeText(this, R.string.name_cant_be_blank, Toast.LENGTH_LONG).show()
+                    } else if (viewModel.counterExists(name)) {
                         Toast.makeText(this, R.string.already_exists, Toast.LENGTH_LONG).show()
                     } else {
-                        viewModel.addCounter(name)
+                        viewModel.addCounter(
+                            name,
+                            intervalAdapter.itemAt(spinner.selectedItemPosition)
+                        )
                     }
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
@@ -46,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val recyclerView = findViewById<RecyclerView>(R.id.recycler)
-        val entryViewAdapter  = EntryListViewAdapter(this, viewModel)
+        val entryViewAdapter = EntryListViewAdapter(this, viewModel)
         recyclerView.adapter = entryViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         val callback = DragAndSwipeTouchHelper(entryViewAdapter)

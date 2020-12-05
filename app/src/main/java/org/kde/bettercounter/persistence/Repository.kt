@@ -1,10 +1,12 @@
 package org.kde.bettercounter.persistence
 
 import android.content.SharedPreferences
+import android.util.Log
 import org.kde.bettercounter.boilerplate.Converters
 import java.util.Calendar
 
 const val COUNTERS_PREFS_KEY = "counters"
+const val COUNTERS_INTERVAL_PREFS_KEY = "interval.%s"
 
 class Repository(
     private val entryDao: EntryDao,
@@ -29,12 +31,29 @@ class Repository(
         counters = list
     }
 
+    fun getCounterInterval(name : String) : Interval {
+        val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
+        val str = sharedPref.getString(key, null)
+        return if (str != null) {
+            Interval.valueOf(str)
+        } else {
+            DEFAULT_INTERVAL
+        }
+    }
+
+    fun setCounterInterval(name : String, interval : Interval) {
+        val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
+        sharedPref.edit().putString(key, interval.toString()).apply()
+    }
+
     suspend fun getCounter(name : String): Counter {
+        val interval = getCounterInterval(name)
         return counterCache.getOrPut(name, {
             Counter(
                 name = name,
-                count = entryDao.getCount(name),
-                lastEdit =  entryDao.getMostRecent(name)?.date
+                count = entryDao.getCountSince(name, interval.toDate()),
+                interval = interval,
+                lastEdit = entryDao.getMostRecent(name)?.date
             )
         })
     }
@@ -46,7 +65,7 @@ class Repository(
 
     suspend fun addEntry(name: String) {
         counterCache.remove(name)
-        entryDao.insert(Entry(name=name, date= Calendar.getInstance().time))
+        entryDao.insert(Entry(name=name, date=Calendar.getInstance().time))
     }
 
     suspend fun removeEntry(name: String) {

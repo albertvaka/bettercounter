@@ -3,6 +3,7 @@ package org.kde.bettercounter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -11,16 +12,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
+import org.kde.bettercounter.persistence.Interval
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class EntryListViewAdapter(
-    private var owner: AppCompatActivity,
+    private var activity: AppCompatActivity,
     private var viewModel: ViewModel
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback,
     CoroutineScope {
 
-    private val inflater: LayoutInflater = LayoutInflater.from(owner)
+    private val inflater: LayoutInflater = LayoutInflater.from(activity)
     private var counters: MutableList<String> = mutableListOf()
 
     override fun getItemCount(): Int = counters.size
@@ -30,7 +32,7 @@ class EntryListViewAdapter(
         get() = Dispatchers.Main + job
 
     init {
-        viewModel.observeNewCounter(owner, { newCounter ->
+        viewModel.observeNewCounter(activity, { newCounter ->
             counters.add(newCounter)
             notifyItemInserted(counters.size-1)
         })
@@ -46,40 +48,44 @@ class EntryListViewAdapter(
         if (counter != null) {
             val liveData = viewModel.getCounter(counter.name)
             if (liveData != null) {
-                liveData.removeObservers(owner)
+                liveData.removeObservers(activity)
             }
         }
         super.onViewRecycled(holder)
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
-        viewModel.getCounter(counters[position])?.observe(owner, {
+        viewModel.getCounter(counters[position])?.observe(activity, {
             holder.onBind(it)
         })
     }
 
     fun removeItem(position: Int) {
         val name = counters.removeAt(position)
-        viewModel.getCounter(name)?.removeObservers(owner)
+        viewModel.getCounter(name)?.removeObservers(activity)
         notifyItemRemoved(position)
         viewModel.deleteCounter(name)
         viewModel.saveCounterOrder(counters)
     }
 
-    fun renameItem(position: Int, newName: String) {
+    fun editCounter(position: Int, newName: String, interval : Interval) {
         val oldName = counters[position]
-        if (oldName == newName) {
-            notifyItemChanged(position)
-            return
+        if (oldName != newName) {
+            if (newName.isBlank()) {
+                Toast.makeText(activity, R.string.name_cant_be_blank, Toast.LENGTH_LONG).show()
+                notifyItemChanged(position)
+                return
+            }
+            if (viewModel.counterExists(newName)) {
+                Toast.makeText(activity, R.string.already_exists, Toast.LENGTH_LONG).show()
+                notifyItemChanged(position)
+                return
+            }
+            counters[position] = newName
+            viewModel.renameCounter(oldName, newName)
+            viewModel.saveCounterOrder(counters)
         }
-        if (viewModel.counterExists(newName)) {
-            Toast.makeText(owner, R.string.already_exists, Toast.LENGTH_LONG).show()
-            notifyItemChanged(position)
-            return
-        }
-        counters[position] = newName
-        viewModel.renameCounter(oldName, newName)
-        viewModel.saveCounterOrder(counters)
+        viewModel.setCounterInterval(newName, interval)
         notifyItemChanged(position)
     }
 
@@ -98,7 +104,7 @@ class EntryListViewAdapter(
     }
 
     override fun onDragStart(viewHolder: RecyclerView.ViewHolder?) {
-        //TODO: haptic feedback
+        //TODO: haptic feedback?
     }
 
     override fun onDragEnd(viewHolder: RecyclerView.ViewHolder?) {
@@ -106,14 +112,27 @@ class EntryListViewAdapter(
     }
 
     override fun onSwipe(position: Int) {
-        val editView = inflater.inflate(R.layout.simple_edit_text, null)
+        val editView = inflater.inflate(R.layout.edit_counter, null)
         val textEdit = editView.findViewById<EditText>(R.id.text_edit)
-        textEdit.setText(counters[position])
+        val spinner = editView.findViewById<Spinner>(R.id.interval_spinner)
+
+        val name = counters[position]
+        val interval = viewModel.getCounterInterval(name)
+
+        textEdit.setText(name)
+        val intervalAdapter = IntervalAdapter(activity)
+        spinner.adapter = intervalAdapter
+        spinner.setSelection(intervalAdapter.positionOf(interval))
+
         editView.findViewById<EditText>(R.id.text_edit).text.toString()
-        AlertDialog.Builder(owner)
+        AlertDialog.Builder(activity)
             .setTitle(R.string.edit_counter)
             .setView(editView)
-            .setPositiveButton(R.string.save) { _, _ -> renameItem(position, textEdit.text.toString()) }
+            .setPositiveButton(R.string.save) { _, _ -> editCounter(
+                position,
+                textEdit.text.toString(),
+                intervalAdapter.itemAt(spinner.selectedItemPosition)
+            ) }
             .setNeutralButton(R.string.delete) { _, _ -> removeItem(position); }
             .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
             .setOnCancelListener { notifyItemChanged(position) } // This cancels the swipe animation
