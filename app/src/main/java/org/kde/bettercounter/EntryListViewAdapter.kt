@@ -12,13 +12,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
+import org.kde.bettercounter.persistence.Counter
 import org.kde.bettercounter.persistence.Interval
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class EntryListViewAdapter(
     private var activity: AppCompatActivity,
-    private var viewModel: ViewModel
+    private var viewModel: ViewModel,
+    private var onItemClickListener: (c : Counter) -> Unit
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback,
     CoroutineScope {
 
@@ -42,7 +44,14 @@ class EntryListViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val view = inflater.inflate(R.layout.fragment_entry, parent, false)
-        return EntryViewHolder(view, viewModel)
+        val holder = EntryViewHolder(view, viewModel)
+        view.setOnClickListener {
+            val counter = holder.counter
+            if (counter != null) {
+                onItemClickListener(counter)
+            }
+        }
+        return holder
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {

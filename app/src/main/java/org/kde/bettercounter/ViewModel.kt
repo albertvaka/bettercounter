@@ -6,6 +6,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.Counter
+import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Repository
 import kotlin.collections.HashMap
@@ -111,4 +112,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun getAllEntriesInCounterInterval(name : String) : List<Entry> {
+        return repo.getAllEntriesInCounterInterval(name)
+    }
 }

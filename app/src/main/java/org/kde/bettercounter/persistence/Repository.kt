@@ -80,4 +80,9 @@ class Repository(
         counterCache.remove(name)
         entryDao.deleteAll(name)
     }
+
+    fun getAllEntriesInCounterInterval(name : String): List<Entry> {
+        var interval = getCounterInterval(name)
+        return entryDao.getAllEntriesSince(name, interval.toDate())
+    }
 }

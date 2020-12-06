@@ -18,6 +18,9 @@ interface EntryDao {
     @Query("UPDATE entry set name = (:newName) WHERE name = (:oldName)")
     fun renameCounter(oldName : String, newName : String) : Int
 
+    @Query("SELECT * FROM entry WHERE name = (:name) and date >= (:since)")
+    fun getAllEntriesSince(name : String, since: Date) : List<Entry>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entry : Entry)
 

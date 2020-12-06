@@ -8,20 +8,36 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.jjoe64.graphview.GraphView
+import com.jjoe64.graphview.series.DataPoint
+import com.jjoe64.graphview.series.LineGraphSeries
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
+import org.kde.bettercounter.persistence.Counter
+import org.kde.bettercounter.persistence.Entry
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ViewModel
 
+    private lateinit var graph : GraphView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        graph = findViewById(R.id.graph)
+        val bottomSheetBehavior = BottomSheetBehavior.from(graph)
 
         viewModel = ViewModelProvider(this).get(ViewModel::class.java)
 
@@ -54,11 +70,31 @@ class MainActivity : AppCompatActivity() {
         }
 
         val recyclerView = findViewById<RecyclerView>(R.id.recycler)
-        val entryViewAdapter = EntryListViewAdapter(this, viewModel)
+        val entryViewAdapter = EntryListViewAdapter(
+            this,
+            viewModel
+        ) {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            viewModel.viewModelScope.launch(Dispatchers.IO) {
+                val entries = viewModel.getAllEntriesInCounterInterval(it.name)
+                runOnUiThread {
+                    showGraph(it, entries)
+                }
+            }
+        }
         recyclerView.adapter = entryViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         val callback = DragAndSwipeTouchHelper(entryViewAdapter)
         ItemTouchHelper(callback).attachToRecyclerView(recyclerView)
+
     }
 
+    fun showGraph(c: Counter, entries: List<Entry>) {
+        graph.title = c.name
+        val series = mutableListOf<DataPoint>()
+        for (entry in entries) {
+            series.add(DataPoint(entry.date, 1.0))
+        }
+        graph.addSeries(LineGraphSeries(series.toTypedArray()))
+    }
 }

@@ -34,6 +34,14 @@
         android:paddingBottom="100dp"
         tools:listitem="@layout/fragment_entry" />
 
+    <com.jjoe64.graphview.GraphView
+        android:layout_width = "match_parent"
+        android:layout_height = "200dip"
+        android:background="@color/colorAccent"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_hideable="true"
+        android:id = "@+id/graph" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
