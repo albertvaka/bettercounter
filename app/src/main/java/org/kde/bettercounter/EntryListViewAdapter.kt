@@ -43,26 +43,37 @@ class EntryListViewAdapter(
         return EntryViewHolder(view, viewModel)
     }
 
-    override fun onViewRecycled(holder: EntryViewHolder) {
-        val counter = holder.counter
-        if (counter != null) {
-            val liveData = viewModel.getCounter(counter.name)
-            if (liveData != null) {
-                liveData.removeObservers(activity)
-            }
+    override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
+        val oldCounter = holder.counter
+        if (oldCounter != null) {
+            viewModel.getCounter(oldCounter.name)?.removeObservers(holder)
         }
-        super.onViewRecycled(holder)
+        val counter = viewModel.getCounter(counters[position])?.value
+        if (counter != null) {
+            holder.onBind(counter)
+        }
     }
 
-    override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
-        viewModel.getCounter(counters[position])?.observe(activity, {
-            holder.onBind(it)
-        })
+    override fun onViewAttachedToWindow(holder: EntryViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        val counter = holder.counter
+        if (counter != null) {
+            viewModel.getCounter(counter.name)?.observe(holder, {
+                holder.onBind(it)
+            })
+        }
+    }
+
+    override fun onViewDetachedFromWindow(holder: EntryViewHolder) {
+        val counter = holder.counter
+        if (counter != null) {
+            viewModel.getCounter(counter.name)?.removeObservers(holder)
+        }
+        super.onViewDetachedFromWindow(holder)
     }
 
     fun removeItem(position: Int) {
         val name = counters.removeAt(position)
-        viewModel.getCounter(name)?.removeObservers(activity)
         notifyItemRemoved(position)
         viewModel.deleteCounter(name)
         viewModel.saveCounterOrder(counters)
