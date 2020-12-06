@@ -34,7 +34,9 @@ class EntryListViewAdapter(
     init {
         viewModel.observeNewCounter(activity, { newCounter ->
             counters.add(newCounter)
-            notifyItemInserted(counters.size-1)
+            activity.runOnUiThread {
+                notifyItemInserted(counters.size - 1)
+            }
         })
     }
 
