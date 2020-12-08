@@ -20,6 +20,7 @@ import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
+import org.kde.bettercounter.boilerplate.HackyLayoutManager
 import org.kde.bettercounter.persistence.Counter
 import org.kde.bettercounter.persistence.Entry
 
@@ -83,7 +84,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         recyclerView.adapter = entryViewAdapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = HackyLayoutManager(this)
         val callback = DragAndSwipeTouchHelper(entryViewAdapter)
         ItemTouchHelper(callback).attachToRecyclerView(recyclerView)
 
