@@ -33,7 +33,12 @@ class EntryViewHolder(
         countText.text = counter.count.toString()
         val lastEditDate = counter.lastEdit
         if (lastEditDate != null) {
-            lastEditText.text = DateUtils.getRelativeTimeSpanString(lastEditDate.time)
+            lastEditText.text = DateUtils.getRelativeDateTimeString(
+                itemView.context,
+                lastEditDate.time,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.WEEK_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE or DateUtils.FORMAT_NUMERIC_DATE)
             undoButton.isEnabled = true
         } else {
             lastEditText.setText(R.string.never)
