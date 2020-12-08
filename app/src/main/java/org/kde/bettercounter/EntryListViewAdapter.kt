@@ -20,7 +20,7 @@ import kotlin.coroutines.CoroutineContext
 class EntryListViewAdapter(
     private var activity: AppCompatActivity,
     private var viewModel: ViewModel,
-    private var onItemClickListener: (c : Counter) -> Unit
+    private var onItemClickListener: (pos : Int, counter : Counter) -> Unit
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback,
     CoroutineScope {
 
@@ -48,7 +48,7 @@ class EntryListViewAdapter(
         view.setOnClickListener {
             val counter = holder.counter
             if (counter != null) {
-                onItemClickListener(counter)
+                onItemClickListener(counters.indexOf(counter.name), counter)
             }
         }
         return holder

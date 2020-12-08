@@ -1,7 +1,7 @@
 package org.kde.bettercounter
 
 import android.os.Bundle
-import android.view.*
+import android.view.View
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
@@ -10,9 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
@@ -37,12 +38,45 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        graph = findViewById(R.id.graph)
-        val bottomSheetBehavior = BottomSheetBehavior.from(graph)
-
         viewModel = ViewModelProvider(this).get(ViewModel::class.java)
 
-        val fab = findViewById<FloatingActionButton>(R.id.fab)
+
+        // Views
+        // -------------
+
+        val fab : FloatingActionButton = findViewById(R.id.fab)
+        val recyclerView : RecyclerView = findViewById(R.id.recycler)
+        graph = findViewById(R.id.graph)
+
+
+        // Bottom sheet with graph
+        // -----------------------
+
+        val sheetBehavior : BottomSheetBehavior<GraphView> = BottomSheetBehavior.from(graph)
+        sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        var sheetIsExpanding = false
+        var sheetFoldedPadding = recyclerView.paddingBottom; // padding so the fab is in view
+        var sheetUnfoldedPadding = graph.layoutParams.height + 50; // padding to fit the bottomSheet
+
+        sheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == STATE_EXPANDED) {
+                    sheetIsExpanding = false;
+                }
+            }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                if (!sheetIsExpanding) { // only do this when collapsing. when expanding we set the final padding at once so smoothScrollToPosition can do its job
+                    var bottomPadding = sheetFoldedPadding + ((1.0 + slideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
+                    recyclerView.setPadding(0, 0, 0, bottomPadding)
+                }
+            }
+        })
+
+
+        // Create counter dialog
+        // ---------------------
+
         fab.setOnClickListener { view ->
             fab.visibility = View.GONE
             val editView = layoutInflater.inflate(R.layout.edit_counter, null)
@@ -70,16 +104,20 @@ class MainActivity : AppCompatActivity() {
                 .show()
         }
 
-        val recyclerView = findViewById<RecyclerView>(R.id.recycler)
-        val entryViewAdapter = EntryListViewAdapter(
-            this,
-            viewModel
-        ) {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        // Counter list
+        // ------------
+
+        val entryViewAdapter = EntryListViewAdapter(this, viewModel)
+        { position: Int, counter: Counter ->
             viewModel.viewModelScope.launch(Dispatchers.IO) {
-                val entries = viewModel.getAllEntriesInCounterInterval(it.name)
+                val entries = viewModel.getAllEntriesInCounterInterval(counter.name)
                 runOnUiThread {
-                    showGraph(it, entries)
+                    updateGraphForCounter(counter, entries)
+                    sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    sheetIsExpanding = true
+                    recyclerView.setPadding(0, 0, 0, sheetUnfoldedPadding)
+                    recyclerView.smoothScrollToPosition(position)
                 }
             }
         }
@@ -90,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun showGraph(c: Counter, entries: List<Entry>) {
+    fun updateGraphForCounter(c: Counter, entries: List<Entry>) {
         graph.title = c.name
         val series = mutableListOf<DataPoint>()
         for (entry in entries) {
