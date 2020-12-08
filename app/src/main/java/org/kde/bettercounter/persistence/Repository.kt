@@ -42,6 +42,7 @@ class Repository(
     }
 
     fun setCounterInterval(name : String, interval : Interval) {
+        counterCache.remove(name)
         val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
         sharedPref.edit().putString(key, interval.toString()).apply()
     }
