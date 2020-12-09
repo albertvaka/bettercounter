@@ -79,27 +79,11 @@ class MainActivity : AppCompatActivity() {
 
         fab.setOnClickListener { view ->
             fab.visibility = View.GONE
-            val editView = layoutInflater.inflate(R.layout.edit_counter, null)
-            val spinner = editView.findViewById<Spinner>(R.id.interval_spinner)
-            val intervalAdapter = IntervalAdapter(this)
-            spinner.adapter = intervalAdapter
-            AlertDialog.Builder(view.context)
-                .setView(editView)
-                .setTitle(R.string.add_counter)
-                .setPositiveButton(R.string.save) { _, _ ->
-                    val name = editView.findViewById<EditText>(R.id.text_edit).text.toString()
-                    if (name.isBlank()) {
-                        Toast.makeText(this, R.string.name_cant_be_blank, Toast.LENGTH_LONG).show()
-                    } else if (viewModel.counterExists(name)) {
-                        Toast.makeText(this, R.string.already_exists, Toast.LENGTH_LONG).show()
-                    } else {
-                        viewModel.addCounter(
-                            name,
-                            intervalAdapter.itemAt(spinner.selectedItemPosition)
-                        )
-                    }
+            CounterSettingsDialogBuilder(this@MainActivity, viewModel)
+                .forNewCounter()
+                .setOnSaveListener { name, interval ->
+                    viewModel.addCounter(name, interval)
                 }
-                .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
                 .setOnDismissListener { fab.visibility = View.VISIBLE }
                 .show()
         }

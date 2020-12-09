@@ -93,16 +93,6 @@ class EntryListViewAdapter(
     fun editCounter(position: Int, newName: String, interval : Interval) {
         val oldName = counters[position]
         if (oldName != newName) {
-            if (newName.isBlank()) {
-                Toast.makeText(activity, R.string.name_cant_be_blank, Toast.LENGTH_LONG).show()
-                notifyItemChanged(position)
-                return
-            }
-            if (viewModel.counterExists(newName)) {
-                Toast.makeText(activity, R.string.already_exists, Toast.LENGTH_LONG).show()
-                notifyItemChanged(position)
-                return
-            }
             counters[position] = newName
             viewModel.renameCounter(oldName, newName)
             viewModel.saveCounterOrder(counters)
@@ -134,30 +124,19 @@ class EntryListViewAdapter(
     }
 
     override fun onSwipe(position: Int) {
-        val editView = inflater.inflate(R.layout.edit_counter, null)
-        val textEdit = editView.findViewById<EditText>(R.id.text_edit)
-        val spinner = editView.findViewById<Spinner>(R.id.interval_spinner)
-
         val name = counters[position]
         val interval = viewModel.getCounterInterval(name)
-
-        textEdit.setText(name)
-        val intervalAdapter = IntervalAdapter(activity)
-        spinner.adapter = intervalAdapter
-        spinner.setSelection(intervalAdapter.positionOf(interval))
-
-        editView.findViewById<EditText>(R.id.text_edit).text.toString()
-        AlertDialog.Builder(activity)
-            .setTitle(R.string.edit_counter)
-            .setView(editView)
-            .setPositiveButton(R.string.save) { _, _ -> editCounter(
-                position,
-                textEdit.text.toString(),
-                intervalAdapter.itemAt(spinner.selectedItemPosition)
-            ) }
-            .setNeutralButton(R.string.delete) { _, _ -> removeItem(position); }
-            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
-            .setOnCancelListener { notifyItemChanged(position) } // This cancels the swipe animation
+        CounterSettingsDialogBuilder(activity, viewModel)
+            .forExistingCounter(name, interval)
+            .setOnSaveListener { newName, newInterval ->
+                editCounter(position, newName, newInterval)
+            }
+            .setOnCancelListener { _, _ ->
+                notifyItemChanged(position)
+            }
+            .setOnDeleteListener { _, _ ->
+                removeItem(position);
+            }
             .show()
     }
 
