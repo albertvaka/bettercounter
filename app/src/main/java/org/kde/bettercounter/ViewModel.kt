@@ -14,8 +14,12 @@ import kotlin.collections.HashMap
 
 class ViewModel(application: Application) : AndroidViewModel(application) {
 
+    fun interface CounterAddedObserver {
+        fun onCounterAdded(name: String, isUserCreated : Boolean)
+    }
+
     private val repo : Repository
-    private val addCounterObservers = HashMap<LifecycleOwner, Observer<String>>()
+    private val addCounterObservers = HashMap<LifecycleOwner, CounterAddedObserver>()
     private val counterMap = HashMap<String, MutableLiveData<Counter>>()
 
     init {
@@ -27,7 +31,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
             for (name in initialCounters) {
                 counterMap[name] = MutableLiveData(repo.getCounter(name)) // cache it
                 for ((_, observer) in addCounterObservers) {
-                    observer.onChanged(name)
+                    observer.onCounterAdded(name, false)
                 }
             }
         }
@@ -42,16 +46,16 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
             for ((_, observer) in addCounterObservers) {
                 counterMap[name] = MutableLiveData(repo.getCounter(name)) // cache it
                 withContext(Dispatchers.Main) {
-                    observer.onChanged(name)
+                    observer.onCounterAdded(name, true)
                 }
             }
         }
     }
 
-    fun observeNewCounter(owner : LifecycleOwner, observer: Observer<String>) {
+    fun observeNewCounter(owner : LifecycleOwner, observer: CounterAddedObserver) {
         addCounterObservers[owner] = observer
         for (name in counterMap.keys) { //notify the ones we already have
-            observer.onChanged(name)
+            observer.onCounterAdded(name, false)
         }
     }
 

@@ -12,9 +12,10 @@ import java.util.*
 class EntryListViewAdapter(
     private var activity: AppCompatActivity,
     private var viewModel: ViewModel,
-    private var onItemClickListener: (pos : Int, counter : Counter) -> Unit
+    private var onItemClickListener: (pos : Int, counter : Counter) -> Unit,
+    private var onItemAdded: (pos : Int) -> Unit
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback
-     {
+{
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)
     private var counters: MutableList<String> = mutableListOf()
@@ -22,12 +23,16 @@ class EntryListViewAdapter(
     override fun getItemCount(): Int = counters.size
 
     init {
-        viewModel.observeNewCounter(activity, { newCounter ->
-            counters.add(newCounter)
+        viewModel.observeNewCounter(activity, { counterName, isUserAdded ->
+            counters.add(counterName)
             activity.runOnUiThread {
-                notifyItemInserted(counters.size - 1)
-                viewModel.getCounter(newCounter)?.observe(activity) {
+                val position = counters.size - 1
+                notifyItemInserted(position)
+                viewModel.getCounter(counterName)!!.observe(activity) {
                     notifyItemChanged(counters.indexOf(it.name), Unit) // passing a second parameter disables the disappear+appear animation
+                }
+                if (isUserAdded) {
+                    onItemAdded(position)
                 }
             }
         })

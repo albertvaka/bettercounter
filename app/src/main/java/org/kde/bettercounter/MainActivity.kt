@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         // Create counter dialog
         // ---------------------
 
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
             fab.visibility = View.GONE
             CounterSettingsDialogBuilder(this@MainActivity, viewModel)
                 .forNewCounter()
@@ -87,8 +87,7 @@ class MainActivity : AppCompatActivity() {
         // Counter list
         // ------------
 
-        val entryViewAdapter = EntryListViewAdapter(this, viewModel)
-        { position: Int, counter: Counter ->
+        val entryViewAdapter = EntryListViewAdapter(this, viewModel, { position: Int, counter: Counter ->
             viewModel.viewModelScope.launch(Dispatchers.IO) {
                 val entries = viewModel.getAllEntriesInCounterInterval(counter.name)
                 runOnUiThread {
@@ -101,7 +100,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
+        }, { pos -> recyclerView.smoothScrollToPosition(pos) })
+
         recyclerView.adapter = entryViewAdapter
         recyclerView.layoutManager = HackyLayoutManager(this)
         val callback = DragAndSwipeTouchHelper(entryViewAdapter)
