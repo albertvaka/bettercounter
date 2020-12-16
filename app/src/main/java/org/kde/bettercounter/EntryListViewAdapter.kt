@@ -109,7 +109,7 @@ class EntryListViewAdapter(
                 notifyItemChanged(position) // moves the swiped item back to its place
             }
             .setOnDeleteListener { _, _ ->
-                removeItem(position);
+                removeItem(position)
             }
             .show()
     }

@@ -51,18 +51,18 @@ class MainActivity : AppCompatActivity() {
         sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         var sheetIsExpanding = false
-        var sheetFoldedPadding = recyclerView.paddingBottom; // padding so the fab is in view
-        var sheetUnfoldedPadding = graph.layoutParams.height + 50; // padding to fit the bottomSheet
+        val sheetFoldedPadding = recyclerView.paddingBottom // padding so the fab is in view
+        val sheetUnfoldedPadding = graph.layoutParams.height + 50 // padding to fit the bottomSheet
 
         sheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    sheetIsExpanding = false;
+                    sheetIsExpanding = false
                 }
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 if (!sheetIsExpanding) { // only do this when collapsing. when expanding we set the final padding at once so smoothScrollToPosition can do its job
-                    var bottomPadding = sheetFoldedPadding + ((1.0 + slideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
+                    val bottomPadding = sheetFoldedPadding + ((1.0 + slideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
                     recyclerView.setPadding(0, 0, 0, bottomPadding)
                 }
             }
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun updateGraphForCounter(c: Counter, entries: List<Entry>) {
+    private fun updateGraphForCounter(c: Counter, entries: List<Entry>) {
         graph.title = c.name
         val series = mutableListOf<DataPoint>()
         for (entry in entries) {
