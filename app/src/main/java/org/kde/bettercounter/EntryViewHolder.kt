@@ -1,13 +1,8 @@
 package org.kde.bettercounter
 
-import android.text.format.DateUtils
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.boilerplate.BetterRelativeTimeTextView
 import org.kde.bettercounter.persistence.Counter
@@ -16,7 +11,7 @@ import org.kde.bettercounter.persistence.Counter
 class EntryViewHolder(
     view: View,
     private var viewModel: ViewModel
-) : RecyclerView.ViewHolder(view), LifecycleOwner {
+) : RecyclerView.ViewHolder(view) {
 
     private val countText: TextView = view.findViewById(R.id.count)
     private val nameText: TextView = view.findViewById(R.id.name)
@@ -41,13 +36,5 @@ class EntryViewHolder(
             timestampText.setText(R.string.never)
             undoButton.isEnabled = false
         }
-    }
-
-    private var lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
-    init {
-        lifecycleRegistry.currentState = Lifecycle.State.STARTED
-    }
-    override fun getLifecycle(): Lifecycle {
-        return lifecycleRegistry
     }
 }
