@@ -30,14 +30,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
                     observer.onChanged(name)
                 }
             }
-
-            // periodically refresh Counter livedatas, so the UI updates the "x time ago" texts
-            while(this.isActive) { // will stop when the viewmodel is cleared
-                delay(10 * 1000) // 10 seconds
-                for (name in repo.getCounterList()) {
-                    counterMap[name]?.postValue(repo.getCounter(name))
-                }
-            }
         }
     }
 

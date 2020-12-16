@@ -9,6 +9,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.recyclerview.widget.RecyclerView
+import org.kde.bettercounter.boilerplate.BetterRelativeTimeTextView
 import org.kde.bettercounter.persistence.Counter
 
 
@@ -19,7 +20,7 @@ class EntryViewHolder(
 
     private val countText: TextView = view.findViewById(R.id.count)
     private val nameText: TextView = view.findViewById(R.id.name)
-    private val lastEditText : TextView = view.findViewById(R.id.last_edit)
+    private val timestampText : BetterRelativeTimeTextView = view.findViewById(R.id.timestamp)
     private val increaseButton: ImageButton = view.findViewById(R.id.btn_increase)
     private val undoButton: ImageButton = view.findViewById(R.id.btn_undo)
 
@@ -33,15 +34,11 @@ class EntryViewHolder(
         countText.text = counter.count.toString()
         val lastEditDate = counter.lastEdit
         if (lastEditDate != null) {
-            lastEditText.text = DateUtils.getRelativeDateTimeString(
-                itemView.context,
-                lastEditDate.time,
-                DateUtils.MINUTE_IN_MILLIS,
-                DateUtils.WEEK_IN_MILLIS,
-                DateUtils.FORMAT_ABBREV_RELATIVE or DateUtils.FORMAT_NUMERIC_DATE)
+            timestampText.setReferenceTime(lastEditDate.time)
             undoButton.isEnabled = true
         } else {
-            lastEditText.setText(R.string.never)
+            timestampText.setReferenceTime(-1L)
+            timestampText.setText(R.string.never)
             undoButton.isEnabled = false
         }
     }
