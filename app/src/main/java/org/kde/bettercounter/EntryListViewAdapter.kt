@@ -11,11 +11,11 @@ import java.util.*
 
 class EntryListViewAdapter(
     private var activity: AppCompatActivity,
-    private var viewModel: ViewModel,
-    private var onItemClickListener: (pos : Int, counter : Counter) -> Unit,
-    private var onItemAdded: (pos : Int) -> Unit
+    private var viewModel: ViewModel
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback
 {
+    var onItemClickListener: ((Int, Counter) -> Unit)? = null
+    var onItemAdded: ((Int) -> Unit)? = null
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)
     private var counters: MutableList<String> = mutableListOf()
@@ -32,7 +32,7 @@ class EntryListViewAdapter(
                     notifyItemChanged(counters.indexOf(it.name), Unit) // passing a second parameter disables the disappear+appear animation
                 }
                 if (isUserAdded) {
-                    onItemAdded(position)
+                    onItemAdded?.invoke(position)
                 }
             }
         })
@@ -44,7 +44,7 @@ class EntryListViewAdapter(
         view.setOnClickListener {
             val counter = holder.counter
             if (counter != null) {
-                onItemClickListener(counters.indexOf(counter.name), counter)
+                onItemClickListener?.invoke(counters.indexOf(counter.name), counter)
             }
         }
         return holder

@@ -87,7 +87,9 @@ class MainActivity : AppCompatActivity() {
         // Counter list
         // ------------
 
-        val entryViewAdapter = EntryListViewAdapter(this, viewModel, { position: Int, counter: Counter ->
+        val entryViewAdapter = EntryListViewAdapter(this, viewModel)
+        entryViewAdapter.onItemAdded = { pos -> recyclerView.smoothScrollToPosition(pos) }
+        entryViewAdapter.onItemClickListener = { position: Int, counter: Counter ->
             viewModel.viewModelScope.launch(Dispatchers.IO) {
                 val entries = viewModel.getAllEntriesInCounterInterval(counter.name)
                 runOnUiThread {
@@ -100,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        }, { pos -> recyclerView.smoothScrollToPosition(pos) })
+        }
 
         recyclerView.adapter = entryViewAdapter
         recyclerView.layoutManager = HackyLayoutManager(this)
