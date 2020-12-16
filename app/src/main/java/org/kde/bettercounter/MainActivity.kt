@@ -92,11 +92,13 @@ class MainActivity : AppCompatActivity() {
             viewModel.viewModelScope.launch(Dispatchers.IO) {
                 val entries = viewModel.getAllEntriesInCounterInterval(counter.name)
                 runOnUiThread {
-                    updateGraphForCounter(counter, entries)
-                    sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    sheetIsExpanding = true
-                    recyclerView.setPadding(0, 0, 0, sheetUnfoldedPadding)
-                    recyclerView.smoothScrollToPosition(position)
+                    if (BuildConfig.DEBUG) {
+                        updateGraphForCounter(counter, entries)
+                        sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                        sheetIsExpanding = true
+                        recyclerView.setPadding(0, 0, 0, sheetUnfoldedPadding)
+                        recyclerView.smoothScrollToPosition(position)
+                    }
                 }
             }
         }
