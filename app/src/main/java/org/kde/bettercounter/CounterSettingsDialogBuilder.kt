@@ -1,9 +1,7 @@
 package org.kde.bettercounter
 
-import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.os.CancellationSignal
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.Spinner

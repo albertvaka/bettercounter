@@ -2,10 +2,6 @@ package org.kde.bettercounter
 
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -13,7 +9,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
@@ -61,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         sheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == STATE_EXPANDED) {
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     sheetIsExpanding = false;
                 }
             }

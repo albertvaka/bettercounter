@@ -1,7 +1,6 @@
 package org.kde.bettercounter.persistence
 
 import android.content.SharedPreferences
-import android.util.Log
 import org.kde.bettercounter.boilerplate.Converters
 import java.util.Calendar
 

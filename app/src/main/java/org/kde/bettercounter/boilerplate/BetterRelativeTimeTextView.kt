@@ -5,7 +5,6 @@ import android.text.format.DateUtils
 import android.util.AttributeSet
 import com.github.curioustechizen.ago.RelativeTimeTextView
 import org.kde.bettercounter.R
-import kotlin.math.abs
 
 internal class BetterRelativeTimeTextView : RelativeTimeTextView {
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
