@@ -54,13 +54,8 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
         return this
     }
 
-    fun setOnDismissListener(onDismissListener: DialogInterface.OnDismissListener): CounterSettingsDialogBuilder {
-        builder.setOnDismissListener(onDismissListener)
-        return this
-    }
-
-    fun setOnCancelListener(onClickListener: DialogInterface.OnClickListener): CounterSettingsDialogBuilder {
-        builder.setNegativeButton(R.string.cancel, onClickListener)
+    fun setOnDismissListener(onClickListener: DialogInterface.OnDismissListener): CounterSettingsDialogBuilder {
+        builder.setOnDismissListener(onClickListener)
         return this
     }
 

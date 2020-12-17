@@ -72,7 +72,8 @@ class EntryListViewAdapter(
             viewModel.saveCounterOrder(counters)
         }
         viewModel.setCounterInterval(newName, interval)
-        notifyItemChanged(position) // moves the swiped item back to its place. Note the data updates async, when that's ready we get notified separately.
+        // The counter updates async, when the update is done we will get notified through the counter's livedata
+
     }
 
     override fun onMove(fromPosition: Int, toPosition: Int) {
@@ -105,8 +106,8 @@ class EntryListViewAdapter(
             .setOnSaveListener { newName, newInterval ->
                 editCounter(position, newName, newInterval)
             }
-            .setOnCancelListener { _, _ ->
-                notifyItemChanged(position) // moves the swiped item back to its place
+            .setOnDismissListener {
+                notifyItemChanged(position) // moves the swiped item back to its place.
             }
             .setOnDeleteListener { _, _ ->
                 removeItem(position)
