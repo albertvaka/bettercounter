@@ -10,8 +10,8 @@ android {
         applicationId "org.kde.bettercounter"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 10101
-        versionName "1.1.1"
+        versionCode 10200
+        versionName "1.2"
 
         //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
