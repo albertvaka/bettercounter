@@ -29,10 +29,10 @@ class EntryViewHolder(
         countText.text = counter.count.toString()
         val lastEditDate = counter.lastEdit
         if (lastEditDate != null) {
-            timestampText.setReferenceTime(lastEditDate.time)
+            timestampText.referenceTime = lastEditDate.time
             undoButton.isEnabled = true
         } else {
-            timestampText.setReferenceTime(-1L)
+            timestampText.referenceTime = -1L
             timestampText.setText(R.string.never)
             undoButton.isEnabled = false
         }
