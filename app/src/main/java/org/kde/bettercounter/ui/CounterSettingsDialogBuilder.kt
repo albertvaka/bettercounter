@@ -1,4 +1,4 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui
 
 import android.content.Context
 import android.content.DialogInterface
@@ -7,6 +7,9 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import org.kde.bettercounter.IntervalAdapter
+import org.kde.bettercounter.R
+import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.persistence.Interval
 
 class CounterSettingsDialogBuilder(private val context : Context, private val viewModel : ViewModel) {

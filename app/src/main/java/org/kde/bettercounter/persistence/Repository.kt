@@ -82,7 +82,7 @@ class Repository(
     }
 
     fun getAllEntriesInCounterInterval(name : String): List<Entry> {
-        var interval = getCounterInterval(name)
+        val interval = getCounterInterval(name)
         return entryDao.getAllEntriesSince(name, interval.toDate())
     }
 }

@@ -1,4 +1,4 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui
 
 import android.os.Bundle
 import android.view.View
@@ -15,6 +15,10 @@ import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.kde.bettercounter.BuildConfig
+import org.kde.bettercounter.EntryListViewAdapter
+import org.kde.bettercounter.R
+import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.boilerplate.HackyLayoutManager
 import org.kde.bettercounter.persistence.Counter

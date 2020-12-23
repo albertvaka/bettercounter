@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.persistence.Counter
 import org.kde.bettercounter.persistence.Interval
+import org.kde.bettercounter.ui.CounterSettingsDialogBuilder
+import org.kde.bettercounter.ui.EntryViewHolder
 import java.util.*
 
 class EntryListViewAdapter(
