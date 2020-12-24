@@ -25,23 +25,6 @@ class StatsCalculator(private val context : Context) {
         }
     }
 
-    private fun getOldestEntryTime(intervalEntries: List<Entry>) : Long {
-        var oldest = System.currentTimeMillis()
-        for (entry in intervalEntries) {
-            val time = entry.date.time
-            if (time < oldest) {
-                oldest = time
-            }
-        }
-        return oldest
-    }
-
-    private fun daysSince(time: Long): Float {
-        val deltaTimeMillis = System.currentTimeMillis()-time
-        val millisPerDayFloat = (1000*60*60*24).toFloat()
-        return deltaTimeMillis/millisPerDayFloat
-    }
-
     fun getDaily(intervalEntries: List<Entry>): CharSequence {
         if (intervalEntries.isEmpty()) return context.getString(R.string.no_data)
         return getPerHour(intervalEntries.size, 24f)
@@ -73,6 +56,26 @@ class StatsCalculator(private val context : Context) {
         val oldestEntryTime = getOldestEntryTime(intervalEntries)
         val deltaDays = daysSince(oldestEntryTime)
         return getPerDay(intervalEntries.size, ceil(deltaDays))
+    }
+
+    companion object {
+        fun getOldestEntryTime(intervalEntries: List<Entry>): Long {
+            var oldest = System.currentTimeMillis()
+            for (entry in intervalEntries) {
+                val time = entry.date.time
+                if (time < oldest) {
+                    oldest = time
+                }
+            }
+            return oldest
+        }
+
+        private fun daysSince(time: Long): Float {
+            val deltaTimeMillis = System.currentTimeMillis()-time
+            val millisPerDayFloat = (1000*60*60*24).toFloat()
+            return deltaTimeMillis/millisPerDayFloat
+        }
+
     }
 
 }
