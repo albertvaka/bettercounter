@@ -73,6 +73,11 @@ class BetterChart : BarChart {
 
     fun setDailyData(intervalEntries: List<Entry>) {
 
+        if (intervalEntries.isEmpty()) {
+            setBarEntries(listOf())
+            return
+        }
+
         val millisInHour = 60*60*1000L
         val nowHour = System.currentTimeMillis()/millisInHour
 
