@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
-import org.kde.bettercounter.persistence.Counter
+import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.ui.CounterSettingsDialogBuilder
 import org.kde.bettercounter.ui.EntryViewHolder
@@ -16,7 +16,7 @@ class EntryListViewAdapter(
     private var viewModel: ViewModel
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback
 {
-    var onItemClickListener: ((Int, Counter) -> Unit)? = null
+    var onItemClickListener: ((Int, CounterSummary) -> Unit)? = null
     var onItemAdded: ((Int) -> Unit)? = null
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)
@@ -30,7 +30,7 @@ class EntryListViewAdapter(
             activity.runOnUiThread {
                 val position = counters.size - 1
                 notifyItemInserted(position)
-                viewModel.getCounter(counterName)!!.observe(activity) {
+                viewModel.getCounterSummary(counterName).observe(activity) {
                     notifyItemChanged(counters.indexOf(it.name), Unit) // passing a second parameter disables the disappear+appear animation
                 }
                 if (isUserAdded) {
@@ -53,7 +53,7 @@ class EntryListViewAdapter(
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
-        val counter = viewModel.getCounter(counters[position])?.value
+        val counter = viewModel.getCounterSummary(counters[position]).value
         if (counter != null) {
             holder.onBind(counter)
         }

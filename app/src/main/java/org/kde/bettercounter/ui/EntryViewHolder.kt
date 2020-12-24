@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
-import org.kde.bettercounter.persistence.Counter
+import org.kde.bettercounter.persistence.CounterSummary
 
 
 class EntryViewHolder(
@@ -20,9 +20,9 @@ class EntryViewHolder(
     private val increaseButton: ImageButton = view.findViewById(R.id.btn_increase)
     private val undoButton: ImageButton = view.findViewById(R.id.btn_undo)
 
-    var counter : Counter? = null
+    var counter : CounterSummary? = null
 
-    fun onBind(counter: Counter) {
+    fun onBind(counter: CounterSummary) {
         this.counter = counter
         increaseButton.setOnClickListener { viewModel.incrementCounter(counter.name) }
         undoButton.setOnClickListener { viewModel.decrementCounter(counter.name) }

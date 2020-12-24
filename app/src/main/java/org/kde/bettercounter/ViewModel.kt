@@ -17,8 +17,8 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repo : Repository
     private val addCounterObservers = HashMap<LifecycleOwner, CounterAddedObserver>()
-    private val counterMap = HashMap<String, MutableLiveData<Counter>>()
-    private val entriesMap = HashMap<String, MutableLiveData<CounterEntries>>()
+    private val counterMap = HashMap<String, MutableLiveData<CounterSummary>>()
+    private val entriesMap = HashMap<String, MutableLiveData<CounterDetails>>()
 
     init {
         val db  = AppDatabase.getInstance(application)
@@ -27,7 +27,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         val initialCounters = repo.getCounterList()
         viewModelScope.launch(Dispatchers.IO) {
             for (name in initialCounters) {
-                counterMap[name] = MutableLiveData(repo.getCounter(name)) // cache it
+                counterMap[name] = MutableLiveData(repo.getCounterSummary(name)) // cache it
                 for ((_, observer) in addCounterObservers) {
                     observer.onCounterAdded(name, false)
                 }
@@ -42,7 +42,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         repo.setCounterInterval(name, interval)
         viewModelScope.launch(Dispatchers.IO) {
             for ((_, observer) in addCounterObservers) {
-                counterMap[name] = MutableLiveData(repo.getCounter(name)) // cache it
+                counterMap[name] = MutableLiveData(repo.getCounterSummary(name)) // cache it
                 withContext(Dispatchers.Main) {
                     observer.onCounterAdded(name, true)
                 }
@@ -63,13 +63,13 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
             val counter = counterMap.remove(oldName)
             if (counter != null) {
                 counterMap[newName] = counter
-                counter.postValue(repo.getCounter(newName))
+                counter.postValue(repo.getCounterSummary(newName))
             }
 
             val entries = entriesMap.remove(oldName)
             if (entries != null) {
                 entriesMap[newName] = entries
-                entries.postValue(repo.getAllEntriesInCounterInterval(newName))
+                entries.postValue(repo.getCounterDetails(newName))
             }
         }
     }
@@ -77,16 +77,16 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun incrementCounter(name : String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.addEntry(name)
-            counterMap[name]?.postValue(repo.getCounter(name))
-            entriesMap[name]?.postValue(repo.getAllEntriesInCounterInterval(name))
+            counterMap[name]?.postValue(repo.getCounterSummary(name))
+            entriesMap[name]?.postValue(repo.getCounterDetails(name))
         }
     }
 
     fun decrementCounter(name : String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.removeEntry(name)
-            counterMap[name]?.postValue(repo.getCounter(name))
-            entriesMap[name]?.postValue(repo.getAllEntriesInCounterInterval(name))
+            counterMap[name]?.postValue(repo.getCounterSummary(name))
+            entriesMap[name]?.postValue(repo.getCounterDetails(name))
         }
     }
 
@@ -97,13 +97,13 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun setCounterInterval(name : String, interval : Interval) {
         repo.setCounterInterval(name, interval)
         viewModelScope.launch(Dispatchers.IO) {
-            counterMap[name]?.postValue(repo.getCounter(name))
-            entriesMap[name]?.postValue(repo.getAllEntriesInCounterInterval(name))
+            counterMap[name]?.postValue(repo.getCounterSummary(name))
+            entriesMap[name]?.postValue(repo.getCounterDetails(name))
         }
     }
 
-    fun getCounter(name : String) : LiveData<Counter>? {
-        return counterMap[name]
+    fun getCounterSummary(name : String) : LiveData<CounterSummary> {
+        return counterMap[name]!!
     }
 
     fun counterExists(name: String): Boolean = repo.getCounterList().contains(name)
@@ -116,12 +116,12 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getAllEntriesInCounterInterval(name : String) : LiveData<CounterEntries> {
+    fun getCounterDetails(name : String) : LiveData<CounterDetails> {
         var liveData = entriesMap[name]
         if (liveData == null) {
             liveData = MutableLiveData()
             viewModelScope.launch(Dispatchers.IO) {
-                liveData.postValue(repo.getAllEntriesInCounterInterval(name))
+                liveData.postValue(repo.getCounterDetails(name))
             }
         }
         entriesMap[name] = liveData

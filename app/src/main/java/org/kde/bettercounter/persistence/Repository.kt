@@ -13,7 +13,7 @@ class Repository(
 ) {
 
     private var counters : List<String>
-    private var counterCache = HashMap<String, Counter>()
+    private var counterCache = HashMap<String, CounterSummary>()
 
     init {
         val jsonStr = sharedPref.getString(COUNTERS_PREFS_KEY, "[]")
@@ -46,10 +46,10 @@ class Repository(
         sharedPref.edit().putString(key, interval.toString()).apply()
     }
 
-    suspend fun getCounter(name : String): Counter {
+    suspend fun getCounterSummary(name : String): CounterSummary {
         val interval = getCounterInterval(name)
         return counterCache.getOrPut(name, {
-            Counter(
+            CounterSummary(
                 name = name,
                 count = entryDao.getCountSince(name, interval.toDate()),
                 interval = interval,
@@ -81,9 +81,9 @@ class Repository(
         entryDao.deleteAll(name)
     }
 
-    fun getAllEntriesInCounterInterval(name : String): CounterEntries {
+    fun getCounterDetails(name : String): CounterDetails {
         val interval = getCounterInterval(name)
         val entries = entryDao.getAllEntriesSince(name, interval.toDate())
-        return CounterEntries(name, interval, entries)
+        return CounterDetails(name, interval, entries)
     }
 }
