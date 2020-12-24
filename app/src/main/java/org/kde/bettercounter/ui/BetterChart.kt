@@ -111,4 +111,23 @@ class BetterChart : BarChart {
         setBarEntries(series)
     }
 
+    fun setWeeklyData(intervalEntries: List<Entry>) {
+
+    }
+
+    fun setMonthlyData(intervalEntries: List<Entry>) {
+
+    }
+
+    fun setYearlyData(intervalEntries: List<Entry>) {
+
+    }
+
+    fun setYtdData(intervalEntries: List<Entry>) {
+
+    }
+
+    fun setLifetimeData(intervalEntries: List<Entry>) {
+
+    }
 }

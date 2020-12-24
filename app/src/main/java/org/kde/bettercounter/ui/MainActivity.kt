@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import org.kde.bettercounter.EntryListViewAdapter
+import org.kde.bettercounter.R
+import org.kde.bettercounter.StatsCalculator
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.boilerplate.HackyLayoutManager
@@ -23,8 +25,8 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ViewModel
-
     private lateinit var binding: ActivityMainBinding
+    private var statsCalculator = StatsCalculator(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,11 +124,35 @@ class MainActivity : AppCompatActivity() {
     private fun updateChartSheet(counter: CounterDetails) {
         when (counter.interval) {
             Interval.DAY -> {
-                binding.chartTitle.text = counter.name + " (last 24h)"
-                binding.chartAverage.text = "Average: 3.3 times/hour"
+                binding.chartTitle.text = getString(R.string.chart_title_daily, counter.name)
+                binding.chartAverage.text = statsCalculator.getDaily(counter.intervalEntries)
                 binding.chart.setDailyData(counter.intervalEntries)
             }
-            //...
+            Interval.WEEK -> {
+                binding.chartTitle.text = getString(R.string.chart_title_weekly, counter.name)
+                binding.chartAverage.text = statsCalculator.getWeekly(counter.intervalEntries)
+                binding.chart.setWeeklyData(counter.intervalEntries)
+            }
+            Interval.MONTH -> {
+                binding.chartTitle.text = getString(R.string.chart_title_monthly, counter.name)
+                binding.chartAverage.text = statsCalculator.getMonthly(counter.intervalEntries)
+                binding.chart.setMonthlyData(counter.intervalEntries)
+            }
+            Interval.YEAR -> {
+                binding.chartTitle.text = getString(R.string.chart_title_yearly, counter.name)
+                binding.chartAverage.text = statsCalculator.getYearly(counter.intervalEntries)
+                binding.chart.setYearlyData(counter.intervalEntries)
+            }
+            Interval.YTD -> {
+                binding.chartTitle.text = getString(R.string.chart_title_ytd, counter.name)
+                binding.chartAverage.text = statsCalculator.getYtd(counter.intervalEntries)
+                binding.chart.setYtdData(counter.intervalEntries)
+            }
+            Interval.LIFETIME -> {
+                binding.chartTitle.text = getString(R.string.chart_title_lifetime, counter.name)
+                binding.chartAverage.text = statsCalculator.getLifetime(counter.intervalEntries)
+                binding.chart.setLifetimeData(counter.intervalEntries)
+            }
         }
     }
 
