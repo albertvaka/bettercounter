@@ -2,6 +2,7 @@ package org.kde.bettercounter.ui
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewTreeObserver
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -42,7 +43,13 @@ class MainActivity : AppCompatActivity() {
 
         var sheetIsExpanding = false
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
-        val sheetUnfoldedPadding = binding.bottomSheet.layoutParams.height + 50 // padding to fit the bottomSheet
+        var sheetUnfoldedPadding = 0  // padding to fit the bottomSheet. The height is not hardcoded, so we have wait to have it:
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                sheetUnfoldedPadding = binding.bottomSheet.height + 50
+                binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
 
         binding.chart.setup()
 
