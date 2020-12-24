@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
+import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.ui.CounterSettingsDialogBuilder
@@ -41,9 +42,9 @@ class EntryListViewAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
-        val view = inflater.inflate(R.layout.fragment_entry, parent, false)
-        val holder = EntryViewHolder(view, viewModel)
-        view.setOnClickListener {
+        val binding = FragmentEntryBinding.inflate(inflater, parent, false)
+        val holder = EntryViewHolder(binding, viewModel)
+        binding.root.setOnClickListener {
             val counter = holder.counter
             if (counter != null) {
                 onItemClickListener?.invoke(counters.indexOf(counter.name), counter)

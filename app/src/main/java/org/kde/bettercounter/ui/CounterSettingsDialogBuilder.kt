@@ -10,25 +10,22 @@ import androidx.appcompat.app.AlertDialog
 import org.kde.bettercounter.IntervalAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
+import org.kde.bettercounter.databinding.ActivityMainBinding
+import org.kde.bettercounter.databinding.EditCounterBinding
 import org.kde.bettercounter.persistence.Interval
 
 class CounterSettingsDialogBuilder(private val context : Context, private val viewModel : ViewModel) {
 
     private val builder : AlertDialog.Builder = AlertDialog.Builder(context)
-    private val spinner : Spinner
-    private var editText : EditText
+    private val binding : EditCounterBinding = EditCounterBinding.inflate(LayoutInflater.from(context))
     private val intervalAdapter = IntervalAdapter(context)
     private var onSaveListener: (name : String, Interval) -> Unit = { _, _ -> }
     private var previousName : String? = null
 
     init {
-        val editView = LayoutInflater.from(context).inflate(R.layout.edit_counter, null)
-        builder.setView(editView)
+        builder.setView(binding.root)
 
-        spinner = editView.findViewById(R.id.interval_spinner)
-        editText = editView.findViewById(R.id.text_edit)
-
-        spinner.adapter = intervalAdapter
+        binding.spinnerInterval.adapter = intervalAdapter
 
         builder.setPositiveButton(R.string.save, null)
         builder.setNegativeButton(R.string.cancel, null)
@@ -41,8 +38,8 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
 
     fun forExistingCounter(name : String, interval : Interval) : CounterSettingsDialogBuilder {
         builder.setTitle(R.string.edit_counter)
-        editText.setText(name)
-        spinner.setSelection(intervalAdapter.positionOf(interval))
+        binding.editText.setText(name)
+        binding.spinnerInterval.setSelection(intervalAdapter.positionOf(interval))
         previousName = name
         return this
     }
@@ -66,7 +63,7 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
         val dialog = builder.show()
         // Override the listener last (after showing) instead of passing it to setPositiveButton so we can decide when to dismiss the dialog
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            val name = editText.text.toString().trim()
+            val name = binding.editText.text.toString().trim()
             when {
                 name.isBlank() -> {
                     Toast.makeText(
@@ -83,7 +80,7 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
                     ).show()
                 }
                 else -> {
-                    onSaveListener(name, intervalAdapter.itemAt(spinner.selectedItemPosition))
+                    onSaveListener(name, intervalAdapter.itemAt(binding.spinnerInterval.selectedItemPosition))
                     dialog.dismiss()
                 }
             }

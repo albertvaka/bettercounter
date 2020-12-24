@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_height="wrap_content">
     <EditText
-        android:id="@+id/text_edit"
+        android:id="@+id/editText"
         android:inputType="text|textCapSentences"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
         android:importantForAutofill="no" />
 
     <Spinner
-        android:id="@+id/interval_spinner"
+        android:id="@+id/spinnerInterval"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"

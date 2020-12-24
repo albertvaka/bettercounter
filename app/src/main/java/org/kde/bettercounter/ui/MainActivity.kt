@@ -2,20 +2,17 @@ package org.kde.bettercounter.ui
 
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.kde.bettercounter.EntryListViewAdapter
-import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.boilerplate.HackyLayoutManager
+import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.CounterDetails
 import org.kde.bettercounter.persistence.Interval
@@ -26,40 +23,28 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ViewModel
 
-    private lateinit var chart : BetterChart
-    private lateinit var chartTitle : TextView
-    private lateinit var chartAverage : TextView
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+
 
         viewModel = ViewModelProvider(this).get(ViewModel::class.java)
-
-
-        // Views binding
-        // -------------
-
-        val fab : FloatingActionButton = findViewById(R.id.fab)
-        val recyclerView : RecyclerView = findViewById(R.id.recycler)
-        val bottomSheet : View = findViewById(R.id.bottomSheet)
-        chartTitle = findViewById(R.id.chartTitle)
-        chartAverage = findViewById(R.id.chartAverage)
-        chart = findViewById(R.id.chart)
-
 
         // Bottom sheet with graph
         // -----------------------
 
-        val sheetBehavior : BottomSheetBehavior<View> = BottomSheetBehavior.from(bottomSheet)
+        val sheetBehavior : BottomSheetBehavior<View> = BottomSheetBehavior.from(binding.bottomSheet)
         sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         var sheetIsExpanding = false
-        val sheetFoldedPadding = recyclerView.paddingBottom // padding so the fab is in view
-        val sheetUnfoldedPadding = bottomSheet.layoutParams.height + 50 // padding to fit the bottomSheet
+        val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
+        val sheetUnfoldedPadding = binding.bottomSheet.layoutParams.height + 50 // padding to fit the bottomSheet
 
-        chart.setup()
+        binding.chart.setup()
 
         sheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -72,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                 if (!sheetIsExpanding) { // only do this when collapsing. when expanding we set the final padding at once so smoothScrollToPosition can do its job
                     val bottomPadding =
                         sheetFoldedPadding + ((1.0 + slideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
-                    recyclerView.setPadding(0, 0, 0, bottomPadding)
+                    binding.recycler.setPadding(0, 0, 0, bottomPadding)
                 }
             }
         })
@@ -81,14 +66,14 @@ class MainActivity : AppCompatActivity() {
         // Create counter dialog
         // ---------------------
 
-        fab.setOnClickListener {
-            fab.visibility = View.GONE
+        binding.fab.setOnClickListener {
+            binding.fab.visibility = View.GONE
             CounterSettingsDialogBuilder(this@MainActivity, viewModel)
                 .forNewCounter()
                 .setOnSaveListener { name, interval ->
                     viewModel.addCounter(name, interval)
                 }
-                .setOnDismissListener { fab.visibility = View.VISIBLE }
+                .setOnDismissListener { binding.fab.visibility = View.VISIBLE }
                 .show()
         }
 
@@ -97,13 +82,13 @@ class MainActivity : AppCompatActivity() {
         // ------------
 
         val entryViewAdapter = EntryListViewAdapter(this, viewModel)
-        entryViewAdapter.onItemAdded = { pos -> recyclerView.smoothScrollToPosition(pos) }
+        entryViewAdapter.onItemAdded = { pos -> binding.recycler.smoothScrollToPosition(pos) }
         var currentChartLiveData : LiveData<CounterDetails>? = null
         entryViewAdapter.onItemClickListener = { position: Int, counter: CounterSummary ->
             sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             sheetIsExpanding = true
-            recyclerView.setPadding(0, 0, 0, sheetUnfoldedPadding)
-            recyclerView.smoothScrollToPosition(position)
+            binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
+            binding.recycler.smoothScrollToPosition(position)
 
             val liveData = viewModel.getCounterDetails(counter.name)
             currentChartLiveData?.removeObservers(this@MainActivity)
@@ -113,26 +98,26 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     updateChartSheet(it)
                     if (isChartFirstUpdate) {
-                        chart.animateY(200)
+                        binding.chart.animateY(200)
                         isChartFirstUpdate = false
                     }
                 }
             }
         }
 
-        recyclerView.adapter = entryViewAdapter
-        recyclerView.layoutManager = HackyLayoutManager(this)
+        binding.recycler.adapter = entryViewAdapter
+        binding.recycler.layoutManager = HackyLayoutManager(this)
         val callback = DragAndSwipeTouchHelper(entryViewAdapter)
-        ItemTouchHelper(callback).attachToRecyclerView(recyclerView)
+        ItemTouchHelper(callback).attachToRecyclerView(binding.recycler)
 
     }
 
     private fun updateChartSheet(counter: CounterDetails) {
         when (counter.interval) {
             Interval.DAY -> {
-                chartTitle.text = counter.name + " (last 24h)"
-                chartAverage.text = "Average: 3.3 times/hour"
-                chart.setDailyData(counter.intervalEntries)
+                binding.chartTitle.text = counter.name + " (last 24h)"
+                binding.chartAverage.text = "Average: 3.3 times/hour"
+                binding.chart.setDailyData(counter.intervalEntries)
             }
             //...
         }

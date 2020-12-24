@@ -9,7 +9,7 @@
     android:orientation="horizontal">
 
     <ImageButton
-        android:id="@+id/btn_undo"
+        android:id="@+id/undoButton"
         android:layout_width="@dimen/buttonWidth"
         android:layout_height="match_parent"
         style="?android:attr/buttonBarButtonStyle"
@@ -28,7 +28,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/name"
+            android:id="@+id/nameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -38,7 +38,7 @@
             tools:text="Potentially long thing" />
 
         <TextView
-            android:id="@+id/count"
+            android:id="@+id/countText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -48,7 +48,7 @@
             tools:text="0" />
 
         <org.kde.bettercounter.ui.BetterRelativeTimeTextView
-            android:id="@+id/timestamp"
+            android:id="@+id/timestampText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -64,7 +64,7 @@
     <View style="@style/Divider.Vertical"/>
 
     <ImageButton
-        android:id="@+id/btn_increase"
+        android:id="@+id/increaseButton"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="@dimen/buttonWidth"
         android:layout_height="match_parent"
