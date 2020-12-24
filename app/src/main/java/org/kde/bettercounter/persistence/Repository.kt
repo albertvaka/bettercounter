@@ -81,8 +81,9 @@ class Repository(
         entryDao.deleteAll(name)
     }
 
-    fun getAllEntriesInCounterInterval(name : String): List<Entry> {
+    fun getAllEntriesInCounterInterval(name : String): CounterEntries {
         val interval = getCounterInterval(name)
-        return entryDao.getAllEntriesSince(name, interval.toDate())
+        val entries = entryDao.getAllEntriesSince(name, interval.toDate())
+        return CounterEntries(name, interval, entries)
     }
 }

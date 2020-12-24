@@ -5,10 +5,7 @@ import android.content.Context
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import org.kde.bettercounter.boilerplate.AppDatabase
-import org.kde.bettercounter.persistence.Counter
-import org.kde.bettercounter.persistence.Entry
-import org.kde.bettercounter.persistence.Interval
-import org.kde.bettercounter.persistence.Repository
+import org.kde.bettercounter.persistence.*
 import kotlin.collections.HashMap
 
 
@@ -21,6 +18,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     private val repo : Repository
     private val addCounterObservers = HashMap<LifecycleOwner, CounterAddedObserver>()
     private val counterMap = HashMap<String, MutableLiveData<Counter>>()
+    private val entriesMap = HashMap<String, MutableLiveData<CounterEntries>>()
 
     init {
         val db  = AppDatabase.getInstance(application)
@@ -67,6 +65,12 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
                 counterMap[newName] = counter
                 counter.postValue(repo.getCounter(newName))
             }
+
+            val entries = entriesMap.remove(oldName)
+            if (entries != null) {
+                entriesMap[newName] = entries
+                entries.postValue(repo.getAllEntriesInCounterInterval(newName))
+            }
         }
     }
 
@@ -74,6 +78,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.addEntry(name)
             counterMap[name]?.postValue(repo.getCounter(name))
+            entriesMap[name]?.postValue(repo.getAllEntriesInCounterInterval(name))
         }
     }
 
@@ -81,6 +86,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.removeEntry(name)
             counterMap[name]?.postValue(repo.getCounter(name))
+            entriesMap[name]?.postValue(repo.getAllEntriesInCounterInterval(name))
         }
     }
 
@@ -92,6 +98,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         repo.setCounterInterval(name, interval)
         viewModelScope.launch(Dispatchers.IO) {
             counterMap[name]?.postValue(repo.getCounter(name))
+            entriesMap[name]?.postValue(repo.getAllEntriesInCounterInterval(name))
         }
     }
 
@@ -105,10 +112,19 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.removeAllEntries(name)
             counterMap.remove(name)
+            entriesMap.remove(name)
         }
     }
 
-    fun getAllEntriesInCounterInterval(name : String) : List<Entry> {
-        return repo.getAllEntriesInCounterInterval(name)
+    fun getAllEntriesInCounterInterval(name : String) : LiveData<CounterEntries> {
+        var liveData = entriesMap[name]
+        if (liveData == null) {
+            liveData = MutableLiveData()
+            viewModelScope.launch(Dispatchers.IO) {
+                liveData.postValue(repo.getAllEntriesInCounterInterval(name))
+            }
+        }
+        entriesMap[name] = liveData
+        return liveData
     }
 }
