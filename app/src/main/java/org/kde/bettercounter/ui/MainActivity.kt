@@ -8,13 +8,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.XAxis.XAxisPosition
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.jjoe64.graphview.DefaultLabelFormatter
-import com.jjoe64.graphview.GraphView
-import com.jjoe64.graphview.series.BarGraphSeries
-import com.jjoe64.graphview.series.DataPoint
 import org.kde.bettercounter.EntryListViewAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
@@ -30,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ViewModel
 
-    private lateinit var graph : GraphView
+    private lateinit var chart : BarChart
     private lateinit var graphTitle : TextView
     private lateinit var graphAverage : TextView
 
@@ -50,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         val bottomSheet : View = findViewById(R.id.bottomSheet)
         graphTitle = findViewById(R.id.graphTitle)
         graphAverage = findViewById(R.id.graphAverage)
-        graph = findViewById(R.id.graph)
+        chart = findViewById(R.id.graph)
 
 
         // Bottom sheet with graph
@@ -63,15 +66,13 @@ class MainActivity : AppCompatActivity() {
         val sheetFoldedPadding = recyclerView.paddingBottom // padding so the fab is in view
         val sheetUnfoldedPadding = bottomSheet.layoutParams.height + 50 // padding to fit the bottomSheet
 
-        // Graph aspect
-        graph.viewport.isScalable = true
-        graph.viewport.isScrollable = true
-        graph.gridLabelRenderer.numHorizontalLabels = 2
-        graph.gridLabelRenderer.verticalLabelsColor = getColor(R.color.colorAccent)
-        graph.gridLabelRenderer.horizontalLabelsColor = getColor(R.color.colorAccent)
-        graph.gridLabelRenderer.gridColor = getColor(R.color.colorPrimary)
-        graph.gridLabelRenderer.setHumanRounding(false, true)
-        graph.gridLabelRenderer.reloadStyles()
+        chart.setScaleEnabled(false)
+        chart.setDrawBarShadow(false)
+        chart.setDrawGridBackground(false)
+        chart.setDrawValueAboveBar(true)
+        chart.legend.isEnabled = false
+        chart.axisRight.isEnabled = false
+        chart.description.isEnabled = false
 
         sheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -82,7 +83,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 if (!sheetIsExpanding) { // only do this when collapsing. when expanding we set the final padding at once so smoothScrollToPosition can do its job
-                    val bottomPadding = sheetFoldedPadding + ((1.0 + slideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
+                    val bottomPadding =
+                        sheetFoldedPadding + ((1.0 + slideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
                     recyclerView.setPadding(0, 0, 0, bottomPadding)
                 }
             }
@@ -135,11 +137,29 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun updateGraphForCounter(counterWithEntries: CounterEntries, isFirstUpdate : Boolean) {
+    private fun updateGraphForCounter(counterWithEntries: CounterEntries, isFirstUpdate: Boolean) {
         graphTitle.text = counterWithEntries.name + " (last 24h)"
         graphAverage.text = "Average: 3.3 times/hour"
 
-        graph.removeAllSeries()
+        chart.clear()
+
+        val xAxis = chart.xAxis
+        xAxis.position = XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.granularity = 1f
+        xAxis.labelCount = 24
+        xAxis.textColor = getColor(R.color.colorAccent)
+        xAxis.valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                var hour = Calendar.getInstance().get(Calendar.HOUR)+value.toInt()
+                if (hour < 0) hour += 24
+                return hour.toString()
+            }
+        }
+
+        val yAxis = chart.axisLeft
+        yAxis.textColor = getColor(R.color.colorAccent)
+
         if (counterWithEntries.interval != Interval.DAY) return // TODO: Add other intervals
 
         if (counterWithEntries.entries.isEmpty()) {
@@ -159,7 +179,8 @@ class MainActivity : AppCompatActivity() {
             counts[hour] = counts.getOrDefault(hour, 0) + 1
         }
 
-        val series : MutableList<DataPoint> = mutableListOf()
+
+        val series : MutableList<BarEntry> = mutableListOf()
         for (time in counts.keys.sorted()) {
             val count = counts.getOrDefault(time, 0)
             if (count > maxCount) {
@@ -167,33 +188,23 @@ class MainActivity : AppCompatActivity() {
             }
             val relTime: Long = (time - nowHour)
             //Log.e("DATAPOINT", "$relTime = $count")
-            series.add(DataPoint(relTime.toDouble(), count.toDouble()))
+            series.add(BarEntry(relTime.toFloat(), count.toFloat()))
         }
 
+        yAxis.axisMinimum = 0.0f
+        yAxis.axisMaximum = maxCount.toFloat()
 
-        graph.gridLabelRenderer.labelFormatter = object : DefaultLabelFormatter() {
-            override fun formatLabel(value: Double, isAxisX: Boolean): String {
-                return if (isAxisX) {
-                    var hour = Calendar.getInstance().get(Calendar.HOUR)+value.toInt()
-                    if (hour < 0) hour += 24
-                    hour.toString()
-                } else {
-                    value.toInt().toString()
-                }
+        val dataSet = BarDataSet(series, "")
+        dataSet.valueTextColor = getColor(R.color.colorAccent)
+        dataSet.valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                return value.toInt().toString()
             }
         }
-
-        graph.viewport.isXAxisBoundsManual = true
-        graph.viewport.isYAxisBoundsManual = true
-        graph.viewport.setMaxX(0.5)
-        graph.viewport.setMinX(-24.4)
-        graph.viewport.setMinY(0.0)
-        graph.viewport.setMaxY(maxCount.toDouble())
-
-        val barGraph = BarGraphSeries(series.toTypedArray())
-        barGraph.spacing = 20
-        barGraph.isAnimated = isFirstUpdate
-        graph.addSeries(barGraph)
+        val data = BarData(listOf(dataSet))
+        data.isHighlightEnabled = false
+        data.barWidth = 0.9f
+        chart.data = data
     }
 
 }
