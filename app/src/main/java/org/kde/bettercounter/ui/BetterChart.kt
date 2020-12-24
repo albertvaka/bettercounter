@@ -36,7 +36,7 @@ class BetterChart : BarChart {
         xAxis.granularity = 1f
         xAxis.isGranularityEnabled = true
         yAxis.textColor = accentColor
-        yAxis.granularity = 1.0f;
+        yAxis.granularity = 1f;
         yAxis.isGranularityEnabled = true
 
         legend.isEnabled = false
@@ -48,7 +48,11 @@ class BetterChart : BarChart {
         dataSet.valueTextColor = accentColor
         dataSet.valueFormatter = object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
-                return value.toInt().toString()
+                val integer = value.toInt()
+                if (integer == 0) {
+                    return  ""
+                }
+                return integer.toString()
             }
         }
 
