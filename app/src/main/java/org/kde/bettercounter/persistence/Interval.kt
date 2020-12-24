@@ -2,10 +2,8 @@ package org.kde.bettercounter.persistence
 
 import android.content.Context
 import org.kde.bettercounter.R
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.util.*
 
 enum class Interval(val humanReadableResource : Int) {

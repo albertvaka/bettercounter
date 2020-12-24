@@ -1,8 +1,5 @@
 package org.kde.bettercounter.ui
 
-import android.view.View
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel

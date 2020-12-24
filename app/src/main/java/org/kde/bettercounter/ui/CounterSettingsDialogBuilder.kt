@@ -3,14 +3,11 @@ package org.kde.bettercounter.ui
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
-import android.widget.EditText
-import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import org.kde.bettercounter.IntervalAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
-import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.EditCounterBinding
 import org.kde.bettercounter.persistence.Interval
 
