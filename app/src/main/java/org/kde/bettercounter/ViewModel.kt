@@ -6,6 +6,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.*
+import java.util.*
 import kotlin.collections.HashMap
 
 
@@ -74,9 +75,9 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun incrementCounter(name : String) {
+    fun incrementCounter(name : String, date : Date = Calendar.getInstance().time) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.addEntry(name)
+            repo.addEntry(name, date)
             counterMap[name]?.postValue(repo.getCounterSummary(name))
             entriesMap[name]?.postValue(repo.getCounterDetails(name))
         }

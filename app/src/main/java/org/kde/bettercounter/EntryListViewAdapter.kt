@@ -43,7 +43,7 @@ class EntryListViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val binding = FragmentEntryBinding.inflate(inflater, parent, false)
-        val holder = EntryViewHolder(binding, viewModel)
+        val holder = EntryViewHolder(activity, binding, viewModel)
         binding.root.setOnClickListener {
             val counter = holder.counter
             if (counter != null) {

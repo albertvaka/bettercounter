@@ -2,7 +2,8 @@ package org.kde.bettercounter.persistence
 
 import android.content.SharedPreferences
 import org.kde.bettercounter.boilerplate.Converters
-import java.util.Calendar
+import java.util.*
+import kotlin.collections.HashMap
 
 const val COUNTERS_PREFS_KEY = "counters"
 const val COUNTERS_INTERVAL_PREFS_KEY = "interval.%s"
@@ -63,9 +64,9 @@ class Repository(
         entryDao.renameCounter(oldName, newName)
     }
 
-    suspend fun addEntry(name: String) {
+    suspend fun addEntry(name: String, date: Date = Calendar.getInstance().time) {
         counterCache.remove(name)
-        entryDao.insert(Entry(name=name, date=Calendar.getInstance().time))
+        entryDao.insert(Entry(name=name, date=date))
     }
 
     suspend fun removeEntry(name: String) {
