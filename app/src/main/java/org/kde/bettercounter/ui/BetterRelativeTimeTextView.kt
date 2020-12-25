@@ -55,17 +55,26 @@ open class BetterRelativeTimeTextView : androidx.appcompat.widget.AppCompatTextV
      * @return The display text for the relative time
      */
     open fun getRelativeTimeDisplayString(referenceTime: Long, now: Long): CharSequence {
-        var difference: Long = now - referenceTime
-        val days = difference/DateUtils.DAY_IN_MILLIS
-        difference -= days*DateUtils.DAY_IN_MILLIS
-        val hours = difference/DateUtils.HOUR_IN_MILLIS
-        difference -= hours*DateUtils.HOUR_IN_MILLIS
-        val minutes = difference/DateUtils.MINUTE_IN_MILLIS
-        return when {
-            days > 0 -> context.getString(R.string.time_ago_dhm, days, hours, minutes)
-            hours > 0 -> context.getString(R.string.time_ago_hm, hours, minutes)
-            minutes > 0 -> context.getString(R.string.time_ago_m, minutes)
-            else -> context.getString(R.string.just_now)
+        var difference: Long = abs(now - referenceTime)
+        val days = difference / DateUtils.DAY_IN_MILLIS
+        difference -= days * DateUtils.DAY_IN_MILLIS
+        val hours = difference / DateUtils.HOUR_IN_MILLIS
+        difference -= hours * DateUtils.HOUR_IN_MILLIS
+        val minutes = difference / DateUtils.MINUTE_IN_MILLIS
+        if (referenceTime > now) {
+            return when {
+                days > 0 -> context.getString(R.string.time_in_dhm, days, hours, minutes)
+                hours > 0 -> context.getString(R.string.time_in_hm, hours, minutes)
+                minutes > 0 -> context.getString(R.string.time_in_m, minutes)
+                else -> context.getString(R.string.just_now)
+            }
+        } else {
+            return when {
+                days > 0 -> context.getString(R.string.time_ago_dhm, days, hours, minutes)
+                hours > 0 -> context.getString(R.string.time_ago_hm, hours, minutes)
+                minutes > 0 -> context.getString(R.string.time_ago_m, minutes)
+                else -> context.getString(R.string.just_now)
+            }
         }
     }
 

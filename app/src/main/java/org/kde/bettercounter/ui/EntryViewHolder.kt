@@ -30,9 +30,9 @@ class EntryViewHolder(
         binding.undoButton.setOnClickListener { viewModel.decrementCounter(counter.name) }
         binding.nameText.text = counter.name
         binding.countText.text = counter.count.toString()
-        val lastEditDate = counter.lastEdit
-        if (lastEditDate != null) {
-            binding.timestampText.referenceTime = lastEditDate.time
+        val mostRecentDate = counter.mostRecent
+        if (mostRecentDate != null) {
+            binding.timestampText.referenceTime = mostRecentDate.time
             binding.undoButton.isEnabled = true
         } else {
             binding.timestampText.referenceTime = -1L

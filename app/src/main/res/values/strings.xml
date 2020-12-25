@@ -21,6 +21,9 @@
     <string name="time_ago_dhm">%1$dd %2$dh %3$dm ago</string>
     <string name="time_ago_hm">%1$dh %2$dm ago</string>
     <string name="time_ago_m">%1$dm ago</string>
+    <string name="time_in_dhm">In %1$dd %2$dh %3$dm</string>
+    <string name="time_in_hm">In %1$dh %2$dm</string>
+    <string name="time_in_m">In %1$dm</string>
     <string name="just_now">Just now</string>
     <string name="chart_title_daily">%1$s (last 24h)"</string>
     <string name="chart_title_weekly">%1$s (last 7 days)"</string>

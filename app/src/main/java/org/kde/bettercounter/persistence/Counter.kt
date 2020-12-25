@@ -5,7 +5,7 @@ import java.util.*
 class CounterSummary(var name : String,
                      var count : Int,
                      var interval : Interval,
-                     var lastEdit : Date?)
+                     var mostRecent : Date?)
 
 class CounterDetails(var name : String,
                      var interval : Interval,

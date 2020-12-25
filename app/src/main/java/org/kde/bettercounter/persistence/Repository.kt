@@ -54,7 +54,7 @@ class Repository(
                 name = name,
                 count = entryDao.getCountSince(name, interval.toDate()),
                 interval = interval,
-                lastEdit = entryDao.getMostRecent(name)?.date
+                mostRecent = entryDao.getMostRecent(name)?.date
             )
         })
     }
@@ -71,7 +71,7 @@ class Repository(
 
     suspend fun removeEntry(name: String) {
         counterCache.remove(name)
-        val entry = entryDao.getMostRecent(name)
+        val entry = entryDao.getLastAdded(name)
         if (entry != null) {
             entryDao.delete(entry)
         }
@@ -84,7 +84,7 @@ class Repository(
 
     fun getCounterDetails(name : String): CounterDetails {
         val interval = getCounterInterval(name)
-        val entries = entryDao.getAllEntriesSince(name, interval.toDate())
+        val entries = entryDao.getAllEntriesInRange(name, interval.toDate(), Calendar.getInstance().time)
         return CounterDetails(name, interval, entries)
     }
 }
