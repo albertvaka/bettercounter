@@ -3,6 +3,7 @@ package org.kde.bettercounter.ui
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
+import android.view.WindowManager.LayoutParams
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import org.kde.bettercounter.IntervalAdapter
@@ -81,6 +82,10 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
                     dialog.dismiss()
                 }
             }
+        }
+        if (binding.editText.text.isEmpty()) {
+            binding.editText.requestFocus()
+            dialog.window?.setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         }
         return dialog
     }
