@@ -94,8 +94,10 @@ class MainActivity : AppCompatActivity() {
         entryViewAdapter.onItemAdded = { pos -> binding.recycler.smoothScrollToPosition(pos) }
         var currentChartLiveData : LiveData<CounterDetails>? = null
         entryViewAdapter.onItemClickListener = { position: Int, counter: CounterSummary ->
-            sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            sheetIsExpanding = true
+            if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                sheetIsExpanding = true
+            }
             binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
             binding.recycler.smoothScrollToPosition(position)
 
