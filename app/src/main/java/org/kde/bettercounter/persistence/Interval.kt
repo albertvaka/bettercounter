@@ -2,8 +2,7 @@ package org.kde.bettercounter.persistence
 
 import android.content.Context
 import org.kde.bettercounter.R
-import java.time.LocalDateTime
-import java.time.ZoneId
+import org.kde.bettercounter.boilerplate.truncate
 import java.util.*
 
 enum class Interval(val humanReadableResource : Int) {
@@ -21,16 +20,16 @@ enum class Interval(val humanReadableResource : Int) {
     }
 
     fun toDate() : Date {
-        var date = LocalDateTime.now()
-        date = when (this) {
-            DAY -> date.minusDays(1)
-            WEEK -> date.minusDays(7)
-            MONTH -> date.minusMonths(1)
-            YEAR -> date.minusYears(1)
-            YTD -> date.withDayOfYear(1)
-            LIFETIME -> date.minusYears(50)
+        val cal = Calendar.getInstance()
+        when (this) {
+            DAY -> cal.add(Calendar.DAY_OF_YEAR, -1)
+            WEEK -> cal.add(Calendar.DAY_OF_YEAR, -7)
+            MONTH -> cal.add(Calendar.MONTH, -1)
+            YEAR -> cal.add(Calendar.YEAR, -1)
+            YTD -> cal.truncate(Calendar.YEAR)
+            LIFETIME -> cal.add(Calendar.YEAR, -50)
         }
-        return Date.from(date.atZone(ZoneId.systemDefault()).toInstant())
+        return cal.time
     }
 }
 

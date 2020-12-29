@@ -12,8 +12,8 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.StatsCalculator
+import org.kde.bettercounter.boilerplate.truncate
 import org.kde.bettercounter.persistence.Entry
-import java.lang.RuntimeException
 import java.text.DateFormatSymbols
 import java.util.*
 
@@ -188,20 +188,4 @@ class BetterChart : BarChart {
         val cal = Calendar.getInstance()
         cal.timeInMillis = oldest
     }
-}
-
-private fun Calendar.truncate(field: Int) {
-    set(Calendar.SECOND, 0)
-    if (field == Calendar.MINUTE) return
-    set(Calendar.MINUTE, 0)
-    if (field == Calendar.HOUR_OF_DAY) return
-    set(Calendar.HOUR_OF_DAY, 0)
-    if (field in listOf(Calendar.DATE, Calendar.DAY_OF_WEEK, Calendar.DAY_OF_MONTH, Calendar.DAY_OF_YEAR)) return
-    set(Calendar.DATE, 1)
-    if (field == Calendar.MONTH) return
-    set(Calendar.MONTH, Calendar.JANUARY)
-    if (field in listOf(Calendar.YEAR, Calendar.HOUR, Calendar.WEEK_OF_YEAR, Calendar.WEEK_OF_MONTH)) {
-        throw RuntimeException("truncate by $field not implemented")
-    }
-
 }
