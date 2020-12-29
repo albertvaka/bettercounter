@@ -2,20 +2,19 @@ package org.kde.bettercounter.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.formatter.DefaultValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.StatsCalculator
-import org.kde.bettercounter.boilerplate.andLog
 import org.kde.bettercounter.persistence.Entry
+import java.lang.RuntimeException
 import java.text.DateFormatSymbols
-import java.time.Month
 import java.util.*
 
 class BetterChart : BarChart {
@@ -25,7 +24,7 @@ class BetterChart : BarChart {
 
     private val yAxis : YAxis get() { return axisLeft } // alias
 
-    lateinit var dataSet : BarDataSet
+    private lateinit var dataSet : BarDataSet
 
     fun setup() {
         setScaleEnabled(false)
@@ -41,7 +40,7 @@ class BetterChart : BarChart {
         xAxis.granularity = 1f
         xAxis.isGranularityEnabled = true
         yAxis.textColor = accentColor
-        yAxis.granularity = 1f;
+        yAxis.granularity = 1f
         yAxis.isGranularityEnabled = true
 
         legend.isEnabled = false
@@ -67,7 +66,7 @@ class BetterChart : BarChart {
         data = barData
     }
 
-    private fun setBarEntries(series : List<BarEntry>) {
+    private fun setBarEntries(series: List<BarEntry>) {
         dataSet.values = series
         dataSet.notifyDataSetChanged()
         data.notifyDataChanged()
@@ -75,73 +74,85 @@ class BetterChart : BarChart {
         invalidate()
     }
 
-    fun setDataBucketized(intervalEntries: List<Entry>, bucketTypeAsCalendarField : Int, minNumBuckets : Int) {
+    private fun setDataBucketized(
+        intervalEntries: List<Entry>,
+        bucketTypeAsCalendarField: Int,
+        numBuckets: Int
+    ) {
         if (intervalEntries.isEmpty()) return setBarEntries(listOf())
 
+        val sortedEntries = intervalEntries.sortedBy { it.date }
+
         val cal = Calendar.getInstance()
+        //cal.toSimpleDateString().andLog()
+        cal.add(bucketTypeAsCalendarField, -numBuckets+1)
+        //cal.toSimpleDateString().andLog()
+        cal.truncate(bucketTypeAsCalendarField)
+        //cal.toSimpleDateString().andLog()
 
-        val currentTimeBucket = cal.get(bucketTypeAsCalendarField)
-
-        val counts : MutableMap<Int, Int> = mutableMapOf()
-        for (bucket in (currentTimeBucket-minNumBuckets+1)..currentTimeBucket) { // Create minNumBuckets empty buckets
-            counts[bucket] = 0
+        var entriesIndex = 0
+        while (entriesIndex < sortedEntries.size && sortedEntries[entriesIndex].date.time < cal.timeInMillis) {
+            entriesIndex++
         }
-        for (entry in intervalEntries) {
-            cal.timeInMillis = entry.date.time
-            val bucket = cal.get(bucketTypeAsCalendarField)
-            counts[bucket] = counts.getOrDefault(bucket, 0) + 1
+        if (entriesIndex > 0) {
+            Log.e(
+                "setDataBucketized",
+                "Skipping $entriesIndex entries that are too old. This should not happen."
+            )
         }
-
         var maxCount = 0
         val series : MutableList<BarEntry> = mutableListOf()
-        for (time in counts.keys.sorted()) {
-            val count = counts.getOrDefault(time, 0)
-            if (count > maxCount) {
-                maxCount = count
+        for (bucket in 1..numBuckets) {
+            cal.add(bucketTypeAsCalendarField, 1) //Calendar is now at the end of the current bucket
+            var bucketCount = 0
+            while (entriesIndex < sortedEntries.size && sortedEntries[entriesIndex].date.time < cal.timeInMillis) {
+                bucketCount++
+                entriesIndex++
             }
-            val relTime = (time - currentTimeBucket)
-            series.add(BarEntry(relTime.toFloat(), count.toFloat()))
-            //Log.e("DATAPOINT", "$relTime = $count")
+            if (bucketCount > maxCount) {
+                maxCount = bucketCount
+            }
+            //Log.e("Bucket", "$bucket -> ${cal.toSimpleDateString()} -> $bucketCount")
+            series.add(BarEntry(bucket.toFloat(), bucketCount.toFloat()))
         }
 
-        yAxis.axisMinimum = 0.0f
+        yAxis.axisMinimum = 0f
         yAxis.axisMaximum = maxCount.toFloat()
-        xAxis.labelCount = counts.size
+        xAxis.labelCount = series.size
         xAxis.valueFormatter = when(bucketTypeAsCalendarField) {
-            Calendar.DAY_OF_WEEK -> DayOfWeekFormatter()
-            Calendar.MONTH -> MonthFormatter()
-            else -> CalendarFormatter(bucketTypeAsCalendarField)
+            Calendar.DAY_OF_WEEK -> DayOfWeekFormatter(numBuckets)
+            Calendar.MONTH -> MonthFormatter(numBuckets)
+            else -> CalendarFormatter(numBuckets, bucketTypeAsCalendarField)
         }
 
         setBarEntries(series)
-
-        Calendar.getInstance().get(Calendar.MONTH).andLog()
     }
 
-    class DayOfWeekFormatter : ValueFormatter() {
-        private val currentDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
+    class DayOfWeekFormatter(private var numBuckets: Int) : ValueFormatter() {
         private val dayNames = DateFormatSymbols().shortWeekdays
         override fun getFormattedValue(value: Float): String {
-            var dow = currentDayOfWeek+value.toInt()
-            while (dow < 1) dow += 7
-            return dayNames[dow]
+            val cal = Calendar.getInstance()
+            cal.truncate(Calendar.DAY_OF_WEEK)
+            cal.add(Calendar.DAY_OF_WEEK, -numBuckets + value.toInt())
+            return dayNames[cal.get(Calendar.DAY_OF_WEEK)]
         }
     }
 
-    class MonthFormatter : ValueFormatter() {
+    class MonthFormatter(private var numBuckets: Int) : ValueFormatter() {
         private val monthNames = DateFormatSymbols().shortMonths
-        private val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
-        override fun getFormattedValue(value: Float): String {
-            var month = currentMonth+value.toInt()
-            while (month < 0) month += 12
-            return monthNames[month]
-        }
-    }
-
-    class CalendarFormatter(var field : Int) : ValueFormatter() {
         override fun getFormattedValue(value: Float): String {
             val cal = Calendar.getInstance()
-            cal.add(field, value.toInt())
+            cal.truncate(Calendar.MONTH)
+            cal.add(Calendar.MONTH, -numBuckets + value.toInt())
+            return monthNames[cal.get(Calendar.MONTH)]
+        }
+    }
+
+    class CalendarFormatter(private var numBuckets: Int, private var field: Int) : ValueFormatter() {
+        override fun getFormattedValue(value: Float): String {
+            val cal = Calendar.getInstance()
+            cal.truncate(field)
+            cal.add(field, -numBuckets + value.toInt())
             return cal.get(field).toString()
         }
     }
@@ -177,4 +188,20 @@ class BetterChart : BarChart {
         val cal = Calendar.getInstance()
         cal.timeInMillis = oldest
     }
+}
+
+private fun Calendar.truncate(field: Int) {
+    set(Calendar.SECOND, 0)
+    if (field == Calendar.MINUTE) return
+    set(Calendar.MINUTE, 0)
+    if (field == Calendar.HOUR_OF_DAY) return
+    set(Calendar.HOUR_OF_DAY, 0)
+    if (field in listOf(Calendar.DATE, Calendar.DAY_OF_WEEK, Calendar.DAY_OF_MONTH, Calendar.DAY_OF_YEAR)) return
+    set(Calendar.DATE, 1)
+    if (field == Calendar.MONTH) return
+    set(Calendar.MONTH, Calendar.JANUARY)
+    if (field in listOf(Calendar.YEAR, Calendar.HOUR, Calendar.WEEK_OF_YEAR, Calendar.WEEK_OF_MONTH)) {
+        throw RuntimeException("truncate by $field not implemented")
+    }
+
 }
