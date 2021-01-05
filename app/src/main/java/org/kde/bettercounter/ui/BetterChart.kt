@@ -186,6 +186,13 @@ class BetterChart : BarChart {
         if (intervalEntries.isEmpty()) return setBarEntries(listOf())
         val oldest = StatsCalculator.getOldestEntryTime(intervalEntries)
         val cal = Calendar.getInstance()
+        val currentMonthSinceEpoch = 12 * cal.get(Calendar.YEAR) + cal.get(Calendar.MONTH)
         cal.timeInMillis = oldest
+        val oldestEntryMonthSinceEpoch = 12 * cal.get(Calendar.YEAR) + cal.get(Calendar.MONTH)
+        setDataBucketized(
+            intervalEntries,
+            Calendar.MONTH,
+            currentMonthSinceEpoch - oldestEntryMonthSinceEpoch + 1
+        )
     }
 }
