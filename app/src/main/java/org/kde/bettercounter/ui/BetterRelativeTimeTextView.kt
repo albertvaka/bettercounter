@@ -43,7 +43,11 @@ open class BetterRelativeTimeTextView : androidx.appcompat.widget.AppCompatTextV
     constructor(ctx: Context, attrs: AttributeSet?, defStyle: Int) : super(ctx, attrs, defStyle)
 
     private fun updateTextDisplay() {
-        text = if (referenceTime < 0) "" else getRelativeTimeDisplayString(referenceTime, System.currentTimeMillis())
+        if (referenceTime < 0) {
+            setText(R.string.never)
+        } else {
+            text = getRelativeTimeDisplayString(referenceTime, System.currentTimeMillis())
+        }
     }
 
     /**
@@ -61,15 +65,15 @@ open class BetterRelativeTimeTextView : androidx.appcompat.widget.AppCompatTextV
         val hours = difference / DateUtils.HOUR_IN_MILLIS
         difference -= hours * DateUtils.HOUR_IN_MILLIS
         val minutes = difference / DateUtils.MINUTE_IN_MILLIS
-        if (referenceTime > now) {
-            return when {
+        return if (referenceTime > now) {
+            when {
                 days > 0 -> context.getString(R.string.time_in_dhm, days, hours, minutes)
                 hours > 0 -> context.getString(R.string.time_in_hm, hours, minutes)
                 minutes > 0 -> context.getString(R.string.time_in_m, minutes)
                 else -> context.getString(R.string.just_now)
             }
         } else {
-            return when {
+            when {
                 days > 0 -> context.getString(R.string.time_ago_dhm, days, hours, minutes)
                 hours > 0 -> context.getString(R.string.time_ago_hm, hours, minutes)
                 minutes > 0 -> context.getString(R.string.time_ago_m, minutes)

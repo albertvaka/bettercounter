@@ -1,9 +1,7 @@
 package org.kde.bettercounter.ui
 
 import android.content.Context
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
-import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
@@ -36,7 +34,6 @@ class EntryViewHolder(
             binding.undoButton.isEnabled = true
         } else {
             binding.timestampText.referenceTime = -1L
-            binding.timestampText.setText(R.string.never)
             binding.undoButton.isEnabled = false
         }
     }
