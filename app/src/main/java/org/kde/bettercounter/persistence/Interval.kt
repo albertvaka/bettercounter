@@ -33,4 +33,4 @@ enum class Interval(val humanReadableResource : Int) {
     }
 }
 
-val DEFAULT_INTERVAL = Interval.YTD
+val DEFAULT_INTERVAL = Interval.LIFETIME

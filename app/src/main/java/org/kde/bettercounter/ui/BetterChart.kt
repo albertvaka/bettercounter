@@ -119,7 +119,7 @@ class BetterChart : BarChart {
         yAxis.axisMinimum = 0f
         yAxis.axisMaximum = maxCount.toFloat()
         xAxis.labelCount = series.size
-        xAxis.valueFormatter = when(bucketTypeAsCalendarField) {
+        xAxis.valueFormatter = when (bucketTypeAsCalendarField) {
             Calendar.DAY_OF_WEEK -> DayOfWeekFormatter(numBuckets)
             Calendar.MONTH -> MonthFormatter(numBuckets)
             else -> CalendarFormatter(numBuckets, bucketTypeAsCalendarField)

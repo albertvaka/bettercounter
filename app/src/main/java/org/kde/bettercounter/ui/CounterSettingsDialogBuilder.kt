@@ -10,6 +10,7 @@ import org.kde.bettercounter.IntervalAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.EditCounterBinding
+import org.kde.bettercounter.persistence.DEFAULT_INTERVAL
 import org.kde.bettercounter.persistence.Interval
 
 class CounterSettingsDialogBuilder(private val context : Context, private val viewModel : ViewModel) {
@@ -31,6 +32,7 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
 
     fun forNewCounter() : CounterSettingsDialogBuilder {
         builder.setTitle(R.string.add_counter)
+        binding.spinnerInterval.setSelection(intervalAdapter.positionOf(DEFAULT_INTERVAL))
         return this
     }
 
