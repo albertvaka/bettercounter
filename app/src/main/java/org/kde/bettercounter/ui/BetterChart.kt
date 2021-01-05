@@ -12,7 +12,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.StatsCalculator
-import org.kde.bettercounter.boilerplate.truncate
+import org.kde.bettercounter.extensions.truncate
 import org.kde.bettercounter.persistence.Entry
 import java.text.DateFormatSymbols
 import java.util.*

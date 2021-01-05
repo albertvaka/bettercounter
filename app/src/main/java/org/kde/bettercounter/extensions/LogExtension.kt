@@ -1,4 +1,4 @@
-package org.kde.bettercounter.boilerplate
+package org.kde.bettercounter.extensions
 
 import android.util.Log
 

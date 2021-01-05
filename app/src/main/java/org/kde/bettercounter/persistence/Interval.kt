@@ -2,7 +2,7 @@ package org.kde.bettercounter.persistence
 
 import android.content.Context
 import org.kde.bettercounter.R
-import org.kde.bettercounter.boilerplate.truncate
+import org.kde.bettercounter.extensions.truncate
 import java.util.*
 
 enum class Interval(val humanReadableResource : Int) {
