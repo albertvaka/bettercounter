@@ -34,5 +34,5 @@
     <string name="stats_average_every_hours">Avg: every %1$.2f hours"</string>
     <string name="stats_average_per_day">Avg: %1$.2f times/day"</string>
     <string name="stats_average_every_days">Avg: every %1$.2f days"</string>
-    <string name="no_data">No entries in this period</string>
+    <string name="no_data">No entries in the selected period</string>
 </resources>
