@@ -26,33 +26,33 @@ class StatsCalculator(private val context : Context) {
     }
 
     fun getDaily(intervalEntries: List<Entry>): CharSequence {
-        if (intervalEntries.isEmpty()) return context.getString(R.string.no_data)
+        if (intervalEntries.isEmpty()) return context.getString(R.string.stats_average_n_a)
         return getPerHour(intervalEntries.size, 24f)
     }
 
     fun getWeekly(intervalEntries: List<Entry>): CharSequence {
-        if (intervalEntries.isEmpty()) return context.getString(R.string.no_data)
+        if (intervalEntries.isEmpty()) return context.getString(R.string.stats_average_n_a)
         return getPerDay(intervalEntries.size, 7f)
     }
 
     fun getMonthly(intervalEntries: List<Entry>): CharSequence {
-        if (intervalEntries.isEmpty()) return context.getString(R.string.no_data)
+        if (intervalEntries.isEmpty()) return context.getString(R.string.stats_average_n_a)
         return getPerDay(intervalEntries.size, 31f)
     }
 
     fun getYearly(intervalEntries: List<Entry>): CharSequence {
-        if (intervalEntries.isEmpty()) return context.getString(R.string.no_data)
+        if (intervalEntries.isEmpty()) return context.getString(R.string.stats_average_n_a)
         return getPerDay(intervalEntries.size, 365f)
     }
 
     fun getYtd(intervalEntries: List<Entry>): CharSequence {
-        if (intervalEntries.isEmpty()) return context.getString(R.string.no_data)
+        if (intervalEntries.isEmpty()) return context.getString(R.string.stats_average_n_a)
         val dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
         return getPerDay(intervalEntries.size, dayOfYear.toFloat())
     }
 
     fun getLifetime(intervalEntries: List<Entry>): CharSequence {
-        if (intervalEntries.isEmpty()) return context.getString(R.string.no_data)
+        if (intervalEntries.isEmpty()) return context.getString(R.string.stats_average_n_a)
         val oldestEntryTime = getOldestEntryTime(intervalEntries)
         val deltaDays = daysSince(oldestEntryTime)
         return getPerDay(intervalEntries.size, ceil(deltaDays))

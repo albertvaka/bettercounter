@@ -10,6 +10,7 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.utils.Utils
 import org.kde.bettercounter.R
 import org.kde.bettercounter.StatsCalculator
 import org.kde.bettercounter.extensions.truncate
@@ -24,7 +25,8 @@ class BetterChart : BarChart {
 
     private val yAxis : YAxis get() { return axisLeft } // alias
 
-    private lateinit var dataSet : BarDataSet
+    private lateinit var mDataSet : BarDataSet
+    private lateinit var mBarData : BarData
 
     fun setup() {
         setScaleEnabled(false)
@@ -34,6 +36,12 @@ class BetterChart : BarChart {
 
         val accentColor = context.getColor(R.color.colorAccent)
 
+        // No data text
+        setNoDataText(context.getString(R.string.no_data))
+        mInfoPaint.textSize = Utils.convertDpToPixel(16f)
+        mInfoPaint.color = accentColor
+
+        // Axis
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
         xAxis.textColor = accentColor
@@ -47,10 +55,10 @@ class BetterChart : BarChart {
         axisRight.isEnabled = false
         description.isEnabled = false
 
-        dataSet = BarDataSet(listOf(), "")
-        dataSet.color = accentColor
-        dataSet.valueTextColor = accentColor
-        dataSet.valueFormatter = object : ValueFormatter() {
+        mDataSet = BarDataSet(listOf(), "")
+        mDataSet.color = accentColor
+        mDataSet.valueTextColor = accentColor
+        mDataSet.valueFormatter = object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
                 val integer = value.toInt()
                 if (integer == 0) {
@@ -60,17 +68,16 @@ class BetterChart : BarChart {
             }
         }
 
-        val barData = BarData(listOf(dataSet))
-        barData.isHighlightEnabled = false
-        barData.barWidth = 0.9f
-        data = barData
+        mBarData = BarData(listOf(mDataSet))
+        mBarData.isHighlightEnabled = false
+        mBarData.barWidth = 0.9f
+        data = mBarData
     }
 
     private fun setBarEntries(series: List<BarEntry>) {
-        dataSet.values = series
-        dataSet.notifyDataSetChanged()
-        data.notifyDataChanged()
-        notifyDataSetChanged()
+        mDataSet.values = series
+        mBarData.notifyDataChanged()
+        data = mBarData
         invalidate()
     }
 
@@ -79,7 +86,10 @@ class BetterChart : BarChart {
         bucketTypeAsCalendarField: Int,
         numBuckets: Int
     ) {
-        if (intervalEntries.isEmpty()) return setBarEntries(listOf())
+        if (intervalEntries.isEmpty()) {
+            clear()
+            return
+        }
 
         val sortedEntries = intervalEntries.sortedBy { it.date }
 
