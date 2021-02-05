@@ -1,16 +1,20 @@
 package org.kde.bettercounter.ui
 
 import android.content.Context
+import android.view.Gravity
 import androidx.recyclerview.widget.RecyclerView
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
+import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
+import org.kde.bettercounter.persistence.Tutorial
 import java.util.*
 
 
 class EntryViewHolder(
     private val context : Context,
-    private val binding : FragmentEntryBinding,
+    val binding : FragmentEntryBinding,
     private var viewModel: ViewModel
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -18,7 +22,20 @@ class EntryViewHolder(
 
     fun onBind(counter: CounterSummary) {
         this.counter = counter
-        binding.increaseButton.setOnClickListener { viewModel.incrementCounter(counter.name) }
+        binding.increaseButton.setOnClickListener {
+            viewModel.incrementCounter(counter.name)
+            if (!viewModel.isTutorialShown(Tutorial.PICKDATE)) {
+                viewModel.setTutorialShown(Tutorial.PICKDATE)
+                SimpleTooltip.Builder(context)
+                    .anchorView(binding.increaseButton)
+                    .text(R.string.tutorial_pickdate)
+                    .gravity(Gravity.BOTTOM)
+                    .animated(true)
+                    .modal(true)
+                    .build()
+                    .show()
+            }
+        }
         binding.increaseButton.setOnLongClickListener {
             showDateTimePicker(context, Calendar.getInstance()) { pickedDateTime ->
                 viewModel.incrementCounter(counter.name, pickedDateTime.time)

@@ -91,6 +91,14 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun setTutorialShown(id: Tutorial) {
+        repo.setTutorialShown(id)
+    }
+
+    fun isTutorialShown(id: Tutorial) : Boolean {
+        return repo.isTutorialShown(id)
+    }
+
     fun getCounterInterval(name : String) : Interval {
         return repo.getCounterInterval(name)
     }

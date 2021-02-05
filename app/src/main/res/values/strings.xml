@@ -36,4 +36,7 @@
     <string name="stats_average_n_a">Avg: N/A"</string>
     <string name="stats_average_every_days">Avg: every %1$.2f days"</string>
     <string name="no_data">No entries in the selected period</string>
+    <string name="tutorial_pickdate">Long press to pick the date</string>
+    <string name="tutorial_swipe">Swipe to edit or delete</string>
+    <string name="tutorial_drag">Long press and drag to reorder</string>
 </resources>

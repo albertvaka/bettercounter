@@ -1,24 +1,33 @@
 package org.kde.bettercounter.persistence
 
 import android.content.SharedPreferences
+import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.boilerplate.Converters
 import java.util.*
 import kotlin.collections.HashMap
 
+const val alwaysShowTutorialsInDebugBuilds = true
+
 const val COUNTERS_PREFS_KEY = "counters"
 const val COUNTERS_INTERVAL_PREFS_KEY = "interval.%s"
+const val TUTORIALS_PREFS_KEY = "tutorials"
 
 class Repository(
     private val entryDao: EntryDao,
     private val sharedPref : SharedPreferences
 ) {
 
+    private var tutorials: MutableSet<String>
     private var counters : List<String>
     private var counterCache = HashMap<String, CounterSummary>()
 
     init {
-        val jsonStr = sharedPref.getString(COUNTERS_PREFS_KEY, "[]")
-        counters = Converters.stringToStringList(jsonStr)
+        val countersStr = sharedPref.getString(COUNTERS_PREFS_KEY, "[]")
+        counters = Converters.stringToStringList(countersStr)
+        tutorials = sharedPref.getStringSet(TUTORIALS_PREFS_KEY, setOf())!!.toMutableSet()
+        if (BuildConfig.DEBUG && alwaysShowTutorialsInDebugBuilds) {
+            tutorials = mutableSetOf()
+        }
     }
 
     fun getCounterList() : List<String> {
@@ -29,6 +38,15 @@ class Repository(
         val jsonStr = Converters.stringListToString(list)
         sharedPref.edit().putString(COUNTERS_PREFS_KEY, jsonStr).apply()
         counters = list
+    }
+
+    fun setTutorialShown(id: Tutorial) {
+        tutorials.add(id.name)
+        sharedPref.edit().putStringSet(TUTORIALS_PREFS_KEY, tutorials).apply()
+    }
+
+    fun isTutorialShown(id: Tutorial) : Boolean {
+        return tutorials.contains(id.name)
     }
 
     fun getCounterInterval(name : String) : Interval {

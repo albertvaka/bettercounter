@@ -1,13 +1,16 @@
 package org.kde.bettercounter
 
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
+import org.kde.bettercounter.persistence.Tutorial
 import org.kde.bettercounter.ui.CounterSettingsDialogBuilder
 import org.kde.bettercounter.ui.EntryViewHolder
 import java.util.*
@@ -51,6 +54,31 @@ class EntryListViewAdapter(
             }
         }
         return holder
+    }
+
+    override fun onViewAttachedToWindow(holder: EntryViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        if (!viewModel.isTutorialShown(Tutorial.SWIPE)) {
+            viewModel.setTutorialShown(Tutorial.SWIPE)
+            SimpleTooltip.Builder(activity)
+                .anchorView(holder.itemView)
+                .text(R.string.tutorial_swipe)
+                .gravity(Gravity.BOTTOM)
+                .animated(true)
+                .modal(true)
+                .build()
+                .show()
+        } else if (counters.size > 1 && !viewModel.isTutorialShown(Tutorial.DRAG)) {
+            viewModel.setTutorialShown(Tutorial.DRAG)
+            SimpleTooltip.Builder(activity)
+                .anchorView(holder.binding.countText)
+                .text(R.string.tutorial_drag)
+                .gravity(Gravity.BOTTOM)
+                .animated(true)
+                .modal(true)
+                .build()
+                .show()
+        }
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
