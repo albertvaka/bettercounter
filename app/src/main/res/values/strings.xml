@@ -39,4 +39,6 @@
     <string name="tutorial_pickdate">Long press to pick the date</string>
     <string name="tutorial_swipe">Swipe right to edit or delete</string>
     <string name="tutorial_drag">Long press and drag to reorder</string>
+    <string name="export">Export data</string>
+    <string name="exported_n">Exported %1$d/%2$d counters</string>
 </resources>

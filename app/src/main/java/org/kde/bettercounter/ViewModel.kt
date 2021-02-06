@@ -2,10 +2,13 @@ package org.kde.bettercounter
 
 import android.app.Application
 import android.content.Context
+import android.os.Handler
+import android.os.Message
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.*
+import java.io.OutputStream
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -136,4 +139,33 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         entriesMap[name] = liveData
         return liveData
     }
+
+    fun exportAll(stream : OutputStream, progressHandler : Handler?) {
+
+        fun sendProgress(progress : Int) {
+            val message = Message()
+            message.arg1 = progress
+            message.arg2 = repo.getCounterList().size
+            progressHandler?.sendMessage(message)
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            stream.use {
+                it.bufferedWriter().use { writer ->
+                    for ((i, name) in repo.getCounterList().withIndex()) {
+                        sendProgress(i)
+                        val entries = repo.getAllEntries(name)
+                        writer.write(name)
+                        for (entry in entries) {
+                            writer.write(",")
+                            writer.write(entry.date.time.toString())
+                        }
+                        writer.write("\n")
+                    }
+                    sendProgress(repo.getCounterList().size)
+                }
+            }
+        }
+    }
+
 }

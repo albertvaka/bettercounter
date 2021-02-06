@@ -1,8 +1,11 @@
 package org.kde.bettercounter.ui
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.view.ViewTreeObserver
+import android.os.Handler
+import android.os.Looper
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -16,14 +19,16 @@ import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.boilerplate.HackyLayoutManager
 import org.kde.bettercounter.databinding.ActivityMainBinding
-import org.kde.bettercounter.persistence.CounterSummary
+import org.kde.bettercounter.databinding.ProgressDialogBinding
 import org.kde.bettercounter.persistence.CounterDetails
+import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
 
+    private val EXPORT_REQUEST_CODE: Int = 12
     private lateinit var viewModel: ViewModel
     private lateinit var binding: ActivityMainBinding
     private var statsCalculator = StatsCalculator(this)
@@ -155,6 +160,57 @@ class MainActivity : AppCompatActivity() {
                 binding.chartAverage.text = statsCalculator.getLifetime(counter.intervalEntries)
                 binding.chart.setLifetimeData(counter.intervalEntries)
             }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.export -> {
+                startExportIntent()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun startExportIntent() {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.type = "text/csv";
+        intent.putExtra(Intent.EXTRA_TITLE, "bettercounter-export.csv");
+        startActivityForResult(intent, EXPORT_REQUEST_CODE);
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == RESULT_OK && requestCode == EXPORT_REQUEST_CODE) {
+            data?.data?.let { uri ->
+                contentResolver.openOutputStream(uri)?.let { stream ->
+
+                    val progressDialogBinding = ProgressDialogBinding.inflate(layoutInflater)
+                    val dialog = AlertDialog.Builder(this)
+                        .setView(progressDialogBinding.root)
+                        .setCancelable(false)
+                        .create()
+                    dialog.show()
+
+                    val progressHandler = Handler(Looper.getMainLooper()) {
+                        progressDialogBinding.text.text = getString(R.string.exported_n, it.arg1, it.arg2)
+                        if (it.arg1 == it.arg2) {
+                            dialog.setCancelable(true)
+                        }
+                        true
+                    }
+                    viewModel.exportAll(stream, progressHandler)
+                }
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
         }
     }
 

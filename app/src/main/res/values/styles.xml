@@ -19,7 +19,9 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" >
+        <item name="android:background">@color/colorPrimaryDark</item>
+    </style>
 
     <style name="Divider">
         <item name="android:background">@color/colorPrimaryDark</item>

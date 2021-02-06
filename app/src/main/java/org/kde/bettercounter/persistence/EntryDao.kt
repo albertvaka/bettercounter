@@ -24,6 +24,9 @@ interface EntryDao {
     @Query("SELECT * FROM entry WHERE name = (:name) AND date >= (:since) AND date <= (:until)")
     fun getAllEntriesInRange(name : String, since: Date, until: Date) : List<Entry>
 
+    @Query("SELECT * FROM entry WHERE name = (:name)")
+    fun getAllEntries(name : String) : List<Entry>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entry : Entry)
 

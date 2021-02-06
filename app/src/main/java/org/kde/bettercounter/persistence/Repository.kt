@@ -100,9 +100,13 @@ class Repository(
         entryDao.deleteAll(name)
     }
 
-    fun getCounterDetails(name : String): CounterDetails {
+    suspend fun getCounterDetails(name : String): CounterDetails {
         val interval = getCounterInterval(name)
         val entries = entryDao.getAllEntriesInRange(name, interval.toDate(), Calendar.getInstance().time)
         return CounterDetails(name, interval, entries)
+    }
+
+    suspend fun getAllEntries(name : String): List<Entry> {
+        return entryDao.getAllEntries(name)
     }
 }
