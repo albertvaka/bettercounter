@@ -1,7 +1,5 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -9,18 +7,24 @@
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:editTextColor">@color/colorAccent</item>
         <item name="android:textColorHint">@color/colorAccentDisabled</item>
-        <item name="colorBackgroundFloating">@color/colorPrimary</item>
-    </style>
 
-    <style name="AppTheme.NoActionBar">
+        <!-- ActionBar text and overflow menu icon -->
+        <item name="android:textColorPrimary">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
+
+        <!-- Dialog backgronud -->
+        <item name="colorBackgroundFloating">@color/colorPrimary</item>
+
+        <!-- Fab background -->
+        <item name="colorSecondary">@color/colorAccent</item>
+
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupMenu" parent="Theme.MaterialComponents" >
-        <item name="colorSurface">@color/colorPrimaryDark</item>
+    <style name="AppTheme.PopupMenu" parent="Theme.AppCompat" >
+        <!-- ActionBar menu background -->
+        <item name="android:background">@color/colorPrimaryDark</item>
     </style>
 
     <style name="Divider">
