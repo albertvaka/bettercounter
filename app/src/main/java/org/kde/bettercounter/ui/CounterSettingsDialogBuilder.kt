@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.WindowManager.LayoutParams
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
 import org.kde.bettercounter.IntervalAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
@@ -25,6 +26,9 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
         builder.setView(binding.root)
 
         binding.spinnerInterval.adapter = intervalAdapter
+
+        binding.colorpicker.adapter = ColorAdapter(context)
+        binding.colorpicker.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
         builder.setPositiveButton(R.string.save, null)
         builder.setNegativeButton(R.string.cancel, null)

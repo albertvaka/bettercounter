@@ -4,4 +4,22 @@
     <color name="colorPrimaryDark">#171717</color>
     <color name="colorAccent">#D0D0D0</color>
     <color name="colorAccentDisabled">#505050</color>
+
+    <array name="picker_colors">
+        <item>@color/colorPrimary</item>
+        <item>#2062af</item>
+        <item>#8c47fb</item>
+        <item>#51C1EE</item>
+        <item>#8cc453</item>
+        <item>#C2987D</item>
+        <item>#CE7777</item>
+        <item>#9086BA</item>
+        <item>#58AEB7</item>
+        <item>#F4B528</item>
+        <item>#DD3E48</item>
+        <item>#BF89AE</item>
+        <item>#5C88BE</item>
+        <item>#59BC10</item>
+        <item>#E87034</item>
+    </array>
 </resources>

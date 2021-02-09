@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.AppCompatButton
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/color"
+    android:layout_width="37dp"
+    android:layout_height="37dp"
+    android:background="@drawable/bg_color_circle"
+    android:layout_margin="4dp" />
