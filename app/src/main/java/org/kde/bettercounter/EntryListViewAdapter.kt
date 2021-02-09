@@ -95,7 +95,7 @@ class EntryListViewAdapter(
         viewModel.saveCounterOrder(counters)
     }
 
-    fun editCounter(position: Int, newName: String, interval : Interval) {
+    fun editCounter(position: Int, newName: String, interval : Interval, newColor : Int) {
         val oldName = counters[position]
         if (oldName != newName) {
             counters[position] = newName
@@ -103,6 +103,7 @@ class EntryListViewAdapter(
             viewModel.saveCounterOrder(counters)
         }
         viewModel.setCounterInterval(newName, interval)
+        viewModel.setCounterColor(newName, newColor)
         // The counter updates async, when the update is done we will get notified through the counter's livedata
 
     }
@@ -132,10 +133,11 @@ class EntryListViewAdapter(
     override fun onSwipe(position: Int) {
         val name = counters[position]
         val interval = viewModel.getCounterInterval(name)
+        val color = viewModel.getCounterColor(name)
         CounterSettingsDialogBuilder(activity, viewModel)
-            .forExistingCounter(name, interval)
-            .setOnSaveListener { newName, newInterval ->
-                editCounter(position, newName, newInterval)
+            .forExistingCounter(name, interval, color)
+            .setOnSaveListener { newName, newInterval, newColor ->
+                editCounter(position, newName, newInterval, newColor)
             }
             .setOnDismissListener {
                 notifyItemChanged(position) // moves the swiped item back to its place.

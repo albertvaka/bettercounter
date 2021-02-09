@@ -22,6 +22,7 @@ class EntryViewHolder(
 
     fun onBind(counter: CounterSummary) {
         this.counter = counter
+        binding.root.setBackgroundColor(counter.color)
         binding.increaseButton.setOnClickListener {
             viewModel.incrementCounter(counter.name)
             if (!viewModel.isTutorialShown(Tutorial.PICKDATE)) {

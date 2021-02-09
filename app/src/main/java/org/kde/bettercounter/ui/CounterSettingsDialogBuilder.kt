@@ -19,7 +19,8 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
     private val builder : AlertDialog.Builder = AlertDialog.Builder(context)
     private val binding : EditCounterBinding = EditCounterBinding.inflate(LayoutInflater.from(context))
     private val intervalAdapter = IntervalAdapter(context)
-    private var onSaveListener: (name : String, Interval) -> Unit = { _, _ -> }
+    private val colorAdapter = ColorAdapter(context)
+    private var onSaveListener: (name : String, Interval, color: Int) -> Unit = { _, _,_ -> }
     private var previousName : String? = null
 
     init {
@@ -27,7 +28,7 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
 
         binding.spinnerInterval.adapter = intervalAdapter
 
-        binding.colorpicker.adapter = ColorAdapter(context)
+        binding.colorpicker.adapter = colorAdapter
         binding.colorpicker.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
         builder.setPositiveButton(R.string.save, null)
@@ -40,15 +41,16 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
         return this
     }
 
-    fun forExistingCounter(name : String, interval : Interval) : CounterSettingsDialogBuilder {
+    fun forExistingCounter(name: String, interval: Interval, color: Int) : CounterSettingsDialogBuilder {
         builder.setTitle(R.string.edit_counter)
         binding.editText.setText(name)
         binding.spinnerInterval.setSelection(intervalAdapter.positionOf(interval))
+        colorAdapter.selectedColor = color
         previousName = name
         return this
     }
 
-    fun setOnSaveListener(onSave: (newName : String, newInterval : Interval) -> Unit): CounterSettingsDialogBuilder {
+    fun setOnSaveListener(onSave: (newName: String, newInterval: Interval, newColor: Int) -> Unit): CounterSettingsDialogBuilder {
         onSaveListener = onSave
         return this
     }
@@ -84,7 +86,7 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
                     ).show()
                 }
                 else -> {
-                    onSaveListener(name, intervalAdapter.itemAt(binding.spinnerInterval.selectedItemPosition))
+                    onSaveListener(name, intervalAdapter.itemAt(binding.spinnerInterval.selectedItemPosition), colorAdapter.selectedColor)
                     dialog.dismiss()
                 }
             }

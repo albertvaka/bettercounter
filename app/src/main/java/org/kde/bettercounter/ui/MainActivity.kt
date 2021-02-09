@@ -84,8 +84,8 @@ class MainActivity : AppCompatActivity() {
             binding.fab.visibility = View.GONE
             CounterSettingsDialogBuilder(this@MainActivity, viewModel)
                 .forNewCounter()
-                .setOnSaveListener { name, interval ->
-                    viewModel.addCounter(name, interval)
+                .setOnSaveListener { name, interval, color ->
+                    viewModel.addCounter(name, interval, color)
                 }
                 .setOnDismissListener { binding.fab.visibility = View.VISIBLE }
                 .show()

@@ -1,7 +1,9 @@
 package org.kde.bettercounter.persistence
 
+import android.content.Context
 import android.content.SharedPreferences
 import org.kde.bettercounter.BuildConfig
+import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.Converters
 import java.util.*
 import kotlin.collections.HashMap
@@ -10,9 +12,11 @@ const val alwaysShowTutorialsInDebugBuilds = true
 
 const val COUNTERS_PREFS_KEY = "counters"
 const val COUNTERS_INTERVAL_PREFS_KEY = "interval.%s"
+const val COUNTERS_COLOR_PREFS_KEY = "color.%s"
 const val TUTORIALS_PREFS_KEY = "tutorials"
 
 class Repository(
+    private val context: Context,
     private val entryDao: EntryDao,
     private val sharedPref : SharedPreferences
 ) {
@@ -49,6 +53,17 @@ class Repository(
         return tutorials.contains(id.name)
     }
 
+    fun getCounterColor(name : String) : Int {
+        val key = COUNTERS_COLOR_PREFS_KEY.format(name)
+        return sharedPref.getInt(key, context.getColor(R.color.colorPrimary))
+    }
+
+    fun setCounterColor(name : String, color : Int) {
+        counterCache.remove(name)
+        val key = COUNTERS_COLOR_PREFS_KEY.format(name)
+        sharedPref.edit().putInt(key, color).apply()
+    }
+
     fun getCounterInterval(name : String) : Interval {
         val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
         val str = sharedPref.getString(key, null)
@@ -67,11 +82,12 @@ class Repository(
 
     suspend fun getCounterSummary(name : String): CounterSummary {
         val interval = getCounterInterval(name)
+        val color = getCounterColor(name)
         return counterCache.getOrPut(name, {
             CounterSummary(
                 name = name,
                 count = entryDao.getCountSince(name, interval.toDate()),
-                interval = interval,
+                color = color,
                 mostRecent = entryDao.getMostRecent(name)?.date
             )
         })
@@ -109,4 +125,5 @@ class Repository(
     suspend fun getAllEntries(name : String): List<Entry> {
         return entryDao.getAllEntries(name)
     }
+
 }

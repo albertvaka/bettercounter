@@ -27,7 +27,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     init {
         val db  = AppDatabase.getInstance(application)
         val prefs =  application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
-        repo = Repository(db.entryDao(), prefs)
+        repo = Repository(application, db.entryDao(), prefs)
         val initialCounters = repo.getCounterList()
         viewModelScope.launch(Dispatchers.IO) {
             for (name in initialCounters) {
@@ -41,9 +41,10 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveCounterOrder(value : List<String>) = repo.setCounterList(value)
 
-    fun addCounter(name : String, interval : Interval) {
+    fun addCounter(name : String, interval : Interval, color : Int) {
         repo.setCounterList(repo.getCounterList().toMutableList() + name)
         repo.setCounterInterval(name, interval)
+        repo.setCounterColor(name, color)
         viewModelScope.launch(Dispatchers.IO) {
             for ((_, observer) in addCounterObservers) {
                 counterMap[name] = MutableLiveData(repo.getCounterSummary(name)) // cache it
@@ -100,6 +101,17 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun isTutorialShown(id: Tutorial) : Boolean {
         return repo.isTutorialShown(id)
+    }
+
+    fun getCounterColor(name : String) : Int {
+        return repo.getCounterColor(name)
+    }
+
+    fun setCounterColor(name : String, color : Int) {
+        repo.setCounterColor(name, color)
+        viewModelScope.launch(Dispatchers.IO) {
+            counterMap[name]?.postValue(repo.getCounterSummary(name))
+        }
     }
 
     fun getCounterInterval(name : String) : Interval {
