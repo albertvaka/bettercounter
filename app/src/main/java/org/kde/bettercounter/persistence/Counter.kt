@@ -8,5 +8,6 @@ class CounterSummary(var name : String,
                      var mostRecent : Date?)
 
 class CounterDetails(var name : String,
+                     var color : Int,
                      var interval : Interval,
                      var intervalEntries : List<Entry>)

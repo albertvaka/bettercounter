@@ -111,6 +111,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         repo.setCounterColor(name, color)
         viewModelScope.launch(Dispatchers.IO) {
             counterMap[name]?.postValue(repo.getCounterSummary(name))
+            entriesMap[name]?.postValue(repo.getCounterDetails(name))
         }
     }
 

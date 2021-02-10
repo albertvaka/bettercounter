@@ -129,6 +129,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateChartSheet(counter: CounterDetails) {
+        val defaultColor = getColor(R.color.colorPrimary)
+        binding.chart.setColorForNextDataSet(if (counter.color == defaultColor) getColor(R.color.colorAccent) else counter.color)
         when (counter.interval) {
             Interval.DAY -> {
                 binding.chartTitle.text = getString(R.string.chart_title_daily, counter.name)

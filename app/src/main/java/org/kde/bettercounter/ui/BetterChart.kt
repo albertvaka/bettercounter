@@ -167,6 +167,10 @@ class BetterChart : BarChart {
         }
     }
 
+    fun setColorForNextDataSet(color : Int) {
+        mDataSet.color = color
+    }
+
     fun setDailyData(intervalEntries: List<Entry>) {
         setDataBucketized(intervalEntries, Calendar.HOUR_OF_DAY, 24)
     }

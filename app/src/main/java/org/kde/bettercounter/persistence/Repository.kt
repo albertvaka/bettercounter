@@ -118,8 +118,14 @@ class Repository(
 
     suspend fun getCounterDetails(name : String): CounterDetails {
         val interval = getCounterInterval(name)
+        val color = getCounterColor(name)
         val entries = entryDao.getAllEntriesInRange(name, interval.toDate(), Calendar.getInstance().time)
-        return CounterDetails(name, interval, entries)
+        return CounterDetails(
+            name = name,
+            interval = interval,
+            color = color,
+            intervalEntries = entries
+        )
     }
 
     suspend fun getAllEntries(name : String): List<Entry> {
