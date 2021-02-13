@@ -15,7 +15,9 @@
 
 ### Features
 
-- Records the date of each individual counter increase, so upcoming versions can graph your data and calculate statistics.
+- Records the date and time of each individual counter increase.
+- Graphs your counters' evolution over a week/month/year.
+- Lets you export your data (eg: to analyze it with your choice of tools).
 - Your data is never sent to any server (except for Google's auto-backup, if it's enabled).
 - Simple as hell and will stay this way.
 
