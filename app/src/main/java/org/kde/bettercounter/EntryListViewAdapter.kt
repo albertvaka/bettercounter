@@ -95,17 +95,16 @@ class EntryListViewAdapter(
         viewModel.saveCounterOrder(counters)
     }
 
-    fun editCounter(position: Int, newName: String, interval : Interval, newColor : Int) {
+    fun editCounter(position: Int, newName: String, newInterval : Interval, newColor : Int) {
         val oldName = counters[position]
         if (oldName != newName) {
             counters[position] = newName
-            viewModel.renameCounter(oldName, newName)
             viewModel.saveCounterOrder(counters)
+            viewModel.editCounter(oldName, newName, newInterval, newColor)
+        } else {
+            viewModel.editCounterSameName(newName, newInterval, newColor)
         }
-        viewModel.setCounterInterval(newName, interval)
-        viewModel.setCounterColor(newName, newColor)
         // The counter updates async, when the update is done we will get notified through the counter's livedata
-
     }
 
     override fun onMove(fromPosition: Int, toPosition: Int) {

@@ -74,6 +74,18 @@ class Repository(
         }
     }
 
+    fun removeCounterColor(name : String) {
+        val key = COUNTERS_COLOR_PREFS_KEY.format(name)
+        sharedPref.edit().remove(key).apply()
+        counterCache.remove(name)
+    }
+
+    fun removeCounterInterval(name : String) {
+        val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
+        sharedPref.edit().remove(key).apply()
+        counterCache.remove(name)
+    }
+
     fun setCounterInterval(name : String, interval : Interval) {
         val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
         sharedPref.edit().putString(key, interval.toString()).apply()
