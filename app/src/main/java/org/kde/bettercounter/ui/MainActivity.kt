@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
 
-        viewModel = ViewModelProvider(this).get(ViewModel::class.java)
+        viewModel = ViewModelProvider.AndroidViewModelFactory(application).create(ViewModel::class.java)
 
         // Bottom sheet with graph
         // -----------------------
