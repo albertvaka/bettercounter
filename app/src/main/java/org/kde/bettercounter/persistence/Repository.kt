@@ -59,9 +59,9 @@ class Repository(
     }
 
     fun setCounterColor(name : String, color : Int) {
-        counterCache.remove(name)
         val key = COUNTERS_COLOR_PREFS_KEY.format(name)
         sharedPref.edit().putInt(key, color).apply()
+        counterCache.remove(name)
     }
 
     fun getCounterInterval(name : String) : Interval {
@@ -75,9 +75,9 @@ class Repository(
     }
 
     fun setCounterInterval(name : String, interval : Interval) {
-        counterCache.remove(name)
         val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
         sharedPref.edit().putString(key, interval.toString()).apply()
+        counterCache.remove(name)
     }
 
     suspend fun getCounterSummary(name : String): CounterSummary {
@@ -94,26 +94,26 @@ class Repository(
     }
 
     suspend fun renameCounter(oldName : String, newName : String) {
-        counterCache.remove(oldName)
         entryDao.renameCounter(oldName, newName)
+        counterCache.remove(oldName)
     }
 
     suspend fun addEntry(name: String, date: Date = Calendar.getInstance().time) {
-        counterCache.remove(name)
         entryDao.insert(Entry(name=name, date=date))
+        counterCache.remove(name)
     }
 
     suspend fun removeEntry(name: String) {
-        counterCache.remove(name)
         val entry = entryDao.getLastAdded(name)
         if (entry != null) {
             entryDao.delete(entry)
         }
+        counterCache.remove(name)
     }
 
     suspend fun removeAllEntries(name: String) {
-        counterCache.remove(name)
         entryDao.deleteAll(name)
+        counterCache.remove(name)
     }
 
     suspend fun getCounterDetails(name : String): CounterDetails {
