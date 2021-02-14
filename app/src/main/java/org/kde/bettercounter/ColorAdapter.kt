@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.RecyclerView
-import org.kde.bettercounter.R
 
 // Based on https://github.com/kristiyanP/colorpicker
 class ColorAdapter(context: Context) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {

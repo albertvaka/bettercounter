@@ -7,6 +7,7 @@ import android.view.WindowManager.LayoutParams
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
+import org.kde.bettercounter.ColorAdapter
 import org.kde.bettercounter.IntervalAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
