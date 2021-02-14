@@ -182,11 +182,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startExportIntent() {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.type = "text/csv";
-        intent.putExtra(Intent.EXTRA_TITLE, "bettercounter-export.csv");
-        startActivityForResult(intent, EXPORT_REQUEST_CODE);
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "text/csv"
+        intent.putExtra(Intent.EXTRA_TITLE, "bettercounter-export.csv")
+        startActivityForResult(intent, EXPORT_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
