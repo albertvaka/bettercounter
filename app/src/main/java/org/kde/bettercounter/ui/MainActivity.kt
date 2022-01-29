@@ -32,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: ViewModel
     private lateinit var binding: ActivityMainBinding
     private var statsCalculator = StatsCalculator(this)
+    private lateinit var sheetBehavior : BottomSheetBehavior<View>
+    private var sheetIsExpanding = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,10 +47,10 @@ class MainActivity : AppCompatActivity() {
         // Bottom sheet with graph
         // -----------------------
 
-        val sheetBehavior : BottomSheetBehavior<View> = BottomSheetBehavior.from(binding.bottomSheet)
+        sheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
         sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
-        var sheetIsExpanding = false
+        sheetIsExpanding = false
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
         var sheetUnfoldedPadding = 0  // padding to fit the bottomSheet. The height is not hardcoded, so we have wait to have it:
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -216,4 +218,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        if (sheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            sheetIsExpanding = false
+        } else {
+            super.onBackPressed()
+        }
+    }
 }
