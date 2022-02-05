@@ -15,7 +15,7 @@
         style="?android:attr/buttonBarButtonStyle"
         android:layout_gravity="center"
         android:tint="@drawable/button_state_color"
-        android:src="@drawable/ic_undo"
+        android:src="@drawable/ic_minusone"
         android:contentDescription="@string/decrease" />
 
     <View style="@style/Divider.Vertical"/>
