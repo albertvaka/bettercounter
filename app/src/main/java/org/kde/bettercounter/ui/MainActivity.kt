@@ -248,9 +248,16 @@ class MainActivity : AppCompatActivity() {
                     binding.fab.visibility = View.VISIBLE
                 }
                 .setOnDeleteListener { _, _ ->
-                    viewModel.deleteCounter(counter.name)
-                    sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    sheetIsExpanding = false
+                    AlertDialog.Builder(this)
+                        .setTitle(counter.name)
+                        .setMessage(R.string.delete_confirmation)
+                        .setPositiveButton(R.string.delete) { _, _ ->
+                            viewModel.deleteCounter(counter.name)
+                            sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                            sheetIsExpanding = false
+                        }
+                        .setNegativeButton(R.string.cancel, null)
+                        .show()
                 }
                 .show()
         }
