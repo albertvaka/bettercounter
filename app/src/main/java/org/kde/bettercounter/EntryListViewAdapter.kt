@@ -9,9 +9,7 @@ import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
-import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
-import org.kde.bettercounter.ui.CounterSettingsDialogBuilder
 import org.kde.bettercounter.ui.EntryViewHolder
 import java.util.*
 
@@ -29,16 +27,37 @@ class EntryListViewAdapter(
     override fun getItemCount(): Int = counters.size
 
     init {
-        viewModel.observeNewCounter(activity, { counterName, isUserAdded ->
-            counters.add(counterName)
-            activity.runOnUiThread {
-                val position = counters.size - 1
-                notifyItemInserted(position)
-                viewModel.getCounterSummary(counterName).observe(activity) {
-                    notifyItemChanged(counters.indexOf(it.name), Unit) // passing a second parameter disables the disappear+appear animation
+        viewModel.observeCounterChange(activity, object : ViewModel.CounterAddedObserver {
+            override fun onCounterAdded(counterName: String, isUserAdded: Boolean) {
+                counters.add(counterName)
+                activity.runOnUiThread {
+                    val position = counters.size - 1
+                    notifyItemInserted(position)
+                    viewModel.getCounterSummary(counterName).observe(activity) {
+                        notifyItemChanged(
+                            counters.indexOf(it.name),
+                            Unit
+                        ) // passing a second parameter disables the disappear+appear animation
+                    }
+                    if (isUserAdded) {
+                        onItemAdded?.invoke(position)
+                    }
                 }
-                if (isUserAdded) {
-                    onItemAdded?.invoke(position)
+            }
+
+            override fun onCounterRemoved(counterName: String) {
+                val position = counters.indexOf(counterName)
+                counters.removeAt(position)
+                activity.runOnUiThread {
+                    notifyItemRemoved(position)
+                }
+            }
+
+            override fun onCounterRenamed(oldName : String, newName: String) {
+                val position = counters.indexOf(oldName)
+                counters[position] = newName
+                activity.runOnUiThread {
+                    notifyItemChanged(position, Unit)
                 }
             }
         })
@@ -58,17 +77,7 @@ class EntryListViewAdapter(
 
     override fun onViewAttachedToWindow(holder: EntryViewHolder) {
         super.onViewAttachedToWindow(holder)
-        if (!viewModel.isTutorialShown(Tutorial.SWIPE)) {
-            viewModel.setTutorialShown(Tutorial.SWIPE)
-            SimpleTooltip.Builder(activity)
-                .anchorView(holder.itemView)
-                .text(R.string.tutorial_swipe)
-                .gravity(Gravity.BOTTOM)
-                .animated(true)
-                .modal(true)
-                .build()
-                .show()
-        } else if (counters.size > 1 && !viewModel.isTutorialShown(Tutorial.DRAG)) {
+        if (counters.size > 1 && !viewModel.isTutorialShown(Tutorial.DRAG)) {
             viewModel.setTutorialShown(Tutorial.DRAG)
             SimpleTooltip.Builder(activity)
                 .anchorView(holder.binding.countText)
@@ -86,25 +95,6 @@ class EntryListViewAdapter(
         if (counter != null) {
             holder.onBind(counter)
         }
-    }
-
-    fun removeItem(position: Int) {
-        val name = counters.removeAt(position)
-        notifyItemRemoved(position)
-        viewModel.deleteCounter(name)
-        viewModel.saveCounterOrder(counters)
-    }
-
-    fun editCounter(position: Int, newName: String, newInterval : Interval, newColor : Int) {
-        val oldName = counters[position]
-        if (oldName != newName) {
-            counters[position] = newName
-            viewModel.saveCounterOrder(counters)
-            viewModel.editCounter(oldName, newName, newInterval, newColor)
-        } else {
-            viewModel.editCounterSameName(newName, newInterval, newColor)
-        }
-        // The counter updates async, when the update is done we will get notified through the counter's livedata
     }
 
     override fun onMove(fromPosition: Int, toPosition: Int) {
@@ -129,22 +119,5 @@ class EntryListViewAdapter(
         viewModel.saveCounterOrder(counters)
     }
 
-    override fun onSwipe(position: Int) {
-        val name = counters[position]
-        val interval = viewModel.getCounterInterval(name)
-        val color = viewModel.getCounterColor(name)
-        CounterSettingsDialogBuilder(activity, viewModel)
-            .forExistingCounter(name, interval, color)
-            .setOnSaveListener { newName, newInterval, newColor ->
-                editCounter(position, newName, newInterval, newColor)
-            }
-            .setOnDismissListener {
-                notifyItemChanged(position) // moves the swiped item back to its place.
-            }
-            .setOnDeleteListener { _, _ ->
-                removeItem(position)
-            }
-            .show()
-    }
 
 }

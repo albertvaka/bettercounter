@@ -35,7 +35,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var statsCalculator = StatsCalculator(this)
     private lateinit var sheetBehavior : BottomSheetBehavior<View>
+    private lateinit var entryViewAdapter : EntryListViewAdapter
     private var sheetIsExpanding = false
+    private var currentDetailsLiveData : LiveData<CounterDetails>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +70,8 @@ class MainActivity : AppCompatActivity() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     sheetIsExpanding = false
+                } else if (newState == BottomSheetBehavior.STATE_HIDDEN){
+                    setFabToCreate()
                 }
             }
 
@@ -83,25 +87,12 @@ class MainActivity : AppCompatActivity() {
 
         // Create counter dialog
         // ---------------------
-
-        binding.fab.setOnClickListener {
-            binding.fab.visibility = View.GONE
-            CounterSettingsDialogBuilder(this@MainActivity, viewModel)
-                .forNewCounter()
-                .setOnSaveListener { name, interval, color ->
-                    viewModel.addCounter(name, interval, color)
-                }
-                .setOnDismissListener { binding.fab.visibility = View.VISIBLE }
-                .show()
-        }
-
+        setFabToCreate()
 
         // Counter list
         // ------------
-
-        val entryViewAdapter = EntryListViewAdapter(this, viewModel)
+        entryViewAdapter = EntryListViewAdapter(this, viewModel)
         entryViewAdapter.onItemAdded = { pos -> binding.recycler.smoothScrollToPosition(pos) }
-        var currentChartLiveData : LiveData<CounterDetails>? = null
         entryViewAdapter.onItemClickListener = { position: Int, counter: CounterSummary ->
             if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                 sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -110,11 +101,13 @@ class MainActivity : AppCompatActivity() {
             binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
             binding.recycler.smoothScrollToPosition(position)
 
-            val liveData = viewModel.getCounterDetails(counter.name)
-            currentChartLiveData?.removeObservers(this@MainActivity)
-            currentChartLiveData = liveData
+            setFabToEdit(counter)
+
+            val detailsData = viewModel.getCounterDetails(counter.name)
+            currentDetailsLiveData?.removeObservers(this@MainActivity)
+            currentDetailsLiveData = detailsData
             var isChartFirstUpdate = true
-            liveData.observe(this@MainActivity) {
+            detailsData.observe(this@MainActivity) {
                 runOnUiThread {
                     updateChartSheet(it)
                     if (isChartFirstUpdate) {
@@ -215,6 +208,51 @@ class MainActivity : AppCompatActivity() {
             sheetIsExpanding = false
         } else {
             super.onBackPressed()
+        }
+    }
+
+    private fun setFabToCreate() {
+        binding.fab.setImageResource(R.drawable.ic_add)
+        binding.fab.setOnClickListener {
+            binding.fab.visibility = View.GONE
+            CounterSettingsDialogBuilder(this@MainActivity, viewModel)
+                .forNewCounter()
+                .setOnSaveListener { name, interval, color ->
+                    viewModel.addCounter(name, interval, color)
+                }
+                .setOnDismissListener { binding.fab.visibility = View.VISIBLE }
+                .show()
+        }
+    }
+
+    private fun setFabToEdit(counter : CounterSummary) {
+        binding.fab.setImageResource(R.drawable.ic_edit)
+        binding.fab.setOnClickListener {
+            binding.fab.visibility = View.GONE
+
+            CounterSettingsDialogBuilder(this@MainActivity, viewModel)
+                .forExistingCounter(counter)
+                .setOnSaveListener { newName, newInterval, newColor ->
+                    if (counter.name != newName) {
+                        viewModel.editCounter(counter.name, newName, newInterval, newColor)
+                    } else {
+                        viewModel.editCounterSameName(newName, newInterval, newColor)
+                    }
+                    // We are not subscribed to the summary livedata, so we won't get notified of the change we just made.
+                    // Update our local copy so it has the right data if we open the dialog again.
+                    counter.name = newName
+                    counter.interval = newInterval
+                    counter.color = newColor
+                }
+                .setOnDismissListener {
+                    binding.fab.visibility = View.VISIBLE
+                }
+                .setOnDeleteListener { _, _ ->
+                    viewModel.deleteCounter(counter.name)
+                    sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    sheetIsExpanding = false
+                }
+                .show()
         }
     }
 }

@@ -16,12 +16,11 @@ class DragAndSwipeTouchHelper(private val mAdapter: ListGesturesCallback) :
         viewHolder: RecyclerView.ViewHolder
     ): Int {
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-        val swipeFlags = ItemTouchHelper.RIGHT
+        val swipeFlags = 0
         return makeMovementFlags(dragFlags, swipeFlags)
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
-        mAdapter.onSwipe(viewHolder.adapterPosition)
     }
 
     override fun onMove(
@@ -55,6 +54,5 @@ class DragAndSwipeTouchHelper(private val mAdapter: ListGesturesCallback) :
         fun onMove(fromPosition: Int, toPosition: Int)
         fun onDragStart(viewHolder: RecyclerView.ViewHolder?)
         fun onDragEnd(viewHolder: RecyclerView.ViewHolder?)
-        fun onSwipe(position: Int)
     }
 }

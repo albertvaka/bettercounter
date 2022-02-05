@@ -12,6 +12,7 @@ import org.kde.bettercounter.IntervalAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.EditCounterBinding
+import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.DEFAULT_INTERVAL
 import org.kde.bettercounter.persistence.Interval
 
@@ -42,12 +43,12 @@ class CounterSettingsDialogBuilder(private val context : Context, private val vi
         return this
     }
 
-    fun forExistingCounter(name: String, interval: Interval, color: Int) : CounterSettingsDialogBuilder {
+    fun forExistingCounter(counter: CounterSummary) : CounterSettingsDialogBuilder {
         builder.setTitle(R.string.edit_counter)
-        binding.editText.setText(name)
-        binding.spinnerInterval.setSelection(intervalAdapter.positionOf(interval))
-        colorAdapter.selectedColor = color
-        previousName = name
+        binding.editText.setText(counter.name)
+        binding.spinnerInterval.setSelection(intervalAdapter.positionOf(counter.interval))
+        colorAdapter.selectedColor = counter.color
+        previousName = counter.name
         return this
     }
 

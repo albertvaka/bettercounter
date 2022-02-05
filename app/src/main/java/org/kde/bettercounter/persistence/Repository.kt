@@ -8,7 +8,7 @@ import org.kde.bettercounter.boilerplate.Converters
 import java.util.*
 import kotlin.collections.HashMap
 
-const val alwaysShowTutorialsInDebugBuilds = true
+const val alwaysShowTutorialsInDebugBuilds = false
 
 const val COUNTERS_PREFS_KEY = "counters"
 const val COUNTERS_INTERVAL_PREFS_KEY = "interval.%s"
@@ -53,18 +53,12 @@ class Repository(
         return tutorials.contains(id.name)
     }
 
-    fun getCounterColor(name : String) : Int {
+    private fun getCounterColor(name : String) : Int {
         val key = COUNTERS_COLOR_PREFS_KEY.format(name)
         return sharedPref.getInt(key, context.getColor(R.color.colorPrimary))
     }
 
-    fun setCounterColor(name : String, color : Int) {
-        val key = COUNTERS_COLOR_PREFS_KEY.format(name)
-        sharedPref.edit().putInt(key, color).apply()
-        counterCache.remove(name)
-    }
-
-    fun getCounterInterval(name : String) : Interval {
+    private fun getCounterInterval(name : String) : Interval {
         val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
         val str = sharedPref.getString(key, null)
         return if (str != null) {
@@ -74,21 +68,17 @@ class Repository(
         }
     }
 
-    fun removeCounterColor(name : String) {
-        val key = COUNTERS_COLOR_PREFS_KEY.format(name)
-        sharedPref.edit().remove(key).apply()
+    fun deleteCounterMetadata(name : String) {
+        val colorKey = COUNTERS_COLOR_PREFS_KEY.format(name)
+        val intervalKey = COUNTERS_INTERVAL_PREFS_KEY.format(name)
+        sharedPref.edit().remove(colorKey).remove(intervalKey).apply()
         counterCache.remove(name)
     }
 
-    fun removeCounterInterval(name : String) {
-        val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
-        sharedPref.edit().remove(key).apply()
-        counterCache.remove(name)
-    }
-
-    fun setCounterInterval(name : String, interval : Interval) {
-        val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
-        sharedPref.edit().putString(key, interval.toString()).apply()
+    fun setCounterMetadata(name : String, color : Int, interval : Interval) {
+        val colorKey = COUNTERS_COLOR_PREFS_KEY.format(name)
+        val intervalKey = COUNTERS_INTERVAL_PREFS_KEY.format(name)
+        sharedPref.edit().putInt(colorKey, color).putString(intervalKey, interval.toString()).apply()
         counterCache.remove(name)
     }
 
@@ -100,6 +90,7 @@ class Repository(
                 name = name,
                 count = entryDao.getCountSince(name, interval.toDate()),
                 color = color,
+                interval = interval,
                 mostRecent = entryDao.getMostRecent(name)?.date
             )
         })

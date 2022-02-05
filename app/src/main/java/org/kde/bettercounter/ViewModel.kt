@@ -5,7 +5,9 @@ import android.content.Context
 import android.os.Handler
 import android.os.Message
 import androidx.lifecycle.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.*
 import java.io.OutputStream
@@ -15,8 +17,10 @@ import kotlin.collections.HashMap
 
 class ViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun interface CounterAddedObserver {
+    interface CounterAddedObserver {
         fun onCounterAdded(name: String, isUserCreated : Boolean)
+        fun onCounterRemoved(name: String)
+        fun onCounterRenamed(oldName : String, newName: String)
     }
 
     private val repo : Repository
@@ -43,8 +47,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun addCounter(name : String, interval : Interval, color : Int) {
         repo.setCounterList(repo.getCounterList().toMutableList() + name)
-        repo.setCounterInterval(name, interval)
-        repo.setCounterColor(name, color)
+        repo.setCounterMetadata(name, color, interval)
         viewModelScope.launch(Dispatchers.IO) {
             for ((_, observer) in addCounterObservers) {
                 summaryMap[name] = MutableLiveData(repo.getCounterSummary(name)) // cache it
@@ -55,7 +58,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun observeNewCounter(owner : LifecycleOwner, observer: CounterAddedObserver) {
+    fun observeCounterChange(owner : LifecycleOwner, observer: CounterAddedObserver) {
         addCounterObservers[owner] = observer
         for (name in summaryMap.keys) { //notify the ones we already have
             observer.onCounterAdded(name, false)
@@ -86,17 +89,8 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         return repo.isTutorialShown(id)
     }
 
-    fun getCounterColor(name : String) : Int {
-        return repo.getCounterColor(name)
-    }
-
-    fun getCounterInterval(name : String) : Interval {
-        return repo.getCounterInterval(name)
-    }
-
     fun editCounterSameName(name : String, interval : Interval, color : Int) {
-        repo.setCounterColor(name, color)
-        repo.setCounterInterval(name, interval)
+        repo.setCounterMetadata(name, color, interval)
         viewModelScope.launch(Dispatchers.IO) {
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
             detailsMap[name]?.postValue(repo.getCounterDetails(name))
@@ -104,16 +98,25 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun editCounter(oldName : String, newName : String, interval : Interval, color : Int) {
-        repo.setCounterColor(newName, color)
-        repo.setCounterInterval(newName, interval)
-        repo.removeCounterColor(oldName)
-        repo.removeCounterInterval(oldName)
+        repo.deleteCounterMetadata(oldName)
+        repo.setCounterMetadata(newName, color, interval)
+        val list = repo.getCounterList().toMutableList()
+        list.forEachIndexed { index, element ->
+            if (element == oldName) {
+                list[index] = newName
+            }
+        }
+        repo.setCounterList(list)
+
         viewModelScope.launch(Dispatchers.IO) {
             repo.renameCounter(oldName, newName)
             val counter = summaryMap.remove(oldName)
             if (counter != null) {
                 summaryMap[newName] = counter
                 counter.postValue(repo.getCounterSummary(newName))
+            } else {
+                // should not happen, in theory we always have summaryMap populated
+                summaryMap[newName] = MutableLiveData(repo.getCounterSummary(newName)) // cache it
             }
 
             val entries = detailsMap.remove(oldName)
@@ -121,6 +124,13 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
                 detailsMap[newName] = entries
                 entries.postValue(repo.getCounterDetails(newName))
             }
+
+            for ((_, observer) in addCounterObservers) {
+                withContext(Dispatchers.Main) {
+                    observer.onCounterRenamed(oldName, newName)
+                }
+            }
+
         }
     }
 
@@ -133,11 +143,18 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteCounter(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.removeAllEntries(name)
-            repo.removeCounterColor(name)
-            repo.removeCounterInterval(name)
-            summaryMap.remove(name)
-            detailsMap.remove(name)
+            for ((_, observer) in addCounterObservers) {
+                withContext(Dispatchers.Main) {
+                    observer.onCounterRemoved(name)
+                }
+            }
         }
+        summaryMap.remove(name)
+        detailsMap.remove(name)
+        repo.deleteCounterMetadata(name)
+        val list = repo.getCounterList().toMutableList()
+        list.remove(name)
+        repo.setCounterList(list)
     }
 
     fun getCounterDetails(name : String) : LiveData<CounterDetails> {
