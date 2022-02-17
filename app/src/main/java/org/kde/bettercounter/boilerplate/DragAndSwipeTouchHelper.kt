@@ -27,7 +27,7 @@ class DragAndSwipeTouchHelper(private val mAdapter: ListGesturesCallback) :
         recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        mAdapter.onMove(viewHolder.adapterPosition, target.adapterPosition)
+        mAdapter.onMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
         return true
     }
 
