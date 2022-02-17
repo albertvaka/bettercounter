@@ -18,8 +18,8 @@ import kotlin.collections.HashMap
 class ViewModel(application: Application) : AndroidViewModel(application) {
 
     interface CounterAddedObserver {
-        fun onCounterAdded(name: String, isUserCreated : Boolean)
-        fun onCounterRemoved(name: String)
+        fun onCounterAdded(counterName: String, isUserAdded : Boolean)
+        fun onCounterRemoved(counterName: String)
         fun onCounterRenamed(oldName : String, newName: String)
     }
 
