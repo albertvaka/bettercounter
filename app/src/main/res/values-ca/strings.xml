@@ -36,9 +36,9 @@
     <string name="stats_average_n_a">Mitjana: N/A"</string>
     <string name="stats_average_every_days">Mitjana: cada %1$.2f dies"</string>
     <string name="no_data">No hi ha entrades en aquest període</string>
-    <string name="tutorial_pickdate">Manté premut per escollir la data</string>
-    <string name="tutorial_swipe">Llisca per editar</string>
-    <string name="tutorial_drag">Manté premut i arrossega per a reordenar</string>
+    <string name="tutorial_pickdate">Feu una pulsació llarga per escollir la data</string>
+    <string name="tutorial_swipe">Llisqueu per editar</string>
+    <string name="tutorial_drag">Feu una pulsació llarga i arrossegueu per a reordenar</string>
     <string name="export">Exporta les dades</string>
     <string name="exported_n">Exportats %1$d/%2$d comptadors</string>
     <string name="delete_confirmation">Segur que voleu esborrar aquest comptador?</string>
