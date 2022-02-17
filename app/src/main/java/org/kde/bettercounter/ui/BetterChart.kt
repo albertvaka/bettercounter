@@ -16,6 +16,8 @@ import org.kde.bettercounter.StatsCalculator
 import org.kde.bettercounter.extensions.truncate
 import org.kde.bettercounter.persistence.Entry
 import java.text.DateFormatSymbols
+import java.text.FieldPosition
+import java.text.SimpleDateFormat
 import java.util.*
 
 class BetterChart : BarChart {
@@ -149,12 +151,16 @@ class BetterChart : BarChart {
     }
 
     class MonthFormatter(private var numBuckets: Int) : ValueFormatter() {
-        private val monthNames = DateFormatSymbols().shortMonths
+        // When the language requires different month forms for formatting and stand-alone usages, then
+        // DateFormatSymbols returns short month names in the formatting form, but we want stand-alone.
+        private val monthNamesFormatter = SimpleDateFormat("LLL", Locale.getDefault())
         override fun getFormattedValue(value: Float): String {
             val cal = Calendar.getInstance()
             cal.truncate(Calendar.MONTH)
             cal.add(Calendar.MONTH, -numBuckets + value.toInt())
-            return monthNames[cal.get(Calendar.MONTH)]
+            monthNamesFormatter.timeZone = cal.timeZone
+            return monthNamesFormatter.format(cal.time, StringBuffer(), FieldPosition(0)).toString()
+
         }
     }
 
