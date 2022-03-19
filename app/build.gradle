@@ -54,7 +54,7 @@ android {
 }
 
 dependencies {
-    def room_version = "2.4.1"
+    def room_version = "2.4.2"
 
     implementation 'com.github.douglasjunior:android-simple-tooltip:1.0.0-rc.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
