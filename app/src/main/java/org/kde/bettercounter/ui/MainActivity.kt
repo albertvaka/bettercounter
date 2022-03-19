@@ -11,12 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import org.kde.bettercounter.EntryListViewAdapter
-import org.kde.bettercounter.R
-import org.kde.bettercounter.StatsCalculator
-import org.kde.bettercounter.ViewModel
+import org.kde.bettercounter.*
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
@@ -26,7 +25,6 @@ import org.kde.bettercounter.databinding.ProgressDialogBinding
 import org.kde.bettercounter.persistence.CounterDetails
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private var statsCalculator = StatsCalculator(this)
     private lateinit var sheetBehavior : BottomSheetBehavior<View>
     private lateinit var entryViewAdapter : EntryListViewAdapter
+    private lateinit var chartsAdapter : ChartsAdapter
     private var sheetIsExpanding = false
     private var currentDetailsLiveData : LiveData<CounterDetails>? = null
 
@@ -64,8 +63,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        binding.chart.setup()
-
         sheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
@@ -89,6 +86,10 @@ class MainActivity : AppCompatActivity() {
         // ---------------------
         setFabToCreate()
 
+        // Chart pager
+        // -----------
+        chartsAdapter = ChartsAdapter(this)
+
         // Counter list
         // ------------
         entryViewAdapter = EntryListViewAdapter(this, viewModel)
@@ -109,9 +110,10 @@ class MainActivity : AppCompatActivity() {
             var isChartFirstUpdate = true
             detailsData.observe(this@MainActivity) {
                 runOnUiThread {
-                    updateChartSheet(it)
+                    updateStats(it)
+                    chartsAdapter.setChart(it)
                     if (isChartFirstUpdate) {
-                        binding.chart.animateY(200)
+                        chartsAdapter.animate()
                         isChartFirstUpdate = false
                     }
                 }
@@ -123,43 +125,9 @@ class MainActivity : AppCompatActivity() {
         val callback = DragAndSwipeTouchHelper(entryViewAdapter)
         ItemTouchHelper(callback).attachToRecyclerView(binding.recycler)
 
-    }
-
-    private fun updateChartSheet(counter: CounterDetails) {
-        val defaultColor = getColor(R.color.colorPrimary)
-        binding.chart.setColorForNextDataSet(if (counter.color == defaultColor) getColor(R.color.colorAccent) else counter.color)
-        when (counter.interval) {
-            Interval.DAY -> {
-                binding.chartTitle.text = getString(R.string.chart_title_daily, counter.name)
-                binding.chartAverage.text = statsCalculator.getDaily(counter.intervalEntries)
-                binding.chart.setDailyData(counter.intervalEntries)
-            }
-            Interval.WEEK -> {
-                binding.chartTitle.text = getString(R.string.chart_title_weekly, counter.name)
-                binding.chartAverage.text = statsCalculator.getWeekly(counter.intervalEntries)
-                binding.chart.setWeeklyData(counter.intervalEntries)
-            }
-            Interval.MONTH -> {
-                binding.chartTitle.text = getString(R.string.chart_title_monthly, counter.name)
-                binding.chartAverage.text = statsCalculator.getMonthly(counter.intervalEntries)
-                binding.chart.setMonthlyData(counter.intervalEntries)
-            }
-            Interval.YEAR -> {
-                binding.chartTitle.text = getString(R.string.chart_title_yearly, counter.name)
-                binding.chartAverage.text = statsCalculator.getYearly(counter.intervalEntries)
-                binding.chart.setYearlyData(counter.intervalEntries)
-            }
-            Interval.YTD -> {
-                binding.chartTitle.text = getString(R.string.chart_title_ytd, counter.name)
-                binding.chartAverage.text = statsCalculator.getYtd(counter.intervalEntries)
-                binding.chart.setYtdData(counter.intervalEntries)
-            }
-            Interval.LIFETIME -> {
-                binding.chartTitle.text = getString(R.string.chart_title_lifetime, counter.name)
-                binding.chartAverage.text = statsCalculator.getLifetime(counter.intervalEntries)
-                binding.chart.setLifetimeData(counter.intervalEntries)
-            }
-        }
+        binding.charts.layoutManager = HackyLayoutManager(this, RecyclerView.HORIZONTAL)
+        binding.charts.adapter = chartsAdapter
+        PagerSnapHelper().attachToRecyclerView(binding.charts) // Scroll one by one
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -211,6 +179,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateStats(counter: CounterDetails) {
+        when (counter.interval) {
+            Interval.DAY -> {
+                binding.chartTitle.text = getString(R.string.chart_title_daily, counter.name)
+                binding.chartAverage.text = statsCalculator.getDaily(counter.intervalEntries)
+            }
+            Interval.WEEK -> {
+                binding.chartTitle.text = getString(R.string.chart_title_weekly, counter.name)
+                binding.chartAverage.text = statsCalculator.getWeekly(counter.intervalEntries)
+            }
+            Interval.MONTH -> {
+                binding.chartTitle.text = getString(R.string.chart_title_monthly, counter.name)
+                binding.chartAverage.text = statsCalculator.getMonthly(counter.intervalEntries)
+            }
+            Interval.YEAR -> {
+                binding.chartTitle.text = getString(R.string.chart_title_yearly, counter.name)
+                binding.chartAverage.text = statsCalculator.getYearly(counter.intervalEntries)
+            }
+            Interval.YTD -> {
+                binding.chartTitle.text = getString(R.string.chart_title_ytd, counter.name)
+                binding.chartAverage.text = statsCalculator.getYtd(counter.intervalEntries)
+            }
+            Interval.LIFETIME -> {
+                binding.chartTitle.text = getString(R.string.chart_title_lifetime, counter.name)
+                binding.chartAverage.text = statsCalculator.getLifetime(counter.intervalEntries)
+            }
+        }
+    }
     private fun setFabToCreate() {
         binding.fab.setImageResource(R.drawable.ic_add)
         binding.fab.setOnClickListener {

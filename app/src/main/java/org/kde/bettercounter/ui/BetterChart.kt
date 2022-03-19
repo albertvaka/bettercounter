@@ -22,6 +22,7 @@ import java.util.*
 
 class BetterChart : BarChart {
 
+    constructor(ctx: Context) : super(ctx)
     constructor(ctx: Context, attrs: AttributeSet?) : super(ctx, attrs)
     constructor(ctx: Context, attrs: AttributeSet?, defStyle: Int) : super(ctx, attrs, defStyle)
 

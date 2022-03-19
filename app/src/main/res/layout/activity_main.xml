@@ -23,11 +23,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:name="org.kde.bettercounter.EntryFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="LinearLayoutManager"
-        tools:context=".EntryListFragment"
         android:clipToPadding="false"
         android:paddingBottom="100dp"
         tools:listitem="@layout/fragment_entry" />
@@ -46,7 +44,7 @@
         android:layout_height = "wrap_content">
 
         <TextView
-            android:id = "@+id/chartTitle"
+            android:id="@+id/chartTitle"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:clickable="true"
@@ -57,7 +55,7 @@
             android:layout_width="match_parent"/>
 
         <TextView
-            android:id = "@+id/chartAverage"
+            android:id="@+id/chartAverage"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:clickable="true"
@@ -66,11 +64,13 @@
             android:textAppearance="?attr/textAppearanceListItem"
             android:layout_width="match_parent"/>
 
-        <org.kde.bettercounter.ui.BetterChart
-            android:id="@+id/chart"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/charts"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
-            android:background="@color/colorPrimaryDark"
-            android:layout_height="260dip" />
+            android:layout_height="wrap_content"
+            app:layoutManager="LinearLayoutManager"
+            android:background="@color/colorPrimaryDark" />
 
     </LinearLayout>
 
