@@ -15,7 +15,6 @@
     <string name="interval_week">Weekly</string>
     <string name="interval_month">Monthly</string>
     <string name="interval_year">Yearly</string>
-    <string name="interval_ytd">Year to date</string>
     <string name="interval_lifetime">Lifetime</string>
     <string name="time_ago_dhm">%1$dd %2$dh %3$dm ago</string>
     <string name="time_ago_hm">%1$dh %2$dm ago</string>
@@ -24,17 +23,12 @@
     <string name="time_in_hm">In %1$dh %2$dm</string>
     <string name="time_in_m">In %1$dm</string>
     <string name="just_now">Just now</string>
-    <string name="chart_title_daily">%1$s (last 24h)"</string>
-    <string name="chart_title_weekly">%1$s (last 7 days)"</string>
-    <string name="chart_title_monthly">%1$s (last month)"</string>
-    <string name="chart_title_yearly">%1$s (last year)"</string>
-    <string name="chart_title_ytd">%1$s (YTD)"</string>
-    <string name="chart_title_lifetime">%1$s (lifetime)"</string>
     <string name="stats_average_per_hour">Avg: %1$.2f times/hour"</string>
     <string name="stats_average_every_hours">Avg: every %1$.2f hours"</string>
     <string name="stats_average_per_day">Avg: %1$.2f times/day"</string>
     <string name="stats_average_n_a">Avg: N/A"</string>
     <string name="stats_average_every_days">Avg: every %1$.2f days"</string>
+    <string name="stats_total_period">%1$s: %2$d</string>
     <string name="no_data">No entries in the selected period</string>
     <string name="tutorial_pickdate">Long press to pick the date</string>
     <string name="tutorial_swipe">Swipe right to edit or delete</string>

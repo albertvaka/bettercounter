@@ -1,5 +1,6 @@
 package org.kde.bettercounter
 
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -94,6 +95,8 @@ class EntryListViewAdapter(
         val counter = viewModel.getCounterSummary(counters[position]).value
         if (counter != null) {
             holder.onBind(counter)
+        } else {
+            Log.e("EntryListAdapter", "Counter not found?")
         }
     }
 

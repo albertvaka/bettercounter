@@ -12,7 +12,6 @@ import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.*
 import java.io.OutputStream
 import java.util.*
-import kotlin.collections.HashMap
 
 
 class ViewModel(application: Application) : AndroidViewModel(application) {
@@ -183,7 +182,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
                 it.bufferedWriter().use { writer ->
                     for ((i, name) in repo.getCounterList().withIndex()) {
                         sendProgress(i)
-                        val entries = repo.getAllEntries(name)
+                        val entries = repo.getAllEntriesSortedByDate(name)
                         writer.write(name)
                         for (entry in entries) {
                             writer.write(",")

@@ -54,23 +54,12 @@
             android:textAppearance="?attr/textAppearanceListItem"
             android:layout_width="match_parent"/>
 
-        <TextView
-            android:id="@+id/chartAverage"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceListItem"
-            android:layout_width="match_parent"/>
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/charts"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layoutManager="LinearLayoutManager"
-            android:background="@color/colorPrimaryDark" />
+            app:layoutManager="LinearLayoutManager" />
 
     </LinearLayout>
 

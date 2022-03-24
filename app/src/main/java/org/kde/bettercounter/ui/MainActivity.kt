@@ -1,6 +1,7 @@
 package org.kde.bettercounter.ui
 
 import android.app.AlertDialog
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -15,7 +16,10 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import org.kde.bettercounter.*
+import org.kde.bettercounter.ChartsAdapter
+import org.kde.bettercounter.EntryListViewAdapter
+import org.kde.bettercounter.R
+import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
@@ -31,10 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ViewModel
     private lateinit var binding: ActivityMainBinding
-    private var statsCalculator = StatsCalculator(this)
     private lateinit var sheetBehavior : BottomSheetBehavior<View>
-    private lateinit var entryViewAdapter : EntryListViewAdapter
-    private lateinit var chartsAdapter : ChartsAdapter
     private var sheetIsExpanding = false
     private var currentDetailsLiveData : LiveData<CounterDetails>? = null
 
@@ -44,8 +45,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
-
         viewModel = ViewModelProvider.AndroidViewModelFactory(application).create(ViewModel::class.java)
+
 
         // Bottom sheet with graph
         // -----------------------
@@ -55,7 +56,9 @@ class MainActivity : AppCompatActivity() {
 
         sheetIsExpanding = false
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
-        var sheetUnfoldedPadding = 0  // padding to fit the bottomSheet. The height is not hardcoded, so we have wait to have it:
+        var sheetUnfoldedPadding = 0  // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
+        // FIXME: Hack so the size of the sheet is known from the beginning, since we only compute it once.
+        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterDetails("Empty", Color.BLACK, Interval.DAY, listOf()))
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 sheetUnfoldedPadding = binding.bottomSheet.height + 50
@@ -86,13 +89,9 @@ class MainActivity : AppCompatActivity() {
         // ---------------------
         setFabToCreate()
 
-        // Chart pager
-        // -----------
-        chartsAdapter = ChartsAdapter(this)
-
         // Counter list
         // ------------
-        entryViewAdapter = EntryListViewAdapter(this, viewModel)
+        val entryViewAdapter = EntryListViewAdapter(this, viewModel)
         entryViewAdapter.onItemAdded = { pos -> binding.recycler.smoothScrollToPosition(pos) }
         entryViewAdapter.onItemClickListener = { position: Int, counter: CounterSummary ->
             if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
@@ -104,18 +103,15 @@ class MainActivity : AppCompatActivity() {
 
             setFabToEdit(counter)
 
-            val detailsData = viewModel.getCounterDetails(counter.name)
             currentDetailsLiveData?.removeObservers(this@MainActivity)
+            val detailsData = viewModel.getCounterDetails(counter.name)
             currentDetailsLiveData = detailsData
-            var isChartFirstUpdate = true
             detailsData.observe(this@MainActivity) {
                 runOnUiThread {
-                    updateStats(it)
-                    chartsAdapter.setChart(it)
-                    if (isChartFirstUpdate) {
-                        chartsAdapter.animate()
-                        isChartFirstUpdate = false
-                    }
+                    binding.chartTitle.text = counter.name
+                    val adapter = ChartsAdapter(this, viewModel, it)
+                    binding.charts.swapAdapter(adapter, true)
+                    binding.charts.scrollToPosition(0)
                 }
             }
         }
@@ -125,8 +121,12 @@ class MainActivity : AppCompatActivity() {
         val callback = DragAndSwipeTouchHelper(entryViewAdapter)
         ItemTouchHelper(callback).attachToRecyclerView(binding.recycler)
 
-        binding.charts.layoutManager = HackyLayoutManager(this, RecyclerView.HORIZONTAL)
-        binding.charts.adapter = chartsAdapter
+        binding.charts.layoutManager = HackyLayoutManager(this, RecyclerView.HORIZONTAL).also {
+            it.reverseLayout = true
+            it.stackFromEnd = true
+        }
+
+        binding.charts.isNestedScrollingEnabled = false;
         PagerSnapHelper().attachToRecyclerView(binding.charts) // Scroll one by one
     }
 
@@ -179,34 +179,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateStats(counter: CounterDetails) {
-        when (counter.interval) {
-            Interval.DAY -> {
-                binding.chartTitle.text = getString(R.string.chart_title_daily, counter.name)
-                binding.chartAverage.text = statsCalculator.getDaily(counter.intervalEntries)
-            }
-            Interval.WEEK -> {
-                binding.chartTitle.text = getString(R.string.chart_title_weekly, counter.name)
-                binding.chartAverage.text = statsCalculator.getWeekly(counter.intervalEntries)
-            }
-            Interval.MONTH -> {
-                binding.chartTitle.text = getString(R.string.chart_title_monthly, counter.name)
-                binding.chartAverage.text = statsCalculator.getMonthly(counter.intervalEntries)
-            }
-            Interval.YEAR -> {
-                binding.chartTitle.text = getString(R.string.chart_title_yearly, counter.name)
-                binding.chartAverage.text = statsCalculator.getYearly(counter.intervalEntries)
-            }
-            Interval.YTD -> {
-                binding.chartTitle.text = getString(R.string.chart_title_ytd, counter.name)
-                binding.chartAverage.text = statsCalculator.getYtd(counter.intervalEntries)
-            }
-            Interval.LIFETIME -> {
-                binding.chartTitle.text = getString(R.string.chart_title_lifetime, counter.name)
-                binding.chartAverage.text = statsCalculator.getLifetime(counter.intervalEntries)
-            }
-        }
-    }
     private fun setFabToCreate() {
         binding.fab.setImageResource(R.drawable.ic_add)
         binding.fab.setOnClickListener {
