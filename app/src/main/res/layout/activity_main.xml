@@ -44,7 +44,7 @@
         android:layout_height = "wrap_content">
 
         <TextView
-            android:id="@+id/chartTitle"
+            android:id="@+id/detailsTitle"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:clickable="true"

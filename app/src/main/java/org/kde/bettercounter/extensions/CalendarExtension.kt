@@ -8,7 +8,7 @@ fun Calendar.truncate(field: Int) {
     set(Calendar.SECOND, 0)
     if (field == Calendar.MINUTE) return
     set(Calendar.MINUTE, 0)
-    if (field == Calendar.HOUR_OF_DAY) return
+    if (field == Calendar.HOUR_OF_DAY || field == Calendar.HOUR) return
     set(Calendar.HOUR_OF_DAY, 0)
     if (field in listOf(Calendar.DATE, Calendar.DAY_OF_WEEK, Calendar.DAY_OF_MONTH, Calendar.DAY_OF_YEAR)) return
     if (field in listOf(Calendar.WEEK_OF_YEAR, Calendar.WEEK_OF_MONTH)) {

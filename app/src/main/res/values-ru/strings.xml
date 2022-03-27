@@ -23,16 +23,12 @@
     <string name="time_in_hm">На %1$dh %2$dm</string>
     <string name="time_in_m">На %1$dm</string>
     <string name="just_now">Только что</string>
-    <string name="chart_title_daily">%1$s (Ежедневно)"</string>
-    <string name="chart_title_weekly">%1$s (Еженедельно)"</string>
-    <string name="chart_title_monthly">%1$s (Ежемесячно)"</string>
-    <string name="chart_title_yearly">%1$s (Ежегодно)"</string>
-    <string name="chart_title_lifetime">%1$s (Пожизненно)"</string>
-    <string name="stats_average_per_hour">В среднем: %1$.2f раз/час"</string>
-    <string name="stats_average_every_hours">В среднем: каждые %1$.2f часов"</string>
-    <string name="stats_average_per_day">В среднем: %1$.2f раз/день"</string>
-    <string name="stats_average_n_a">В среднем: Н/Д"</string>
-    <string name="stats_average_every_days">В среднем: каждые %1$.2f дней"</string>
+    <string name="stats_average_per_hour">%1$.2f раз/час"</string>
+    <string name="stats_average_every_hours">каждые %1$.2f часов"</string>
+    <string name="stats_average_per_day">%1$.2f раз/день"</string>
+    <string name="stats_average_n_a">Н/Д"</string>
+    <string name="stats_average_every_days">каждые %1$.2f дней"</string>
+    <string name="stats_averages">В среднем: %1$s, Пожизненно: %2$s</string>
     <string name="no_data">Отсутствуют записи в выбранном периоде</string>
     <string name="tutorial_pickdate">Долгое нажатие для выбора даты</string>
     <string name="tutorial_swipe">Проведите пальцем вправо для редактирования или удаления</string>
@@ -40,4 +36,9 @@
     <string name="export">Экспорт данных</string>
     <string name="exported_n">Экспортировано %1$d/%2$d счетчиков</string>
     <string name="delete_confirmation">Вы уверены, что хотите удалить этот счетчик?</string>
+    <plurals name="chart_title">
+        <item quantity="one">%1$s (%2$d)</item>
+        <item quantity="many">%1$s (%2$d)</item>
+        <item quantity="few">%1$s (%2$d)</item>
+    </plurals>
 </resources>

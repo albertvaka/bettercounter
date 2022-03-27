@@ -20,7 +20,7 @@ class ChartHolder(
         binding.chart.setup()
     }
 
-    fun onBind(counter: CounterDetails, position : Int, entries : List<Entry>, rangeStart : Calendar, averageString : String) {
+    fun onBind(counter: CounterDetails, entries : List<Entry>, rangeStart : Calendar, averageString : String) {
         // Chart name
         val dateFormat = when (counter.intervalForChart) {
             Interval.DAY, Interval.WEEK -> "dd/MM/yyyy"
@@ -28,7 +28,8 @@ class ChartHolder(
             Interval.YEAR -> "yyyy"
             Interval.LIFETIME -> "".also { assert(false) } // Not a valid display interval
         }
-        binding.chartName.text = SimpleDateFormat(dateFormat, Locale.getDefault()).format(rangeStart.time)
+        val dateString = SimpleDateFormat(dateFormat, Locale.getDefault()).format(rangeStart.time)
+        binding.chartName.text = context.resources.getQuantityString(R.plurals.chart_title, entries.size, dateString, entries.size)
 
         // Chart
         val defaultColor = context.getColor(R.color.colorPrimary)
@@ -37,7 +38,5 @@ class ChartHolder(
 
         // Stats
         binding.chartAverage.text = averageString
-        val periodString = context.getString(counter.intervalForChart.humanReadableResource)
-        binding.chartTotal.text = context.getString(R.string.stats_total_period, periodString, entries.size)
     }
 }

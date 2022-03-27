@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
             currentDetailsLiveData = detailsData
             detailsData.observe(this@MainActivity) {
                 runOnUiThread {
-                    binding.chartTitle.text = counter.name
+                    binding.detailsTitle.text = counter.name
                     val adapter = ChartsAdapter(this, viewModel, it)
                     binding.charts.swapAdapter(adapter, true)
                     binding.charts.scrollToPosition(0)
