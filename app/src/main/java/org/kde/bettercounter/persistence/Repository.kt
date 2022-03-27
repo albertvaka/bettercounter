@@ -2,10 +2,13 @@ package org.kde.bettercounter.persistence
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.Converters
 import org.kde.bettercounter.extensions.addInterval
+import org.kde.bettercounter.extensions.copy
+import org.kde.bettercounter.extensions.truncate
 import java.util.*
 
 const val alwaysShowTutorialsInDebugBuilds = false
@@ -85,11 +88,15 @@ class Repository(
     suspend fun getCounterSummary(name : String): CounterSummary {
         val interval = getCounterInterval(name)
         val color = getCounterColor(name)
-        val intervalStartDate = Calendar.getInstance().also { it.addInterval(interval, -1) }
-        return counterCache.getOrPut(name) {
+        val intervalStartDate = when (interval) {
+            Interval.LIFETIME -> Calendar.getInstance().apply { set(Calendar.YEAR, 1990) }
+            else -> Calendar.getInstance().apply { truncate(interval) }
+        }
+        val intervalEndDate = intervalStartDate.copy().apply { addInterval(interval, 1) }
+         return counterCache.getOrPut(name) {
             CounterSummary(
                 name = name,
-                count = entryDao.getCountSince(name, intervalStartDate.time),
+                count = entryDao.getCountInRange(name, intervalStartDate.time, intervalEndDate.time),
                 color = color,
                 interval = interval,
                 mostRecent = entryDao.getMostRecent(name)?.date

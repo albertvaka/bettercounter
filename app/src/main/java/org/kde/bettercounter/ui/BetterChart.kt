@@ -110,7 +110,7 @@ class BetterChart : BarChart {
         assert(intervalEntries.first().date.time >= cal.timeInMillis) {
             "Entry on ${intervalEntries.first().date} is not after ${cal.time}}"
         }
-        val endCal = ((cal.clone() as Calendar).also { it.add(bucketIntervalAsCalendarField, numBuckets) })
+        val endCal = ((cal.clone() as Calendar).apply { add(bucketIntervalAsCalendarField, numBuckets) })
         assert(intervalEntries.last().date.time < endCal.timeInMillis) {
             "Entry on ${intervalEntries.first().date} is not before ${endCal.time}}"
         }

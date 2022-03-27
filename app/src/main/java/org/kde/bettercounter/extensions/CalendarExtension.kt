@@ -13,7 +13,12 @@ fun Calendar.truncate(field: Int) {
     if (field in listOf(Calendar.DATE, Calendar.DAY_OF_WEEK, Calendar.DAY_OF_MONTH, Calendar.DAY_OF_YEAR)) return
     if (field in listOf(Calendar.WEEK_OF_YEAR, Calendar.WEEK_OF_MONTH)) {
         // TODO: Support Sunday as week start day
-        add(Calendar.DAY_OF_MONTH, Calendar.MONDAY - get(Calendar.DAY_OF_WEEK));
+        val dow = get(Calendar.DAY_OF_WEEK)
+        if (dow == Calendar.SUNDAY) {
+            add(Calendar.DAY_OF_MONTH, -6)
+        } else {
+            add(Calendar.DAY_OF_MONTH, Calendar.MONDAY - dow)
+        }
         return
     }
     set(Calendar.DATE, 1)
@@ -51,4 +56,5 @@ fun Calendar.addInterval(interval : Interval, times : Int) {
         Interval.YEAR -> add(Calendar.YEAR, 1*times)
         Interval.LIFETIME -> add(Calendar.YEAR, 1000)
     }
+    add(Calendar.MINUTE, -1) // Hack so the new calendar is  at the end of an interval and not at the beginning of the next
 }

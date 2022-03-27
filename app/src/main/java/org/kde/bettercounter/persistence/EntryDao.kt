@@ -15,8 +15,8 @@ interface EntryDao {
     @Query("SELECT * FROM entry WHERE name = (:name) ORDER BY date ASC LIMIT 1")
     fun getLeastRecent(name : String) : Entry?
 
-    @Query("SELECT COUNT(*) FROM entry WHERE name = (:name) and date >= (:since)")
-    fun getCountSince(name : String, since: Date) : Int
+    @Query("SELECT COUNT(*) FROM entry WHERE name = (:name) AND date >= (:since) AND date <= (:until)")
+    fun getCountInRange(name : String, since: Date, until: Date) : Int
 
     @Query("SELECT COUNT(*) FROM entry WHERE name = (:name)")
     fun getCount(name : String) : Int

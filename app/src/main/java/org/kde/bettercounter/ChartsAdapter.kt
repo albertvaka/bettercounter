@@ -12,7 +12,6 @@ import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.ui.ChartHolder
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
 import java.util.*
 
 class ChartsAdapter(
@@ -36,7 +35,8 @@ class ChartsAdapter(
 
     override fun onBindViewHolder(holder: ChartHolder, position: Int) {
         val rangeStart = findRangeStartForPosition(position)
-        val rangeEnd = rangeStart.copy().also { it.addInterval(counter.intervalForChart, 1) }
+        val rangeEnd = rangeStart.copy().apply { addInterval(counter.intervalForChart, 1) }
+        Log.e("AAAAA", "${rangeStart.toSimpleDateString()} plus ${counter.intervalForChart} equals ${rangeEnd.toSimpleDateString()}")
         val entries = entriesForRange(rangeStart, rangeEnd).andLog("ENTRIES POS $position")
         val periodAverage = getPeriodAverageString(entries, rangeStart, rangeEnd)
         val lifetimeAverage = getLifetimeAverageString()
@@ -50,34 +50,41 @@ class ChartsAdapter(
             return activity.getString(R.string.stats_average_n_a)
         }
 
-        val firstEntryDate = counter.sortedEntries.first().date
+        val beginRange = counter.sortedEntries.first().date
+        val now = Date.from(Calendar.getInstance().toInstant())
         val lastEntryDate = counter.sortedEntries.last().date
+        val endRange = if (lastEntryDate > now) lastEntryDate else now
 
         return when (counter.interval) {
-            Interval.DAY -> getAverageStringPerHour(counter.sortedEntries.size,  firstEntryDate, lastEntryDate)
-            else -> getAverageStringPerDay(counter.sortedEntries.size,  firstEntryDate, lastEntryDate)
+            Interval.DAY -> getAverageStringPerHour(counter.sortedEntries.size, beginRange, endRange)
+            else -> getAverageStringPerDay(counter.sortedEntries.size, beginRange, endRange)
         }
     }
 
-    private fun getPeriodAverageString(intervalEntries: List<Entry>, rangeStart: Calendar?, rangeEnd: Calendar): String {
+    private fun getPeriodAverageString(intervalEntries: List<Entry>, rangeStart: Calendar, rangeEnd: Calendar): String {
         if (intervalEntries.isEmpty()) {
             return activity.getString(R.string.stats_average_n_a)
         }
 
-        var startDate = rangeStart!!.time
+
         val firstEntryDate = counter.sortedEntries.first().date
-        val hasEntriesBefore = (firstEntryDate < rangeStart.time)
-        if (hasEntriesBefore) {
-            // Use the beginning of the current interval as the begin date
-            startDate = rangeStart.copy().time
+        val hasEntriesInPreviousPeriods = (firstEntryDate < rangeStart.time)
+        val startDate = if (hasEntriesInPreviousPeriods) {
+            // Use the period start as the start date
+            rangeStart.time
+        } else {
+            // Use the firstEntry as the start date
+            firstEntryDate
         }
 
-        var endDate = rangeEnd.time
         val lastEntryDate = counter.sortedEntries.last().date
-        val hasEntriesAfter = (lastEntryDate > rangeEnd.time)
-        if (hasEntriesAfter) {
-            // Use the end of the current interval as the end date
-            endDate = rangeEnd.copy().also { it.addInterval(counter.intervalForChart, 1) }.time
+        val now = Calendar.getInstance().time
+        val hasEntriesInFuturePeriods = (lastEntryDate > rangeEnd.time)
+        val hasEntriesInTheFuture = (lastEntryDate > now)
+        val endDate = when {
+            hasEntriesInFuturePeriods -> rangeEnd.time // Use the period end as the end date
+            hasEntriesInTheFuture -> lastEntryDate // Use lastEntry as the end date
+            else -> now // Use now as the end date
         }
 
         return when (counter.interval) {
@@ -87,10 +94,11 @@ class ChartsAdapter(
     }
 
     private fun getAverageStringPerDay(count: Int, startDate: Date, endDate: Date): String {
-        val days = ChronoUnit.DAYS.between(startDate.toZonedDateTime(), endDate.toZonedDateTime())
+        var days = ChronoUnit.DAYS.between(startDate.toZonedDateTime(), endDate.toZonedDateTime())
         if (days == 0L) {
             return activity.getString(R.string.stats_average_n_a)
         }
+        days += 1L
         val avgPerDay = count.toFloat()/days
         return if (avgPerDay > 1) {
             activity.getString(R.string.stats_average_per_day, avgPerDay)
@@ -113,33 +121,27 @@ class ChartsAdapter(
     }
 
     private fun entriesForRange(rangeStart: Calendar, rangeEnd : Calendar): List<Entry> {
-        var from = counter.sortedEntries.indexOfFirst { it.date.after(rangeStart.time) }
+        val from = counter.sortedEntries.indexOfFirst { it.date.after(rangeStart.time) || it.date == rangeStart.time }
         if (from == -1) {
-            Log.e("DOES_THIS_HAPPEN APART FROM DUMMY CHART?", "from == -1")
-            from = 0
+            return listOf()
         }
-        var to = counter.sortedEntries.indexOfLast { it.date.before(rangeEnd.time) }
-        to = if (to == -1) {
-            Log.e("DOES_THIS_HAPPEN APART FROM DUMMY CHART?", "to == -1")
-            counter.sortedEntries.size
-        } else {
-            to + 1
+        var to = counter.sortedEntries.indexOfLast { it.date.before(rangeEnd.time) || it.date ==  rangeEnd.time }
+        if (to == -1) {
+            return listOf()
         }
+        to += 1
 
         return counter.sortedEntries.subList(from, to)
     }
 
     private fun findRangeStartForPosition(position: Int): Calendar {
         val cal = Calendar.getInstance()
-        val endRange = counter.sortedEntries.lastOrNull()?.date
+        val endRange = counter.sortedEntries.firstOrNull()?.date
         if (endRange != null) {
             cal.time = endRange
         }
-        when (counter.interval) {
-            Interval.DAY -> cal.truncate(Calendar.HOUR)
-            else -> cal.truncate(Calendar.DATE)
-        }
-        cal.addInterval(counter.intervalForChart, -position)
+        cal.truncate(counter.intervalForChart)
+        cal.addInterval(counter.intervalForChart, position)
         return cal
     }
 
@@ -148,19 +150,12 @@ class ChartsAdapter(
     }
 
     private fun countNumCharts(counter: CounterDetails) : Int {
-        val firstDate = counter.sortedEntries.firstOrNull()?.date?.toZonedDateTime()
-        val lastDate = counter.sortedEntries.lastOrNull()?.date?.toZonedDateTime()
+        val firstDate = counter.sortedEntries.firstOrNull()
+        val lastDate = counter.sortedEntries.lastOrNull()
         if (lastDate == null || firstDate == null) {
             return 1
         }
-        val count = when (counter.intervalForChart) {
-            Interval.DAY -> ChronoUnit.DAYS.between(firstDate, lastDate)
-            Interval.WEEK -> ChronoUnit.WEEKS.between(firstDate, lastDate)
-            Interval.MONTH -> ChronoUnit.MONTHS.between(firstDate, lastDate)
-            Interval.YEAR -> ChronoUnit.YEARS.between(firstDate, lastDate)
-            Interval.LIFETIME -> 0.also { assert(false) } // Not a valid display interval
-        }
-        return count.toInt() + 1 // between end date is non-inclusive
+        return counter.intervalForChart.between(firstDate.date, lastDate.date)
     }
 
 /*
@@ -171,3 +166,4 @@ class ChartsAdapter(
     }
 */
 }
+

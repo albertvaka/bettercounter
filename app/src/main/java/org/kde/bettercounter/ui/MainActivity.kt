@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
                     binding.detailsTitle.text = counter.name
                     val adapter = ChartsAdapter(this, viewModel, it)
                     binding.charts.swapAdapter(adapter, true)
-                    binding.charts.scrollToPosition(0)
+                    binding.charts.scrollToPosition(adapter.itemCount-1)
                 }
             }
         }
@@ -121,9 +121,9 @@ class MainActivity : AppCompatActivity() {
         val callback = DragAndSwipeTouchHelper(entryViewAdapter)
         ItemTouchHelper(callback).attachToRecyclerView(binding.recycler)
 
-        binding.charts.layoutManager = HackyLayoutManager(this, RecyclerView.HORIZONTAL).also {
-            it.reverseLayout = true
-            it.stackFromEnd = true
+        binding.charts.layoutManager = HackyLayoutManager(this, RecyclerView.HORIZONTAL).apply {
+            //reverseLayout = true // FIXME: Check if we want this or not
+            stackFromEnd = true
         }
 
         binding.charts.isNestedScrollingEnabled = false;

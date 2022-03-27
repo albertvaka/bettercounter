@@ -10,3 +10,9 @@ import java.util.*
 fun Date.toZonedDateTime() : ZonedDateTime {
     return toInstant().atZone(ZoneId.systemDefault())
 }
+
+fun Date.toCalendar(): Calendar {
+    val cal = Calendar.getInstance()
+    cal.time = this
+    return cal
+}
