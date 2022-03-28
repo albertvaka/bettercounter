@@ -122,7 +122,6 @@ class MainActivity : AppCompatActivity() {
         ItemTouchHelper(callback).attachToRecyclerView(binding.recycler)
 
         binding.charts.layoutManager = HackyLayoutManager(this, RecyclerView.HORIZONTAL).apply {
-            //reverseLayout = true // FIXME: Check if we want this or not
             stackFromEnd = true
         }
 

@@ -56,5 +56,4 @@ fun Calendar.addInterval(interval : Interval, times : Int) {
         Interval.YEAR -> add(Calendar.YEAR, 1*times)
         Interval.LIFETIME -> add(Calendar.YEAR, 1000)
     }
-    add(Calendar.MINUTE, -1) // Hack so the new calendar is  at the end of an interval and not at the beginning of the next
 }

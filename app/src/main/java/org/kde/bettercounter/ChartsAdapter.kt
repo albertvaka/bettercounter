@@ -66,6 +66,9 @@ class ChartsAdapter(
             return activity.getString(R.string.stats_average_n_a)
         }
 
+        // Hack so to use the end of this interval and not at the beginning of the next,
+        // so weeks have 7 days and not 8 because of the rounding up we do later.
+        rangeEnd.add(Calendar.MINUTE, -1)
 
         val firstEntryDate = counter.sortedEntries.first().date
         val hasEntriesInPreviousPeriods = (firstEntryDate < rangeStart.time)
@@ -95,9 +98,6 @@ class ChartsAdapter(
 
     private fun getAverageStringPerDay(count: Int, startDate: Date, endDate: Date): String {
         var days = ChronoUnit.DAYS.between(startDate.toZonedDateTime(), endDate.toZonedDateTime())
-        if (days == 0L) {
-            return activity.getString(R.string.stats_average_n_a)
-        }
         days += 1L
         val avgPerDay = count.toFloat()/days
         return if (avgPerDay > 1) {
@@ -108,10 +108,8 @@ class ChartsAdapter(
     }
 
     private fun getAverageStringPerHour(count: Int, startDate: Date, endDate: Date): String {
-        val hours = ChronoUnit.HOURS.between(startDate.toZonedDateTime(), endDate.toZonedDateTime())
-        if (hours == 0L) {
-            return activity.getString(R.string.stats_average_n_a)
-        }
+        var hours = ChronoUnit.HOURS.between(startDate.toZonedDateTime(), endDate.toZonedDateTime())
+        hours += 1L
         val avgPerHour = count.toFloat()/hours
         return if (avgPerHour > 1) {
             activity.getString(R.string.stats_average_per_hour, avgPerHour)
