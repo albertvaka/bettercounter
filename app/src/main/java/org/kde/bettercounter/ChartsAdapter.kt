@@ -9,7 +9,7 @@ import org.kde.bettercounter.extensions.addInterval
 import org.kde.bettercounter.extensions.copy
 import org.kde.bettercounter.extensions.toZonedDateTime
 import org.kde.bettercounter.extensions.truncate
-import org.kde.bettercounter.persistence.CounterDetails
+import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.ui.ChartHolder
@@ -19,7 +19,7 @@ import java.util.*
 class ChartsAdapter(
     private val activity: AppCompatActivity,
     private val viewModel: ViewModel,
-    private var counter: CounterDetails
+    private var counter: CounterSummary
 ) : RecyclerView.Adapter<ChartHolder>()
 {
     private val boundViewHolders = mutableListOf<ChartHolder>()
@@ -38,27 +38,29 @@ class ChartsAdapter(
         val rangeStart = findRangeStartForPosition(position)
         val rangeEnd = rangeStart.copy().apply { addInterval(counter.intervalForChart, 1) }
         //Log.e("ChartsAdapter", "${rangeStart.toSimpleDateString()} plus ${counter.intervalForChart} equals ${rangeEnd.toSimpleDateString()}")
-        val entries = entriesForRange(rangeStart, rangeEnd)
-        val periodAverage = getPeriodAverageString(entries, rangeStart, rangeEnd)
-        val lifetimeAverage = getLifetimeAverageString()
-        val averageString = activity.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
-        holder.onBind(counter, entries, rangeStart, averageString)
         boundViewHolders.add(holder)
+        viewModel.getEntriesForRangeSortedByDate(counter.name, rangeStart.time, rangeEnd.time).observe(activity) {
+            val periodAverage = getPeriodAverageString(it, rangeStart, rangeEnd)
+            val lifetimeAverage = getLifetimeAverageString()
+            val averageString = activity.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
+            holder.onBind(counter, it, rangeStart, averageString)
+        }
+
     }
 
     private fun getLifetimeAverageString(): String {
-        if (counter.sortedEntries.isEmpty()) {
+        if (counter.totalCount == 0) {
             return activity.getString(R.string.stats_average_n_a)
         }
 
-        val beginRange = counter.sortedEntries.first().date
+        val beginRange = counter.leastRecent!!
         val now = Date.from(Calendar.getInstance().toInstant())
-        val lastEntryDate = counter.sortedEntries.last().date
+        val lastEntryDate = counter.mostRecent!!
         val endRange = if (lastEntryDate > now) lastEntryDate else now
 
         return when (counter.interval) {
-            Interval.DAY -> getAverageStringPerHour(counter.sortedEntries.size, beginRange, endRange)
-            else -> getAverageStringPerDay(counter.sortedEntries.size, beginRange, endRange)
+            Interval.DAY -> getAverageStringPerHour(counter.totalCount, beginRange, endRange)
+            else -> getAverageStringPerDay(counter.totalCount, beginRange, endRange)
         }
     }
 
@@ -71,7 +73,7 @@ class ChartsAdapter(
         // so weeks have 7 days and not 8 because of the rounding up we do later.
         rangeEnd.add(Calendar.MINUTE, -1)
 
-        val firstEntryDate = counter.sortedEntries.first().date
+        val firstEntryDate = counter.leastRecent!!
         val hasEntriesInPreviousPeriods = (firstEntryDate < rangeStart.time)
         val startDate = if (hasEntriesInPreviousPeriods) {
             // Use the period start as the start date
@@ -81,7 +83,7 @@ class ChartsAdapter(
             firstEntryDate
         }
 
-        val lastEntryDate = counter.sortedEntries.last().date
+        val lastEntryDate = counter.mostRecent!!
         val now = Calendar.getInstance().time
         val hasEntriesInFuturePeriods = (lastEntryDate > rangeEnd.time)
         val hasEntriesInTheFuture = (lastEntryDate > now)
@@ -119,23 +121,9 @@ class ChartsAdapter(
         }
     }
 
-    private fun entriesForRange(rangeStart: Calendar, rangeEnd : Calendar): List<Entry> {
-        val from = counter.sortedEntries.indexOfFirst { it.date.after(rangeStart.time) || it.date == rangeStart.time }
-        if (from == -1) {
-            return listOf()
-        }
-        var to = counter.sortedEntries.indexOfLast { it.date.before(rangeEnd.time) || it.date ==  rangeEnd.time }
-        if (to == -1) {
-            return listOf()
-        }
-        to += 1
-
-        return counter.sortedEntries.subList(from, to)
-    }
-
     private fun findRangeStartForPosition(position: Int): Calendar {
         val cal = Calendar.getInstance()
-        val endRange = counter.sortedEntries.firstOrNull()?.date
+        val endRange = counter.leastRecent
         if (endRange != null) {
             cal.time = endRange
         }
@@ -148,13 +136,13 @@ class ChartsAdapter(
         boundViewHolders.remove(holder);
     }
 
-    private fun countNumCharts(counter: CounterDetails) : Int {
-        val firstDate = counter.sortedEntries.firstOrNull()
-        val lastDate = counter.sortedEntries.lastOrNull()
+    private fun countNumCharts(counter: CounterSummary) : Int {
+        val firstDate = counter.leastRecent
+        val lastDate = counter.mostRecent
         if (lastDate == null || firstDate == null) {
             return 1
         }
-        return counter.intervalForChart.count(firstDate.date, lastDate.date)
+        return counter.intervalForChart.count(firstDate, lastDate)
     }
 
 /*

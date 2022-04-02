@@ -11,3 +11,10 @@ data class Entry(
         val date: Date,
         val name: String,
 )
+
+@TypeConverters(Converters::class)
+data class FirstLastAndCount(
+        @ColumnInfo(name = "first") val first: Date?,
+        @ColumnInfo(name = "last") val last: Date?,
+        @ColumnInfo(name = "count") val count: Int,
+)

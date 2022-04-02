@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
-import org.kde.bettercounter.persistence.CounterDetails
+import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import java.text.SimpleDateFormat
@@ -20,7 +20,7 @@ class ChartHolder(
         binding.chart.setup()
     }
 
-    fun onBind(counter: CounterDetails, entries : List<Entry>, rangeStart : Calendar, averageString : String) {
+    fun onBind(counter: CounterSummary, entries : List<Entry>, rangeStart : Calendar, averageString : String) {
         // Chart name
         val dateFormat = when (counter.intervalForChart) {
             Interval.DAY, Interval.WEEK -> "dd/MM/yyyy"

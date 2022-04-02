@@ -9,7 +9,6 @@ import android.os.Looper
 import android.view.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -26,7 +25,6 @@ import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.boilerplate.HackyLayoutManager
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
-import org.kde.bettercounter.persistence.CounterDetails
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 
@@ -34,10 +32,10 @@ import org.kde.bettercounter.persistence.Interval
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ViewModel
+    private lateinit var entryViewAdapter : EntryListViewAdapter
     private lateinit var binding: ActivityMainBinding
     private lateinit var sheetBehavior : BottomSheetBehavior<View>
     private var sheetIsExpanding = false
-    private var currentDetailsLiveData : LiveData<CounterDetails>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
         var sheetUnfoldedPadding = 0  // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
         // FIXME: Hack so the size of the sheet is known from the beginning, since we only compute it once.
-        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterDetails("Empty", Color.BLACK, Interval.DAY, listOf()))
+        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Color.BLACK, Interval.DAY, 0, 0, null, null))
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 sheetUnfoldedPadding = binding.bottomSheet.height + 50
@@ -72,6 +70,7 @@ class MainActivity : AppCompatActivity() {
                     sheetIsExpanding = false
                 } else if (newState == BottomSheetBehavior.STATE_HIDDEN){
                     setFabToCreate()
+                    entryViewAdapter.clearItemSelected()
                 }
             }
 
@@ -91,9 +90,9 @@ class MainActivity : AppCompatActivity() {
 
         // Counter list
         // ------------
-        val entryViewAdapter = EntryListViewAdapter(this, viewModel)
+        entryViewAdapter = EntryListViewAdapter(this, viewModel)
         entryViewAdapter.onItemAdded = { pos -> binding.recycler.smoothScrollToPosition(pos) }
-        entryViewAdapter.onItemClickListener = { position: Int, counter: CounterSummary ->
+        entryViewAdapter.onItemSelected = { position: Int, counter: CounterSummary ->
             if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                 sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 sheetIsExpanding = true
@@ -103,17 +102,10 @@ class MainActivity : AppCompatActivity() {
 
             setFabToEdit(counter)
 
-            currentDetailsLiveData?.removeObservers(this@MainActivity)
-            val detailsData = viewModel.getCounterDetails(counter.name)
-            currentDetailsLiveData = detailsData
-            detailsData.observe(this@MainActivity) {
-                runOnUiThread {
-                    binding.detailsTitle.text = counter.name
-                    val adapter = ChartsAdapter(this, viewModel, it)
-                    binding.charts.swapAdapter(adapter, true)
-                    binding.charts.scrollToPosition(adapter.itemCount-1)
-                }
-            }
+            binding.detailsTitle.text = counter.name
+            val adapter = ChartsAdapter(this, viewModel, counter)
+            binding.charts.swapAdapter(adapter, true)
+            binding.charts.scrollToPosition(adapter.itemCount-1)
         }
 
         binding.recycler.adapter = entryViewAdapter
@@ -125,7 +117,7 @@ class MainActivity : AppCompatActivity() {
             stackFromEnd = true
         }
 
-        binding.charts.isNestedScrollingEnabled = false;
+        binding.charts.isNestedScrollingEnabled = false
         PagerSnapHelper().attachToRecyclerView(binding.charts) // Scroll one by one
     }
 

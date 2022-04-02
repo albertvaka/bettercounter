@@ -2,7 +2,6 @@ package org.kde.bettercounter.persistence
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.Converters
@@ -93,13 +92,16 @@ class Repository(
             else -> Calendar.getInstance().apply { truncate(interval) }
         }
         val intervalEndDate = intervalStartDate.copy().apply { addInterval(interval, 1) }
-         return counterCache.getOrPut(name) {
+        val firstLastAndCount = entryDao.getFirstLastAndCount(name)
+        return counterCache.getOrPut(name) {
             CounterSummary(
                 name = name,
-                count = entryDao.getCountInRange(name, intervalStartDate.time, intervalEndDate.time),
                 color = color,
                 interval = interval,
-                mostRecent = entryDao.getMostRecent(name)?.date
+                lastIntervalCount = entryDao.getCountInRange(name, intervalStartDate.time, intervalEndDate.time),
+                totalCount = firstLastAndCount.count, //entryDao.getCount(name),
+                leastRecent = firstLastAndCount.first, //entryDao.getLeastRecent(name)?.date,
+                mostRecent = firstLastAndCount.last, //entryDao.getMostRecent(name)?.date,
             )
         }
     }
@@ -127,18 +129,9 @@ class Repository(
         counterCache.remove(name)
     }
 
-    suspend fun getCounterDetails(name : String): CounterDetails {
-        val interval = getCounterInterval(name)
-        val color = getCounterColor(name)
-        val entries = entryDao.getAllEntriesSortedByDate(name)
-        return CounterDetails(
-            name = name,
-            interval = interval,
-            color = color,
-            sortedEntries = entries
-        )
+    suspend fun getEntriesForRangeSortedByDate(name : String, since: Date, until: Date): List<Entry> {
+        return entryDao.getAllEntriesInRangeSortedByDate(name, since, until)
     }
-
     suspend fun getAllEntriesSortedByDate(name : String): List<Entry> {
         return entryDao.getAllEntriesSortedByDate(name)
     }

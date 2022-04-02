@@ -25,7 +25,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     private val repo : Repository
     private val addCounterObservers = HashMap<LifecycleOwner, CounterAddedObserver>()
     private val summaryMap = HashMap<String, MutableLiveData<CounterSummary>>()
-    private val detailsMap = HashMap<String, MutableLiveData<CounterDetails>>()
 
     init {
         val db  = AppDatabase.getInstance(application)
@@ -68,7 +67,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.addEntry(name, date)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
-            detailsMap[name]?.postValue(repo.getCounterDetails(name))
         }
     }
 
@@ -76,7 +74,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.removeEntry(name)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
-            detailsMap[name]?.postValue(repo.getCounterDetails(name))
         }
     }
 
@@ -92,7 +89,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         repo.setCounterMetadata(name, color, interval)
         viewModelScope.launch(Dispatchers.IO) {
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
-            detailsMap[name]?.postValue(repo.getCounterDetails(name))
         }
     }
 
@@ -116,12 +112,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
             } else {
                 // should not happen, in theory we always have summaryMap populated
                 summaryMap[newName] = MutableLiveData(repo.getCounterSummary(newName)) // cache it
-            }
-
-            val entries = detailsMap.remove(oldName)
-            if (entries != null) {
-                detailsMap[newName] = entries
-                entries.postValue(repo.getCounterDetails(newName))
             }
 
             for ((_, observer) in addCounterObservers) {
@@ -149,23 +139,10 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
         summaryMap.remove(name)
-        detailsMap.remove(name)
         repo.deleteCounterMetadata(name)
         val list = repo.getCounterList().toMutableList()
         list.remove(name)
         repo.setCounterList(list)
-    }
-
-    fun getCounterDetails(name : String) : LiveData<CounterDetails> {
-        var liveData = detailsMap[name]
-        if (liveData == null) {
-            liveData = MutableLiveData()
-            viewModelScope.launch(Dispatchers.IO) {
-                liveData.postValue(repo.getCounterDetails(name))
-            }
-        }
-        detailsMap[name] = liveData
-        return liveData
     }
 
     fun exportAll(stream : OutputStream, progressHandler : Handler?) {
@@ -196,4 +173,15 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun getEntriesForRangeSortedByDate(name : String, since: Date, until: Date): LiveData<List<Entry>> {
+        val ret = MutableLiveData<List<Entry>>()
+        viewModelScope.launch(Dispatchers.IO) {
+            val entries = repo.getEntriesForRangeSortedByDate(name, since, until)
+            //Log.e("Repository", "Queried ${entries.size} entries")
+            viewModelScope.launch(Dispatchers.Main) {
+                ret.value = entries
+            }
+        }
+        return ret
+    }
 }

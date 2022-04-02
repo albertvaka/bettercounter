@@ -19,8 +19,11 @@ class EntryListViewAdapter(
     private var viewModel: ViewModel
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback
 {
-    var onItemClickListener: ((Int, CounterSummary) -> Unit)? = null
+    var onItemSelected: ((Int, CounterSummary) -> Unit)? = null // Gets called again if the last selected item gets updated
     var onItemAdded: ((Int) -> Unit)? = null
+
+    var lastSelectedCounterName : String? = null
+    fun clearItemSelected() { lastSelectedCounterName = null }
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)
     private var counters: MutableList<String> = mutableListOf()
@@ -35,10 +38,10 @@ class EntryListViewAdapter(
                     val position = counters.size - 1
                     notifyItemInserted(position)
                     viewModel.getCounterSummary(counterName).observe(activity) {
-                        notifyItemChanged(
-                            counters.indexOf(it.name),
-                            Unit
-                        ) // passing a second parameter disables the disappear+appear animation
+                        notifyItemChanged(counters.indexOf(it.name), Unit)
+                        if (lastSelectedCounterName == it.name) {
+                            onItemSelected?.invoke(counters.indexOf(it.name), it)
+                        }
                     }
                     if (isUserAdded) {
                         onItemAdded?.invoke(position)
@@ -49,6 +52,9 @@ class EntryListViewAdapter(
             override fun onCounterRemoved(counterName: String) {
                 val position = counters.indexOf(counterName)
                 counters.removeAt(position)
+                if (lastSelectedCounterName == counterName) {
+                    lastSelectedCounterName = null
+                }
                 activity.runOnUiThread {
                     notifyItemRemoved(position)
                 }
@@ -57,7 +63,12 @@ class EntryListViewAdapter(
             override fun onCounterRenamed(oldName : String, newName: String) {
                 val position = counters.indexOf(oldName)
                 counters[position] = newName
+                if (lastSelectedCounterName == oldName) {
+                    lastSelectedCounterName = newName
+                    onItemSelected?.invoke(position,viewModel.getCounterSummary(newName).value!!)
+                }
                 activity.runOnUiThread {
+                    // passing a second parameter disables the disappear+appear animation
                     notifyItemChanged(position, Unit)
                 }
             }
@@ -70,7 +81,8 @@ class EntryListViewAdapter(
         binding.root.setOnClickListener {
             val counter = holder.counter
             if (counter != null) {
-                onItemClickListener?.invoke(counters.indexOf(counter.name), counter)
+                lastSelectedCounterName = counter.name
+                onItemSelected?.invoke(counters.indexOf(counter.name), counter)
             }
         }
         return holder
