@@ -54,7 +54,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core:1.7.0'
     def room_version = "2.4.2"
 
     implementation 'com.github.douglasjunior:android-simple-tooltip:1.0.0-rc.0'

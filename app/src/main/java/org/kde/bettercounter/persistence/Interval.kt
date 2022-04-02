@@ -1,9 +1,10 @@
 package org.kde.bettercounter.persistence
 
 import android.content.Context
-import android.util.Log
 import org.kde.bettercounter.R
-import org.kde.bettercounter.extensions.*
+import org.kde.bettercounter.extensions.toCalendar
+import org.kde.bettercounter.extensions.toZonedDateTime
+import org.kde.bettercounter.extensions.truncate
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.math.ceil
@@ -21,19 +22,9 @@ enum class Interval(val humanReadableResource : Int) {
         }
     }
 
-    // FIXME: Add unit test for edge cases, otherwise changing this function is super scary
-    // FIXME: It's a bit weird but this returns 2 and 8 in the following cases:
-    //{
-    //   val a = Calendar.getInstance().apply { truncate(Interval.DAY) }
-    //   val b = Calendar.getInstance().apply {  truncate(Interval.DAY); addInterval(Interval.DAY, 1) }
-    //   assert(Interval.DAY.between(a.time, b.time) == 1)
-    //}
-    //{
-    //   val a = Calendar.getInstance().apply { truncate(Interval.WEEK) }
-    //   val b = Calendar.getInstance().apply {  truncate(Interval.WEEK); addInterval(Interval.WEEK, 1) }
-    //   assert(Interval.WEEK.between(a.time, b.time) == 7)
-    //}
-    fun between(from : Date, to : Date) : Int {
+    // Rounds up. Both dates included. Eg: returns 2 weeks from Monday at 00:00 to next Monday at 00:00
+    // TODO: Unit test with edge cases, otherwise changing this function is super scary
+    fun count(from : Date, to : Date) : Int {
         val count = when (this) {
             DAY -> {
                 val dayTruncatedFrom = from.toCalendar().apply { truncate(Calendar.DAY_OF_MONTH) }.time.toZonedDateTime()
@@ -50,7 +41,7 @@ enum class Interval(val humanReadableResource : Int) {
             YEAR -> to.year - from.year
             LIFETIME -> 0
         }
-        Log.e("BETWEEN", "${count+1} $this between ${from.toCalendar().toSimpleDateString()} and ${to.toCalendar().toSimpleDateString()}")
+        //Log.e("Interval", "${count+1} $this between ${from.toCalendar().toSimpleDateString()} and ${to.toCalendar().toSimpleDateString()}")
         return count + 1
     }
 

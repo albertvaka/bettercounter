@@ -1,12 +1,14 @@
 package org.kde.bettercounter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.databinding.FragmentChartBinding
-import org.kde.bettercounter.extensions.*
+import org.kde.bettercounter.extensions.addInterval
+import org.kde.bettercounter.extensions.copy
+import org.kde.bettercounter.extensions.toZonedDateTime
+import org.kde.bettercounter.extensions.truncate
 import org.kde.bettercounter.persistence.CounterDetails
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
@@ -24,8 +26,7 @@ class ChartsAdapter(
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)
 
-    private var numCharts : Int = countNumCharts(counter).andLog("AAAA NumCharts")
-
+    private var numCharts : Int = countNumCharts(counter)
     override fun getItemCount(): Int = numCharts
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartHolder {
@@ -36,8 +37,8 @@ class ChartsAdapter(
     override fun onBindViewHolder(holder: ChartHolder, position: Int) {
         val rangeStart = findRangeStartForPosition(position)
         val rangeEnd = rangeStart.copy().apply { addInterval(counter.intervalForChart, 1) }
-        Log.e("AAAAA", "${rangeStart.toSimpleDateString()} plus ${counter.intervalForChart} equals ${rangeEnd.toSimpleDateString()}")
-        val entries = entriesForRange(rangeStart, rangeEnd).andLog("ENTRIES POS $position")
+        //Log.e("ChartsAdapter", "${rangeStart.toSimpleDateString()} plus ${counter.intervalForChart} equals ${rangeEnd.toSimpleDateString()}")
+        val entries = entriesForRange(rangeStart, rangeEnd)
         val periodAverage = getPeriodAverageString(entries, rangeStart, rangeEnd)
         val lifetimeAverage = getLifetimeAverageString()
         val averageString = activity.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
@@ -153,7 +154,7 @@ class ChartsAdapter(
         if (lastDate == null || firstDate == null) {
             return 1
         }
-        return counter.intervalForChart.between(firstDate.date, lastDate.date)
+        return counter.intervalForChart.count(firstDate.date, lastDate.date)
     }
 
 /*
