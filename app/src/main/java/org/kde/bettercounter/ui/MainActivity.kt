@@ -1,6 +1,7 @@
 package org.kde.bettercounter.ui
 
 import android.app.AlertDialog
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -8,14 +9,15 @@ import android.os.Looper
 import android.view.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import org.kde.bettercounter.ChartsAdapter
 import org.kde.bettercounter.EntryListViewAdapter
 import org.kde.bettercounter.R
-import org.kde.bettercounter.StatsCalculator
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
@@ -23,21 +25,17 @@ import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.boilerplate.HackyLayoutManager
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
-import org.kde.bettercounter.persistence.CounterDetails
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ViewModel
-    private lateinit var binding: ActivityMainBinding
-    private var statsCalculator = StatsCalculator(this)
-    private lateinit var sheetBehavior : BottomSheetBehavior<View>
     private lateinit var entryViewAdapter : EntryListViewAdapter
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var sheetBehavior : BottomSheetBehavior<View>
     private var sheetIsExpanding = false
-    private var currentDetailsLiveData : LiveData<CounterDetails>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +43,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
-
         viewModel = ViewModelProvider.AndroidViewModelFactory(application).create(ViewModel::class.java)
+
 
         // Bottom sheet with graph
         // -----------------------
@@ -56,7 +54,9 @@ class MainActivity : AppCompatActivity() {
 
         sheetIsExpanding = false
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
-        var sheetUnfoldedPadding = 0  // padding to fit the bottomSheet. The height is not hardcoded, so we have wait to have it:
+        var sheetUnfoldedPadding = 0  // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
+        // FIXME: Hack so the size of the sheet is known from the beginning, since we only compute it once.
+        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Color.BLACK, Interval.DAY, 0, 0, null, null))
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 sheetUnfoldedPadding = binding.bottomSheet.height + 50
@@ -64,14 +64,13 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        binding.chart.setup()
-
         sheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     sheetIsExpanding = false
                 } else if (newState == BottomSheetBehavior.STATE_HIDDEN){
                     setFabToCreate()
+                    entryViewAdapter.clearItemSelected()
                 }
             }
 
@@ -93,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         // ------------
         entryViewAdapter = EntryListViewAdapter(this, viewModel)
         entryViewAdapter.onItemAdded = { pos -> binding.recycler.smoothScrollToPosition(pos) }
-        entryViewAdapter.onItemClickListener = { position: Int, counter: CounterSummary ->
+        entryViewAdapter.onItemSelected = { position: Int, counter: CounterSummary ->
             if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                 sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 sheetIsExpanding = true
@@ -103,19 +102,10 @@ class MainActivity : AppCompatActivity() {
 
             setFabToEdit(counter)
 
-            val detailsData = viewModel.getCounterDetails(counter.name)
-            currentDetailsLiveData?.removeObservers(this@MainActivity)
-            currentDetailsLiveData = detailsData
-            var isChartFirstUpdate = true
-            detailsData.observe(this@MainActivity) {
-                runOnUiThread {
-                    updateChartSheet(it)
-                    if (isChartFirstUpdate) {
-                        binding.chart.animateY(200)
-                        isChartFirstUpdate = false
-                    }
-                }
-            }
+            binding.detailsTitle.text = counter.name
+            val adapter = ChartsAdapter(this, viewModel, counter)
+            binding.charts.swapAdapter(adapter, true)
+            binding.charts.scrollToPosition(adapter.itemCount-1)
         }
 
         binding.recycler.adapter = entryViewAdapter
@@ -123,43 +113,12 @@ class MainActivity : AppCompatActivity() {
         val callback = DragAndSwipeTouchHelper(entryViewAdapter)
         ItemTouchHelper(callback).attachToRecyclerView(binding.recycler)
 
-    }
-
-    private fun updateChartSheet(counter: CounterDetails) {
-        val defaultColor = getColor(R.color.colorPrimary)
-        binding.chart.setColorForNextDataSet(if (counter.color == defaultColor) getColor(R.color.colorAccent) else counter.color)
-        when (counter.interval) {
-            Interval.DAY -> {
-                binding.chartTitle.text = getString(R.string.chart_title_daily, counter.name)
-                binding.chartAverage.text = statsCalculator.getDaily(counter.intervalEntries)
-                binding.chart.setDailyData(counter.intervalEntries)
-            }
-            Interval.WEEK -> {
-                binding.chartTitle.text = getString(R.string.chart_title_weekly, counter.name)
-                binding.chartAverage.text = statsCalculator.getWeekly(counter.intervalEntries)
-                binding.chart.setWeeklyData(counter.intervalEntries)
-            }
-            Interval.MONTH -> {
-                binding.chartTitle.text = getString(R.string.chart_title_monthly, counter.name)
-                binding.chartAverage.text = statsCalculator.getMonthly(counter.intervalEntries)
-                binding.chart.setMonthlyData(counter.intervalEntries)
-            }
-            Interval.YEAR -> {
-                binding.chartTitle.text = getString(R.string.chart_title_yearly, counter.name)
-                binding.chartAverage.text = statsCalculator.getYearly(counter.intervalEntries)
-                binding.chart.setYearlyData(counter.intervalEntries)
-            }
-            Interval.YTD -> {
-                binding.chartTitle.text = getString(R.string.chart_title_ytd, counter.name)
-                binding.chartAverage.text = statsCalculator.getYtd(counter.intervalEntries)
-                binding.chart.setYtdData(counter.intervalEntries)
-            }
-            Interval.LIFETIME -> {
-                binding.chartTitle.text = getString(R.string.chart_title_lifetime, counter.name)
-                binding.chartAverage.text = statsCalculator.getLifetime(counter.intervalEntries)
-                binding.chart.setLifetimeData(counter.intervalEntries)
-            }
+        binding.charts.layoutManager = HackyLayoutManager(this, RecyclerView.HORIZONTAL).apply {
+            stackFromEnd = true
         }
+
+        binding.charts.isNestedScrollingEnabled = false
+        PagerSnapHelper().attachToRecyclerView(binding.charts) // Scroll one by one
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -5,8 +5,10 @@ import android.content.SharedPreferences
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.Converters
+import org.kde.bettercounter.extensions.addInterval
+import org.kde.bettercounter.extensions.copy
+import org.kde.bettercounter.extensions.truncate
 import java.util.*
-import kotlin.collections.HashMap
 
 const val alwaysShowTutorialsInDebugBuilds = false
 
@@ -61,10 +63,10 @@ class Repository(
     private fun getCounterInterval(name : String) : Interval {
         val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
         val str = sharedPref.getString(key, null)
-        return if (str != null) {
-            Interval.valueOf(str)
-        } else {
-            DEFAULT_INTERVAL
+        return when(str) {
+            "YTD" -> Interval.YEAR
+            null -> DEFAULT_INTERVAL
+            else -> Interval.valueOf(str)
         }
     }
 
@@ -85,15 +87,23 @@ class Repository(
     suspend fun getCounterSummary(name : String): CounterSummary {
         val interval = getCounterInterval(name)
         val color = getCounterColor(name)
-        return counterCache.getOrPut(name, {
+        val intervalStartDate = when (interval) {
+            Interval.LIFETIME -> Calendar.getInstance().apply { set(Calendar.YEAR, 1990) }
+            else -> Calendar.getInstance().apply { truncate(interval) }
+        }
+        val intervalEndDate = intervalStartDate.copy().apply { addInterval(interval, 1) }
+        val firstLastAndCount = entryDao.getFirstLastAndCount(name)
+        return counterCache.getOrPut(name) {
             CounterSummary(
                 name = name,
-                count = entryDao.getCountSince(name, interval.toDate()),
                 color = color,
                 interval = interval,
-                mostRecent = entryDao.getMostRecent(name)?.date
+                lastIntervalCount = entryDao.getCountInRange(name, intervalStartDate.time, intervalEndDate.time),
+                totalCount = firstLastAndCount.count, //entryDao.getCount(name),
+                leastRecent = firstLastAndCount.first, //entryDao.getLeastRecent(name)?.date,
+                mostRecent = firstLastAndCount.last, //entryDao.getMostRecent(name)?.date,
             )
-        })
+        }
     }
 
     suspend fun renameCounter(oldName : String, newName : String) {
@@ -119,20 +129,11 @@ class Repository(
         counterCache.remove(name)
     }
 
-    suspend fun getCounterDetails(name : String): CounterDetails {
-        val interval = getCounterInterval(name)
-        val color = getCounterColor(name)
-        val entries = entryDao.getAllEntriesInRange(name, interval.toDate(), Calendar.getInstance().time)
-        return CounterDetails(
-            name = name,
-            interval = interval,
-            color = color,
-            intervalEntries = entries
-        )
+    suspend fun getEntriesForRangeSortedByDate(name : String, since: Date, until: Date): List<Entry> {
+        return entryDao.getAllEntriesInRangeSortedByDate(name, since, until)
     }
-
-    suspend fun getAllEntries(name : String): List<Entry> {
-        return entryDao.getAllEntries(name)
+    suspend fun getAllEntriesSortedByDate(name : String): List<Entry> {
+        return entryDao.getAllEntriesSortedByDate(name)
     }
 
 }

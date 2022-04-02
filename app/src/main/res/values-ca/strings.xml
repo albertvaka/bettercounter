@@ -15,7 +15,6 @@
     <string name="interval_week">Setmanal</string>
     <string name="interval_month">Mensual</string>
     <string name="interval_year">Annual</string>
-    <string name="interval_ytd">Aquest any</string>
     <string name="interval_lifetime">De per vida</string>
     <string name="time_ago_dhm">Fa %1$dd %2$dh %3$dm</string>
     <string name="time_ago_hm">Fa %1$dh %2$dm</string>
@@ -24,17 +23,12 @@
     <string name="time_in_hm">En %1$dh %2$dm</string>
     <string name="time_in_m">En %1$dm</string>
     <string name="just_now">Ara mateix</string>
-    <string name="chart_title_daily">%1$s (últimes 24h)"</string>
-    <string name="chart_title_weekly">%1$s (últims 7 dies)"</string>
-    <string name="chart_title_monthly">%1$s (últim mes)"</string>
-    <string name="chart_title_yearly">%1$s (últim any)"</string>
-    <string name="chart_title_ytd">%1$s (aquest any)"</string>
-    <string name="chart_title_lifetime">%1$s (de per vida)"</string>
-    <string name="stats_average_per_hour">Mitjana: %1$.2f vegades cada hora"</string>
-    <string name="stats_average_every_hours">Mitjana: cada %1$.2f hores"</string>
-    <string name="stats_average_per_day">Mitjana: %1$.2f vegades al dia"</string>
-    <string name="stats_average_n_a">Mitjana: N/A"</string>
-    <string name="stats_average_every_days">Mitjana: cada %1$.2f dies"</string>
+    <string name="stats_average_per_hour">%1$.2f vegades cada hora"</string>
+    <string name="stats_average_every_hours">cada %1$.2f hores"</string>
+    <string name="stats_average_per_day">%1$.2f vegades al dia"</string>
+    <string name="stats_average_n_a">N/A"</string>
+    <string name="stats_average_every_days">cada %1$.2f dies"</string>
+    <string name="stats_averages">Mitjana: %1$s, de per vida: %2$s</string>
     <string name="no_data">No hi ha entrades en aquest període</string>
     <string name="tutorial_pickdate">Feu una pulsació llarga per escollir la data</string>
     <string name="tutorial_swipe">Llisqueu per editar</string>
@@ -42,4 +36,8 @@
     <string name="export">Exporta les dades</string>
     <string name="exported_n">Exportats %1$d/%2$d comptadors</string>
     <string name="delete_confirmation">Segur que voleu esborrar aquest comptador?</string>
+    <plurals name="chart_title">
+        <item quantity="one">%1$s (%2$d vegada)</item>
+        <item quantity="other">%1$s (%2$d vegades)</item>
+    </plurals>
 </resources>
