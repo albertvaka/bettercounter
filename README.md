@@ -4,7 +4,7 @@
  
 ###  A multi-purpose counter app
 
-- Track good and bad habits
+- Track good and bad habits (eg: exercising, smoking, drinking...)
 - Track when's the last time you did something (eg: water your plants, change your bedsheets, poop...)
 - Count your lives in MtG
 
@@ -16,9 +16,9 @@
 ### Features
 
 - Records the date and time of each individual counter increase.
-- Graphs your counters' evolution over a week/month/year.
+- Graphs your data over time and calculates statistics.
 - Lets you export your data (eg: to analyze it with your choice of tools).
-- Your data is never sent to any server (except for Google's auto-backup, if it's enabled).
+- Your data is never sent to any server (except for Google's app backup, if enabled).
 - Simple as hell and will stay this way.
 
 ### Screens

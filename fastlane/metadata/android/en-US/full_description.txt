@@ -6,6 +6,8 @@ A multi-purpose counter app
 
 Features:
 
-* Records the date of each individual counter increase, so upcoming versions can graph your data and calculate statistics.
-* Your data is never sent to any server (except for Google's auto-backup, if it's enabled).
+* Records the date of each individual counter increase.
+* Graphs your data over time and calculates statistics.
+* Lets you export your data (eg: to analyze it with your choice of tools).
+* Your data is never sent to any server (except for Google's app backup, if enabled).
 * Simple and will stay this way.
