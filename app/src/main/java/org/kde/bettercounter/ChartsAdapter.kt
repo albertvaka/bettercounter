@@ -54,9 +54,7 @@ class ChartsAdapter(
         }
 
         val beginRange = counter.leastRecent!!
-        val now = Date.from(Calendar.getInstance().toInstant())
-        val lastEntryDate = counter.mostRecent!!
-        val endRange = if (lastEntryDate > now) lastEntryDate else now
+        val endRange = counter.latestBetweenNowAndMostRecentEntry()
 
         return when (counter.interval) {
             Interval.DAY -> getAverageStringPerHour(counter.totalCount, beginRange, endRange)
@@ -137,11 +135,8 @@ class ChartsAdapter(
     }
 
     private fun countNumCharts(counter: CounterSummary) : Int {
-        val firstDate = counter.leastRecent
-        val lastDate = counter.mostRecent
-        if (lastDate == null || firstDate == null) {
-            return 1
-        }
+        val firstDate = counter.leastRecent ?: return 1
+        val lastDate = counter.latestBetweenNowAndMostRecentEntry()
         return counter.intervalForChart.count(firstDate, lastDate)
     }
 
