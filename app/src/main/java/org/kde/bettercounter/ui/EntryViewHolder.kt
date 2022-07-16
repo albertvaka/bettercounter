@@ -2,6 +2,7 @@ package org.kde.bettercounter.ui
 
 import android.content.Context
 import android.view.Gravity
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.R
@@ -13,9 +14,10 @@ import java.util.*
 
 
 class EntryViewHolder(
-    private val context : Context,
-    val binding : FragmentEntryBinding,
-    private var viewModel: ViewModel
+    private val context: Context,
+    val binding: FragmentEntryBinding,
+    private var viewModel: ViewModel,
+    private val touchHelper: ItemTouchHelper
 ) : RecyclerView.ViewHolder(binding.root) {
 
     var counter : CounterSummary? = null
@@ -44,6 +46,10 @@ class EntryViewHolder(
             true
         }
         binding.undoButton.setOnClickListener { viewModel.decrementCounter(counter.name) }
+        binding.draggableArea.setOnLongClickListener {
+            touchHelper.startDrag(this@EntryViewHolder)
+            true
+        }
         binding.nameText.text = counter.name
         binding.countText.text = counter.lastIntervalCount.toString()
         val mostRecentDate = counter.mostRecent

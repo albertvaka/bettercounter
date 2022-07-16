@@ -10,7 +10,6 @@ import android.view.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -21,7 +20,6 @@ import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
-import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.boilerplate.HackyLayoutManager
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
@@ -110,8 +108,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.recycler.adapter = entryViewAdapter
         binding.recycler.layoutManager = HackyLayoutManager(this)
-        val callback = DragAndSwipeTouchHelper(entryViewAdapter)
-        ItemTouchHelper(callback).attachToRecyclerView(binding.recycler)
 
         binding.charts.layoutManager = HackyLayoutManager(this, RecyclerView.HORIZONTAL).apply {
             stackFromEnd = true

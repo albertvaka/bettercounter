@@ -5,6 +5,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
@@ -16,7 +17,7 @@ import java.util.*
 
 class EntryListViewAdapter(
     private var activity: AppCompatActivity,
-    private var viewModel: ViewModel
+    private var viewModel: ViewModel,
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback
 {
     var onItemSelected: ((Int, CounterSummary) -> Unit)? = null // Gets called again if the last selected item gets updated
@@ -29,6 +30,13 @@ class EntryListViewAdapter(
     private var counters: MutableList<String> = mutableListOf()
 
     override fun getItemCount(): Int = counters.size
+
+    private val touchHelper = ItemTouchHelper(DragAndSwipeTouchHelper(this))
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        touchHelper.attachToRecyclerView(recyclerView)
+        super.onAttachedToRecyclerView(recyclerView)
+    }
 
     init {
         viewModel.observeCounterChange(activity, object : ViewModel.CounterAddedObserver {
@@ -77,7 +85,7 @@ class EntryListViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val binding = FragmentEntryBinding.inflate(inflater, parent, false)
-        val holder = EntryViewHolder(activity, binding, viewModel)
+        val holder = EntryViewHolder(activity, binding, viewModel, touchHelper)
         binding.root.setOnClickListener {
             val counter = holder.counter
             if (counter != null) {

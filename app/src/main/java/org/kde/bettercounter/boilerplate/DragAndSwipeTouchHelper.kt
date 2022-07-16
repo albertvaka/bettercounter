@@ -8,7 +8,7 @@ class DragAndSwipeTouchHelper(private val mAdapter: ListGesturesCallback) :
 
     private var isDragging : Boolean = false
 
-    override fun isLongPressDragEnabled(): Boolean { return true }
+    override fun isLongPressDragEnabled(): Boolean { return false } // we start drag manually
     override fun isItemViewSwipeEnabled(): Boolean { return true }
 
     override fun getMovementFlags(
