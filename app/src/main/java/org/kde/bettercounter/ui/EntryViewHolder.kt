@@ -2,6 +2,7 @@ package org.kde.bettercounter.ui
 
 import android.content.Context
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
@@ -48,6 +49,10 @@ class EntryViewHolder(
         binding.undoButton.setOnClickListener { viewModel.decrementCounter(counter.name) }
         binding.draggableArea.setOnLongClickListener {
             touchHelper.startDrag(this@EntryViewHolder)
+            binding.draggableArea.performHapticFeedback(
+                HapticFeedbackConstants.LONG_PRESS,
+                HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+            )
             true
         }
         binding.nameText.text = counter.name

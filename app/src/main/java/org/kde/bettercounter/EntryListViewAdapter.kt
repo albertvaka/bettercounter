@@ -135,12 +135,11 @@ class EntryListViewAdapter(
     }
 
     override fun onDragStart(viewHolder: RecyclerView.ViewHolder?) {
-        //TODO: haptic feedback?
+        // nothing to do
     }
 
     override fun onDragEnd(viewHolder: RecyclerView.ViewHolder?) {
         viewModel.saveCounterOrder(counters)
     }
-
 
 }
