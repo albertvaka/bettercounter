@@ -85,13 +85,9 @@ class EntryListViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val binding = FragmentEntryBinding.inflate(inflater, parent, false)
-        val holder = EntryViewHolder(activity, binding, viewModel, touchHelper)
-        binding.root.setOnClickListener {
-            val counter = holder.counter
-            if (counter != null) {
-                lastSelectedCounterName = counter.name
-                onItemSelected?.invoke(counters.indexOf(counter.name), counter)
-            }
+        val holder = EntryViewHolder(activity, binding, viewModel, touchHelper) { counter ->
+            lastSelectedCounterName = counter.name
+            onItemSelected?.invoke(counters.indexOf(counter.name), counter)
         }
         return holder
     }

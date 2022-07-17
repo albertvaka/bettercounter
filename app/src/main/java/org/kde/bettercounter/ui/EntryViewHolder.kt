@@ -18,7 +18,8 @@ class EntryViewHolder(
     private val context: Context,
     val binding: FragmentEntryBinding,
     private var viewModel: ViewModel,
-    private val touchHelper: ItemTouchHelper
+    private val touchHelper: ItemTouchHelper,
+    private val onClickListener: (counter : CounterSummary) -> Unit?,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     var counter : CounterSummary? = null
@@ -47,6 +48,7 @@ class EntryViewHolder(
             true
         }
         binding.undoButton.setOnClickListener { viewModel.decrementCounter(counter.name) }
+        binding.draggableArea.setOnClickListener { onClickListener(counter) }
         binding.draggableArea.setOnLongClickListener {
             touchHelper.startDrag(this@EntryViewHolder)
             binding.draggableArea.performHapticFeedback(
