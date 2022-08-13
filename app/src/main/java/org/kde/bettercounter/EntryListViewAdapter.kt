@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.databinding.FragmentEntryBinding
@@ -33,13 +34,16 @@ class EntryListViewAdapter(
 
     private val touchHelper = ItemTouchHelper(DragAndSwipeTouchHelper(this))
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        touchHelper.attachToRecyclerView(recyclerView)
-        super.onAttachedToRecyclerView(recyclerView)
+    private var recyclerView : RecyclerView? = null
+
+    override fun onAttachedToRecyclerView(view: RecyclerView) {
+        recyclerView = view
+        touchHelper.attachToRecyclerView(view)
+        super.onAttachedToRecyclerView(view)
     }
 
     init {
-        viewModel.observeCounterChange(activity, object : ViewModel.CounterAddedObserver {
+        viewModel.observeCounterChange(activity, object : ViewModel.CounterObserver {
             override fun onCounterAdded(counterName: String, isUserAdded: Boolean) {
                 counters.add(counterName)
                 activity.runOnUiThread {
@@ -79,6 +83,14 @@ class EntryListViewAdapter(
                     // passing a second parameter disables the disappear+appear animation
                     notifyItemChanged(position, Unit)
                 }
+            }
+
+            override fun onCounterDecremented(counterName: String, date: Date) {
+                Snackbar.make(recyclerView!!, activity.getString(R.string.decreased_entry, counterName), Snackbar.LENGTH_LONG)
+                    .setAction(R.string.undo) { _ ->
+                        viewModel.incrementCounter(counterName, date)
+                    }
+                    .show()
             }
         })
     }

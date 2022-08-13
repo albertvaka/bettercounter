@@ -116,12 +116,13 @@ class Repository(
         counterCache.remove(name)
     }
 
-    suspend fun removeEntry(name: String) {
+    suspend fun removeEntry(name: String): Date? {
         val entry = entryDao.getLastAdded(name)
         if (entry != null) {
             entryDao.delete(entry)
         }
         counterCache.remove(name)
+        return entry?.date
     }
 
     suspend fun removeAllEntries(name: String) {
