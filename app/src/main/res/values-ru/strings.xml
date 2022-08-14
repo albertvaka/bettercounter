@@ -41,4 +41,6 @@
         <item quantity="many">%1$s (%2$d)</item>
         <item quantity="few">%1$s (%2$d)</item>
     </plurals>
+    <string name="decreased_entry">Уменьшенный \'%1$s\'</string>
+    <string name="undo">Отменить</string>
 </resources>

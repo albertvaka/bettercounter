@@ -40,4 +40,6 @@
         <item quantity="one">%1$s (%2$d vegada)</item>
         <item quantity="other">%1$s (%2$d vegades)</item>
     </plurals>
+    <string name="decreased_entry">Decrementat \'%1$s\'</string>
+    <string name="undo">Desfés</string>
 </resources>
