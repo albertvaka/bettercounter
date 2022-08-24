@@ -38,6 +38,9 @@ interface EntryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entry : Entry)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun bulkInsert(entry : List<Entry>)
+
     @Delete
     fun delete(entry : Entry)
 

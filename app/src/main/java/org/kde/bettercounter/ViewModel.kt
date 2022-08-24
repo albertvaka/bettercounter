@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.*
+import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
 
@@ -174,6 +175,48 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
                         writer.write("\n")
                     }
                     sendProgress(repo.getCounterList().size)
+                }
+            }
+        }
+    }
+
+    fun importAll(stream : InputStream, progressHandler : Handler?, defaultInterval : Interval, defaultColor : Int) {
+
+        fun sendProgress(progress : Int, done : Int) {
+            val message = Message()
+            message.arg1 = progress
+            message.arg2 = done // -1 -> error, 0 -> wip, 1 -> done
+            progressHandler?.sendMessage(message)
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            stream.use { stream ->
+                // We read everything into memory before we update the DB so we know there are no errors
+                val entriesToImport : MutableList<Entry> = mutableListOf()
+                val namesToImport : MutableList<String> = mutableListOf()
+                try {
+                    stream.bufferedReader().use { reader ->
+                        reader.forEachLine { line ->
+                            val nameAndDates = line.splitToSequence(",").iterator()
+                            val name = nameAndDates.next()
+                            namesToImport.add(name)
+                            nameAndDates.forEach { timestamp ->
+                                entriesToImport.add(Entry(name = name, date = Date(timestamp.toLong())))
+                            }
+                            sendProgress(namesToImport.size, 0)
+                        }
+                    }
+                    namesToImport.forEach { name ->
+                        if (!counterExists(name)) {
+                            addCounter(name, defaultInterval, defaultColor)
+                        }
+
+                    }
+                    repo.bulkAddEntries(entriesToImport)
+                    sendProgress(namesToImport.size, 1)
+                } catch(e : Exception) {
+                    e.printStackTrace()
+                    sendProgress(namesToImport.size, -1)
                 }
             }
         }

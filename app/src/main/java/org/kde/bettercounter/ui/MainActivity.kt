@@ -1,6 +1,7 @@
 package org.kde.bettercounter.ui
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -18,12 +19,11 @@ import org.kde.bettercounter.ChartsAdapter
 import org.kde.bettercounter.EntryListViewAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
-import org.kde.bettercounter.boilerplate.CreateFileParams
-import org.kde.bettercounter.boilerplate.CreateFileResultContract
-import org.kde.bettercounter.boilerplate.HackyLayoutManager
+import org.kde.bettercounter.boilerplate.*
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
 import org.kde.bettercounter.persistence.CounterSummary
+import org.kde.bettercounter.persistence.DEFAULT_INTERVAL
 import org.kde.bettercounter.persistence.Interval
 
 
@@ -125,11 +125,55 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.export -> {
+            R.id.export_csv -> {
                 exportFilePicker.launch(CreateFileParams("text/csv","bettercounter-export.csv"))
                 true
             }
+            R.id.import_csv -> {
+                importFilePicker.launch(OpenFileParams("text/*"))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private val importFilePicker : ActivityResultLauncher<OpenFileParams> = registerForActivityResult(OpenFileResultContract()) { uri: Uri? ->
+        if (uri != null) {
+            contentResolver.openInputStream(uri)?.let { stream ->
+
+                var hasImported = false
+
+                val progressDialogBinding = ProgressDialogBinding.inflate(layoutInflater)
+                val dialog = AlertDialog.Builder(this)
+                    .setView(progressDialogBinding.root)
+                    .setCancelable(false)
+                    .setOnDismissListener() {
+                        if (hasImported) {
+                            // restart app
+                            val intent = Intent(this, MainActivity::class.java)
+                            this.startActivity(intent)
+                            finishAffinity()
+                        }
+                    }
+                    .create()
+                dialog.show()
+
+                val progressHandler = Handler(Looper.getMainLooper()) {
+                    if (it.arg2 == -1) {
+                        progressDialogBinding.text.text = getString(R.string.import_error)
+                        dialog.setCancelable(true)
+                    } else {
+                        progressDialogBinding.text.text = getString(R.string.imported_n, it.arg1)
+                        if (it.arg2 == 1) { // we are done
+                            dialog.setCancelable(true)
+                            hasImported = true
+                        }
+                    }
+                    true
+                }
+                val defaultColor = resources.obtainTypedArray(R.array.picker_colors).getColor(0, 0)
+                viewModel.importAll(stream, progressHandler, DEFAULT_INTERVAL, defaultColor)
+            }
         }
     }
 

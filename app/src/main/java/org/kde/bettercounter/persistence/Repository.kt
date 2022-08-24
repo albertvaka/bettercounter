@@ -137,4 +137,9 @@ class Repository(
         return entryDao.getAllEntriesSortedByDate(name)
     }
 
+    suspend fun bulkAddEntries(entries : List<Entry>) {
+        entryDao.bulkInsert(entries)
+        counterCache.clear() // we don't know what changed
+    }
+
 }

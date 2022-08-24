@@ -33,8 +33,10 @@
     <string name="tutorial_pickdate">Долгое нажатие для выбора даты</string>
     <string name="tutorial_swipe">Проведите пальцем вправо для редактирования или удаления</string>
     <string name="tutorial_drag">Длительное нажатие и перетаскивание для изменения порядка</string>
-    <string name="export">Экспорт данных</string>
+    <string name="export_csv">Экспорт данных</string>
+    <string name="import_csv">импортировать данные</string>
     <string name="exported_n">Экспортировано %1$d/%2$d счетчиков</string>
+    <string name="imported_n">Импортировано %1$d счетчиков</string>
     <string name="delete_confirmation">Вы уверены, что хотите удалить этот счетчик?</string>
     <plurals name="chart_title">
         <item quantity="one">%1$s (%2$d)</item>
@@ -43,4 +45,5 @@
     </plurals>
     <string name="decreased_entry">Уменьшенный \'%1$s\'</string>
     <string name="undo">Отменить</string>
+    <string name="import_error">Ошибка: неправильный формат файла</string>
 </resources>
