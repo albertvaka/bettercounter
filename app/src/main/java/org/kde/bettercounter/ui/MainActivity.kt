@@ -25,6 +25,7 @@ import org.kde.bettercounter.databinding.ProgressDialogBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.DEFAULT_INTERVAL
 import org.kde.bettercounter.persistence.Interval
+import org.kde.bettercounter.persistence.Tutorial
 
 
 class MainActivity : AppCompatActivity() {
@@ -167,6 +168,8 @@ class MainActivity : AppCompatActivity() {
                         if (it.arg2 == 1) { // we are done
                             dialog.setCancelable(true)
                             hasImported = true
+                            // Hide all tutorials
+                            Tutorial.values().forEach { tuto -> viewModel.setTutorialShown(tuto) }
                         }
                     }
                     true
