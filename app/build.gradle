@@ -3,15 +3,17 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "org.kde.bettercounter"
         minSdkVersion 23
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionCode 23001
         versionName "2.3"
+
+        resConfigs("en", "ca", "ru")
 
         //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
