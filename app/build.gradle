@@ -10,8 +10,8 @@ android {
         applicationId "org.kde.bettercounter"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 23001
-        versionName "2.3"
+        versionCode 24000
+        versionName "2.4"
 
         resConfigs("en", "ca", "ru")
 
