@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -35,6 +36,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var sheetBehavior : BottomSheetBehavior<View>
     private var sheetIsExpanding = false
+    private var onBackPressedCloseSheetCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            if (sheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                this.isEnabled = false
+                sheetIsExpanding = false
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,8 +76,10 @@ class MainActivity : AppCompatActivity() {
         sheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    onBackPressedCloseSheetCallback.isEnabled = true
                     sheetIsExpanding = false
                 } else if (newState == BottomSheetBehavior.STATE_HIDDEN){
+                    onBackPressedCloseSheetCallback.isEnabled = false
                     setFabToCreate()
                     entryViewAdapter.clearItemSelected()
                 }
@@ -82,6 +94,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        onBackPressedDispatcher.addCallback(onBackPressedCloseSheetCallback)
 
         // Create counter dialog
         // ---------------------
@@ -94,6 +107,7 @@ class MainActivity : AppCompatActivity() {
         entryViewAdapter.onItemSelected = { position: Int, counter: CounterSummary ->
             if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                 sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                onBackPressedCloseSheetCallback.isEnabled = true
                 sheetIsExpanding = true
             }
             binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
@@ -204,15 +218,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        if (sheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-            sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            sheetIsExpanding = false
-        } else {
-            super.onBackPressed()
-        }
-    }
-
     private fun setFabToCreate() {
         binding.fab.setImageResource(R.drawable.ic_add)
         binding.fab.setOnClickListener {
@@ -256,6 +261,7 @@ class MainActivity : AppCompatActivity() {
                         .setPositiveButton(R.string.delete) { _, _ ->
                             viewModel.deleteCounter(counter.name)
                             sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                            onBackPressedCloseSheetCallback.isEnabled = false
                             sheetIsExpanding = false
                         }
                         .setNegativeButton(R.string.cancel, null)
