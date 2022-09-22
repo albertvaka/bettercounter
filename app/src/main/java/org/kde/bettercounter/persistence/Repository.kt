@@ -2,6 +2,7 @@ package org.kde.bettercounter.persistence
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.ContextCompat
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.Converters
@@ -57,7 +58,7 @@ class Repository(
 
     private fun getCounterColor(name : String) : Int {
         val key = COUNTERS_COLOR_PREFS_KEY.format(name)
-        return sharedPref.getInt(key, context.getColor(R.color.colorPrimary))
+        return sharedPref.getInt(key, ContextCompat.getColor(context, R.color.colorPrimary))
     }
 
     private fun getCounterInterval(name : String) : Interval {

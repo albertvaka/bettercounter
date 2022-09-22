@@ -2,6 +2,7 @@ package org.kde.bettercounter.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
@@ -36,7 +37,7 @@ class BetterChart : BarChart {
         setDrawGridBackground(false)
         setDrawValueAboveBar(true)
 
-        val accentColor = context.getColor(R.color.colorAccent)
+        val accentColor = ContextCompat.getColor(context, R.color.colorAccent)
 
         // No data text
         setNoDataText(context.getString(R.string.no_data))

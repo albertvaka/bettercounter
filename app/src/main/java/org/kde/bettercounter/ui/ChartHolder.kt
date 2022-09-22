@@ -1,6 +1,7 @@
 package org.kde.bettercounter.ui
 
 import android.content.Context
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
@@ -32,8 +33,8 @@ class ChartHolder(
         binding.chartName.text = context.resources.getQuantityString(R.plurals.chart_title, entries.size, dateString, entries.size)
 
         // Chart
-        val defaultColor = context.getColor(R.color.colorPrimary)
-        val color = if (counter.color == defaultColor) context.getColor(R.color.colorAccent) else counter.color
+        val defaultColor = ContextCompat.getColor(context, R.color.colorPrimary)
+        val color = if (counter.color == defaultColor) ContextCompat.getColor(context, R.color.colorAccent) else counter.color
         binding.chart.setDataBucketized(entries, rangeStart, counter.intervalForChart, color)
 
         // Stats
