@@ -43,6 +43,7 @@ android {
         }
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -68,7 +69,7 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'com.google.android.material:material:1.6.1'
-
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'// Chrono.UNITS for Android < 26
     //testImplementation 'junit:junit:4.12'
     //androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     //androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
