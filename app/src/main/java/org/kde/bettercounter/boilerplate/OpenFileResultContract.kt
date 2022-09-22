@@ -1,4 +1,4 @@
-package org.kde.bettercounter.boilerplate;
+package org.kde.bettercounter.boilerplate
 
 import android.app.Activity
 import android.content.Context

@@ -131,7 +131,7 @@ class ChartsAdapter(
     }
 
     override fun onViewRecycled(holder: ChartHolder) {
-        boundViewHolders.remove(holder);
+        boundViewHolders.remove(holder)
     }
 
     private fun countNumCharts(counter: CounterSummary) : Int {

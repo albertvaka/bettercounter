@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity() {
                 val dialog = AlertDialog.Builder(this)
                     .setView(progressDialogBinding.root)
                     .setCancelable(false)
-                    .setOnDismissListener() {
+                    .setOnDismissListener {
                         if (hasImported) {
                             // restart app
                             val intent = Intent(this, MainActivity::class.java)

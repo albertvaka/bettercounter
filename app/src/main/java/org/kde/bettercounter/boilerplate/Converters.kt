@@ -20,7 +20,7 @@ class Converters {
         }
 
         @JvmStatic
-        fun stringListToString(list: List<String>?): String? {
+        fun stringListToString(list: List<String>?): String {
             return JSONArray(list).toString()
         }
 
