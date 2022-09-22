@@ -13,11 +13,11 @@ data class CreateFileParams(
 
 class CreateFileResultContract : ActivityResultContract<CreateFileParams, Uri?>() {
 
-        override fun createIntent(context: Context, data: CreateFileParams): Intent =
+        override fun createIntent(context: Context, input: CreateFileParams): Intent =
                 Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
-                setTypeAndNormalize(data.fileMimeType)
-                putExtra(Intent.EXTRA_TITLE, data.suggestedFileName)
+                setTypeAndNormalize(input.fileMimeType)
+                putExtra(Intent.EXTRA_TITLE, input.suggestedFileName)
         }
 
         override fun parseResult(resultCode: Int, intent: Intent?): Uri? = when (resultCode) {

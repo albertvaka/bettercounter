@@ -21,7 +21,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         fun onCounterAdded(counterName: String, isUserAdded : Boolean)
         fun onCounterRemoved(counterName: String)
         fun onCounterRenamed(oldName : String, newName: String)
-        fun onCounterDecremented(counterName: String, oldEntry: Date)
+        fun onCounterDecremented(counterName: String, oldEntryDate: Date)
     }
 
     private val repo : Repository
@@ -74,11 +74,11 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun decrementCounter(name : String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val date = repo.removeEntry(name)
+            val oldEntryDate = repo.removeEntry(name)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
-            if (date != null) {
+            if (oldEntryDate != null) {
                 for ((_, observer) in counterObservers) {
-                    observer.onCounterDecremented(name, date)
+                    observer.onCounterDecremented(name, oldEntryDate)
                 }
             }
         }

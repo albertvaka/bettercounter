@@ -85,10 +85,10 @@ class EntryListViewAdapter(
                 }
             }
 
-            override fun onCounterDecremented(counterName: String, date: Date) {
+            override fun onCounterDecremented(counterName: String, oldEntryDate: Date) {
                 Snackbar.make(recyclerView!!, activity.getString(R.string.decreased_entry, counterName), Snackbar.LENGTH_LONG)
                     .setAction(R.string.undo) {
-                        viewModel.incrementCounter(counterName, date)
+                        viewModel.incrementCounter(counterName, oldEntryDate)
                     }
                     .show()
             }

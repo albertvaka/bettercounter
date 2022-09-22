@@ -12,10 +12,10 @@ data class OpenFileParams(
 
 class OpenFileResultContract : ActivityResultContract<OpenFileParams, Uri?>() {
 
-        override fun createIntent(context: Context, data: OpenFileParams): Intent =
+        override fun createIntent(context: Context, input: OpenFileParams): Intent =
                 Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
-                setTypeAndNormalize(data.fileMimeType)
+                setTypeAndNormalize(input.fileMimeType)
         }
 
         override fun parseResult(resultCode: Int, intent: Intent?): Uri? = when (resultCode) {
