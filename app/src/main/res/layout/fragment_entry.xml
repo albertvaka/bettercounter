@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_gravity="center"
-        android:tint="@drawable/button_state_color"
+        app:tint="@drawable/button_state_color"
         android:src="@drawable/ic_minusone"
         android:contentDescription="@string/decrease" />
 
@@ -71,7 +71,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:src="@drawable/ic_plusone"
-        android:tint="@drawable/button_state_color"
+        app:tint="@drawable/button_state_color"
         android:contentDescription="@string/increase" />
 
 </LinearLayout>
