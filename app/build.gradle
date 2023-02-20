@@ -13,8 +13,7 @@ android {
         targetSdkVersion 33
         versionCode 24010
         versionName "2.4.1"
-
-        resConfigs("en", "ca", "ru")
+        resConfigs 'en', 'ca', 'ru'
 
         //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -57,20 +56,20 @@ android {
 }
 
 dependencies {
-    def room_version = "2.4.3"
+    def room_version = "2.5.0"
 
     implementation 'com.github.douglasjunior:android-simple-tooltip:1.0.0-rc.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'com.google.android.material:material:1.6.1'
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'// Chrono.UNITS for Android < 26
+    implementation 'com.google.android.material:material:1.8.0'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.2'// Chrono.UNITS for Android < 26
     //testImplementation 'junit:junit:4.12'
     //androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     //androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
