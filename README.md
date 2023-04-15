@@ -1,6 +1,6 @@
 # BetterCounter
 
-<img src="app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" width="64">
+<img src="app/src/main/res/mipmap-xhdpi/ic_launcher.png" width="64">
  
 ###  A multi-purpose counter app
 
