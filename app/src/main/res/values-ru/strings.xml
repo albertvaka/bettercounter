@@ -46,4 +46,5 @@
     <string name="decreased_entry">Уменьшенный \'%1$s\'</string>
     <string name="undo">Отменить</string>
     <string name="import_error">Ошибка: неправильный формат файла</string>
+    <string name="reset">сбросить на ноль</string>
 </resources>

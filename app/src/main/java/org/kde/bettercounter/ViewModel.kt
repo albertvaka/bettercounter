@@ -136,6 +136,13 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun counterExists(name: String): Boolean = repo.getCounterList().contains(name)
 
+    fun resetCounter(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.removeAllEntries(name)
+            summaryMap[name]?.postValue(repo.getCounterSummary(name))
+        }
+    }
+
     fun deleteCounter(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.removeAllEntries(name)

@@ -41,6 +41,7 @@
     <string name="delete_confirmation">Are you sure you want to delete this counter?</string>
     <string name="decreased_entry">Decreased \'%1$s\'</string>
     <string name="undo">Undo</string>
+    <string name="reset">Reset but keep</string>
     <plurals name="chart_title">
         <item quantity="one">%1$s (%2$d time)</item>
         <item quantity="other">%1$s (%2$d times)</item>

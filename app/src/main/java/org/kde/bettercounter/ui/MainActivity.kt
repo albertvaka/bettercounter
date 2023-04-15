@@ -258,6 +258,12 @@ class MainActivity : AppCompatActivity() {
                     AlertDialog.Builder(this)
                         .setTitle(counter.name)
                         .setMessage(R.string.delete_confirmation)
+                        .setNeutralButton(R.string.reset) { _, _ ->
+                            viewModel.resetCounter(counter.name)
+                            sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                            onBackPressedCloseSheetCallback.isEnabled = false
+                            sheetIsExpanding = false
+                        }
                         .setPositiveButton(R.string.delete) { _, _ ->
                             viewModel.deleteCounter(counter.name)
                             sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
