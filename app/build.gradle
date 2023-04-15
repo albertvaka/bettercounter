@@ -11,8 +11,8 @@ android {
         applicationId "org.kde.bettercounter"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 24020
-        versionName "2.4.2"
+        versionCode 25030
+        versionName "2.5.0"
         resConfigs 'en', 'ca', 'ru'
 
         //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
