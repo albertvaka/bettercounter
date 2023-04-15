@@ -47,7 +47,7 @@ class EntryViewHolder(
             }
             true
         }
-        binding.undoButton.setOnClickListener { viewModel.decrementCounter(counter.name) }
+        binding.decreaseButton.setOnClickListener { viewModel.decrementCounter(counter.name) }
         binding.draggableArea.setOnClickListener { onClickListener(counter) }
         binding.draggableArea.setOnLongClickListener {
             touchHelper.startDrag(this@EntryViewHolder)
@@ -62,10 +62,10 @@ class EntryViewHolder(
         val mostRecentDate = counter.mostRecent
         if (mostRecentDate != null) {
             binding.timestampText.referenceTime = mostRecentDate.time
-            binding.undoButton.isEnabled = true
+            binding.decreaseButton.isEnabled = true
         } else {
             binding.timestampText.referenceTime = -1L
-            binding.undoButton.isEnabled = false
+            binding.decreaseButton.isEnabled = false
         }
     }
 }

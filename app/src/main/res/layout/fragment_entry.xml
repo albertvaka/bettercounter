@@ -9,7 +9,7 @@
     android:orientation="horizontal">
 
     <ImageButton
-        android:id="@+id/undoButton"
+        android:id="@+id/decreaseButton"
         android:layout_width="@dimen/buttonWidth"
         android:layout_height="match_parent"
         style="?android:attr/buttonBarButtonStyle"
