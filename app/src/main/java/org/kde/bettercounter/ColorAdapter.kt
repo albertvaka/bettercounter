@@ -1,4 +1,5 @@
 package org.kde.bettercounter
+
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -6,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 
 // Based on https://github.com/kristiyanP/colorpicker
@@ -77,7 +79,9 @@ class ColorAdapter(context: Context) : RecyclerView.Adapter<ColorAdapter.ViewHol
 
         holder.colorButton.text = tickText
         holder.colorButton.setTextColor(textColor)
-        holder.colorButton.background.setTint(color)
+        val background = DrawableCompat.wrap(holder.colorButton.background)
+        DrawableCompat.setTint(background, color)
+        holder.colorButton.background = background
     }
 
     override fun getItemCount(): Int {
