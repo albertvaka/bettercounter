@@ -31,7 +31,6 @@
     <string name="stats_averages">Avg: %1$s, lifetime: %2$s</string>
     <string name="no_data">There are no entries in this period</string>
     <string name="tutorial_pickdate">Long press to pick the date</string>
-    <string name="tutorial_swipe">Swipe right to edit or delete</string>
     <string name="tutorial_drag">Long press and drag to reorder</string>
     <string name="export_csv">Export data</string>
     <string name="import_csv">Import data</string>

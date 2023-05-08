@@ -31,7 +31,6 @@
     <string name="stats_averages">Mitjana: %1$s, de per vida: %2$s</string>
     <string name="no_data">No hi ha entrades en aquest període</string>
     <string name="tutorial_pickdate">Feu una pulsació llarga per escollir la data</string>
-    <string name="tutorial_swipe">Llisqueu per editar</string>
     <string name="tutorial_drag">Feu una pulsació llarga i arrossegueu per a reordenar</string>
     <string name="export_csv">Exporta les dades</string>
     <string name="import_csv">Importa les dades</string>

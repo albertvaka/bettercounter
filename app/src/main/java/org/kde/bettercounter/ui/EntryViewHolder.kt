@@ -22,10 +22,7 @@ class EntryViewHolder(
     private val onClickListener: (counter : CounterSummary) -> Unit?,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    var counter : CounterSummary? = null
-
     fun onBind(counter: CounterSummary) {
-        this.counter = counter
         binding.root.setBackgroundColor(counter.color)
         binding.increaseButton.setOnClickListener {
             viewModel.incrementCounter(counter.name)
