@@ -1,0 +1,17 @@
+2.5:
+* Add the option to reset a counter
+
+2.4:
+* Allows changing the app language in Android 13+
+
+2.3:
+* Adds support for importing counters
+
+2.2:
+* Adds an undo button after decreasing a counter.
+
+2.0:
+* Allows scrolling through past data in the bottom panel graph.
+* All intervals are now tumbling windows instead of sliding windows.
+* Removes the YTD interval type, since Year now behaves like YTD.
+* Counter details now show the average for the current interval and the lifetime of the counter.
