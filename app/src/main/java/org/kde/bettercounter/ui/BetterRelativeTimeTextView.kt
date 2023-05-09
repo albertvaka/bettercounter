@@ -102,7 +102,7 @@ open class BetterRelativeTimeTextView : androidx.appcompat.widget.AppCompatTextV
     }
 
     private fun startTaskForPeriodicallyUpdatingRelativeTime() {
-        if (mUpdateTimeTask!!.isDetached) initUpdateTimeTask()
+        if (mUpdateTimeTask == null || mUpdateTimeTask!!.isDetached) initUpdateTimeTask()
         mHandler.post(mUpdateTimeTask!!)
         isUpdateTaskRunning = true
     }
