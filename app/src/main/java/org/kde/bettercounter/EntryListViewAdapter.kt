@@ -43,7 +43,7 @@ class EntryListViewAdapter(
     }
 
     init {
-        viewModel.observeCounterChange(activity, object : ViewModel.CounterObserver {
+        viewModel.observeCounterChange(object : ViewModel.CounterObserver {
             override fun onCounterAdded(counterName: String, isUserAdded: Boolean) {
                 activity.runOnUiThread {
                     counters.add(counterName)

@@ -25,7 +25,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private val repo : Repository
-    private val counterObservers = HashMap<LifecycleOwner, CounterObserver>()
+    private val counterObservers = HashSet<CounterObserver>()
     private val summaryMap = HashMap<String, MutableLiveData<CounterSummary>>()
 
     init {
@@ -36,7 +36,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             for (name in initialCounters) {
                 summaryMap[name] = MutableLiveData(repo.getCounterSummary(name)) // cache it
-                for ((_, observer) in counterObservers) {
+                for (observer in counterObservers) {
                     observer.onCounterAdded(name, false)
                 }
             }
@@ -49,7 +49,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         repo.setCounterList(repo.getCounterList().toMutableList() + name)
         repo.setCounterMetadata(name, color, interval)
         viewModelScope.launch(Dispatchers.IO) {
-            for ((_, observer) in counterObservers) {
+            for (observer in counterObservers) {
                 summaryMap[name] = MutableLiveData(repo.getCounterSummary(name)) // cache it
                 withContext(Dispatchers.Main) {
                     observer.onCounterAdded(name, true)
@@ -58,11 +58,15 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun observeCounterChange(owner : LifecycleOwner, observer: CounterObserver) {
-        counterObservers[owner] = observer
+    fun observeCounterChange(observer: CounterObserver) {
+        counterObservers.add(observer)
         for (name in summaryMap.keys) { //notify the ones we already have
             observer.onCounterAdded(name, false)
         }
+    }
+
+    fun removeCounterChangeObserver(observer: CounterObserver) {
+        counterObservers.remove(observer)
     }
 
     fun incrementCounter(name : String, date : Date = Calendar.getInstance().time) {
@@ -77,7 +81,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
             val oldEntryDate = repo.removeEntry(name)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
             if (oldEntryDate != null) {
-                for ((_, observer) in counterObservers) {
+                for (observer in counterObservers) {
                     observer.onCounterDecremented(name, oldEntryDate)
                 }
             }
@@ -121,7 +125,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
                 summaryMap[newName] = MutableLiveData(repo.getCounterSummary(newName)) // cache it
             }
 
-            for ((_, observer) in counterObservers) {
+            for (observer in counterObservers) {
                 withContext(Dispatchers.Main) {
                     observer.onCounterRenamed(oldName, newName)
                 }
@@ -146,7 +150,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteCounter(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.removeAllEntries(name)
-            for ((_, observer) in counterObservers) {
+            for (observer in counterObservers) {
                 withContext(Dispatchers.Main) {
                     observer.onCounterRemoved(name)
                 }
