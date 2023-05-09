@@ -45,4 +45,7 @@
         <item quantity="one">%1$s (%2$d time)</item>
         <item quantity="other">%1$s (%2$d times)</item>
     </plurals>
+    <string name="fake_example_title">Go jogging</string>
+    <string name="app_widget_description">Add a counter to your home screen</string>
+    <string name="no_counters">No counters exist: Create some first</string>
 </resources>

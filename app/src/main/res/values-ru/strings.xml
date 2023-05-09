@@ -46,4 +46,7 @@
     <string name="undo">Отменить</string>
     <string name="import_error">Ошибка: неправильный формат файла</string>
     <string name="reset">сбросить на ноль</string>
+    <string name="fake_example_title">Пробежку</string>
+    <string name="app_widget_description">Добавьте счетчик на главный экран</string>
+    <string name="no_counters">Счетчиков не существует</string>
 </resources>

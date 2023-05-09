@@ -1,5 +1,6 @@
 package org.kde.bettercounter
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -54,10 +55,11 @@ class EntryListViewAdapter(
                 }
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun onInitialCountersLoaded() {
                 activity.runOnUiThread {
                     counters = viewModel.getCounterList().toMutableList()
-                    notifyItemRangeInserted(0, counters.size)
+                    notifyDataSetChanged()
                     for (counterName in counters) {
                         observeNewCounter(counterName)
                     }

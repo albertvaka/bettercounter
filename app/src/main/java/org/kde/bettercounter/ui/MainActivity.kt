@@ -7,21 +7,28 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewTreeObserver
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.ChartsAdapter
 import org.kde.bettercounter.EntryListViewAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
-import org.kde.bettercounter.boilerplate.*
+import org.kde.bettercounter.boilerplate.CreateFileParams
+import org.kde.bettercounter.boilerplate.CreateFileResultContract
+import org.kde.bettercounter.boilerplate.OpenFileParams
+import org.kde.bettercounter.boilerplate.OpenFileResultContract
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
 import org.kde.bettercounter.persistence.CounterSummary
@@ -53,12 +60,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
-        viewModel = ViewModelProvider.AndroidViewModelFactory(application).create(ViewModel::class.java)
-
+        viewModel = (application as BetterApplication).viewModel
 
         // Bottom sheet with graph
         // -----------------------
-
         sheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
         sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
@@ -131,6 +136,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.charts.isNestedScrollingEnabled = false
         PagerSnapHelper().attachToRecyclerView(binding.charts) // Scroll one by one
+
+        // For some reason, when the app is installed via Android Studio, the broadcast that
+        // refreshes the widgets after installing doesn't trigger. Do it manually here.
+        forceRefreshWidgets(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -270,6 +279,7 @@ class MainActivity : AppCompatActivity() {
                             sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                             onBackPressedCloseSheetCallback.isEnabled = false
                             sheetIsExpanding = false
+                            removeWidgets(this, counter.name)
                         }
                         .setNegativeButton(R.string.cancel, null)
                         .show()
