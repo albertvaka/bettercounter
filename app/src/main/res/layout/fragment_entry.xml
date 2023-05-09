@@ -35,7 +35,6 @@
             android:layout_gravity="center"
             android:textAppearance="?attr/textAppearanceListItem"
             android:textStyle="bold"
-            android:tint="#FFFFFF"
             tools:text="Potentially long thing" />
 
         <TextView
@@ -56,7 +55,6 @@
             android:textAlignment="center"
             android:textAppearance="?attr/textAppearanceListItem"
             android:drawableStart="@drawable/ic_time"
-            android:drawableTint="@color/colorAccent"
             android:drawablePadding="4.5dip"
             tools:text="yesterday" />
 
