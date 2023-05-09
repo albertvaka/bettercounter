@@ -116,11 +116,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         repo.deleteCounterMetadata(oldName)
         repo.setCounterMetadata(newName, color, interval)
         val list = repo.getCounterList().toMutableList()
-        list.forEachIndexed { index, element ->
-            if (element == oldName) {
-                list[index] = newName
-            }
-        }
+        list[list.indexOf(oldName)] = newName
         repo.setCounterList(list)
 
         viewModelScope.launch(Dispatchers.IO) {
