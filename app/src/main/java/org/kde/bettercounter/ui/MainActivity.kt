@@ -12,6 +12,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -122,9 +123,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.recycler.adapter = entryViewAdapter
-        binding.recycler.layoutManager = HackyLayoutManager(this)
+        binding.recycler.layoutManager = LinearLayoutManager(this)
 
-        binding.charts.layoutManager = HackyLayoutManager(this, RecyclerView.HORIZONTAL).apply {
+        binding.charts.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false).apply {
             stackFromEnd = true
         }
 

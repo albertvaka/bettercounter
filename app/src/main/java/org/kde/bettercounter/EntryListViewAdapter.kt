@@ -45,8 +45,8 @@ class EntryListViewAdapter(
     init {
         viewModel.observeCounterChange(activity, object : ViewModel.CounterObserver {
             override fun onCounterAdded(counterName: String, isUserAdded: Boolean) {
-                counters.add(counterName)
                 activity.runOnUiThread {
+                    counters.add(counterName)
                     val position = counters.size - 1
                     notifyItemInserted(position)
                     viewModel.getCounterSummary(counterName).observe(activity) {
