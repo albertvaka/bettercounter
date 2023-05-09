@@ -44,20 +44,33 @@ class EntryListViewAdapter(
 
     init {
         viewModel.observeCounterChange(object : ViewModel.CounterObserver {
-            override fun onCounterAdded(counterName: String, isUserAdded: Boolean) {
+
+            fun observeNewCounter(counterName : String) {
+                viewModel.getCounterSummary(counterName).observe(activity) {
+                    notifyItemChanged(counters.indexOf(it.name), Unit)
+                    if (lastSelectedCounterName == it.name) {
+                        onItemSelected?.invoke(counters.indexOf(it.name), it)
+                    }
+                }
+            }
+
+            override fun onInitialCountersLoaded() {
+                activity.runOnUiThread {
+                    counters = viewModel.getCounterList().toMutableList()
+                    notifyItemRangeInserted(0, counters.size)
+                    for (counterName in counters) {
+                        observeNewCounter(counterName)
+                    }
+                }
+            }
+
+            override fun onCounterAdded(counterName: String) {
                 activity.runOnUiThread {
                     counters.add(counterName)
                     val position = counters.size - 1
                     notifyItemInserted(position)
-                    viewModel.getCounterSummary(counterName).observe(activity) {
-                        notifyItemChanged(counters.indexOf(it.name), Unit)
-                        if (lastSelectedCounterName == it.name) {
-                            onItemSelected?.invoke(counters.indexOf(it.name), it)
-                        }
-                    }
-                    if (isUserAdded) {
-                        onItemAdded?.invoke(position)
-                    }
+                    observeNewCounter(counterName)
+                    onItemAdded?.invoke(position)
                 }
             }
 

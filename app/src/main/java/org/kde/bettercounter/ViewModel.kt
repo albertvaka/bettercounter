@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.os.Handler
 import android.os.Message
+import android.util.Log
+import androidx.annotation.MainThread
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +20,8 @@ import java.util.*
 class ViewModel(application: Application) : AndroidViewModel(application) {
 
     interface CounterObserver {
-        fun onCounterAdded(counterName: String, isUserAdded : Boolean)
+        fun onInitialCountersLoaded()
+        fun onCounterAdded(counterName: String)
         fun onCounterRemoved(counterName: String)
         fun onCounterRenamed(oldName : String, newName: String)
         fun onCounterDecremented(counterName: String, oldEntryDate: Date)
@@ -33,35 +36,41 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         val prefs =  application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
         repo = Repository(application, db.entryDao(), prefs)
         val initialCounters = repo.getCounterList()
+        for (name in initialCounters) {
+            summaryMap[name] = MutableLiveData()
+        }
         viewModelScope.launch(Dispatchers.IO) {
+            val counters = mutableListOf<CounterSummary>()
             for (name in initialCounters) {
-                summaryMap[name] = MutableLiveData(repo.getCounterSummary(name)) // cache it
+                counters.add(repo.getCounterSummary(name))
+            }
+            withContext(Dispatchers.Main) {
+                for (counter in counters) {
+                    summaryMap[counter.name]!!.value = counter
+                }
                 for (observer in counterObservers) {
-                    observer.onCounterAdded(name, false)
+                    observer.onInitialCountersLoaded()
                 }
             }
         }
     }
 
-    fun saveCounterOrder(value : List<String>) = repo.setCounterList(value)
+    @MainThread
+    fun observeCounterChange(observer: CounterObserver) {
+        counterObservers.add(observer)
+        observer.onInitialCountersLoaded()
+    }
 
     fun addCounter(name : String, interval : Interval, color : Int) {
         repo.setCounterList(repo.getCounterList().toMutableList() + name)
         repo.setCounterMetadata(name, color, interval)
         viewModelScope.launch(Dispatchers.IO) {
-            for (observer in counterObservers) {
-                summaryMap[name] = MutableLiveData(repo.getCounterSummary(name)) // cache it
-                withContext(Dispatchers.Main) {
-                    observer.onCounterAdded(name, true)
+            summaryMap[name] = MutableLiveData(repo.getCounterSummary(name))
+            withContext(Dispatchers.Main) {
+                for (observer in counterObservers) {
+                    observer.onCounterAdded(name)
                 }
             }
-        }
-    }
-
-    fun observeCounterChange(observer: CounterObserver) {
-        counterObservers.add(observer)
-        for (name in summaryMap.keys) { //notify the ones we already have
-            observer.onCounterAdded(name, false)
         }
     }
 
@@ -116,21 +125,18 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch(Dispatchers.IO) {
             repo.renameCounter(oldName, newName)
-            val counter = summaryMap.remove(oldName)
-            if (counter != null) {
-                summaryMap[newName] = counter
-                counter.postValue(repo.getCounterSummary(newName))
-            } else {
-                // should not happen, in theory we always have summaryMap populated
-                summaryMap[newName] = MutableLiveData(repo.getCounterSummary(newName)) // cache it
+            val counter : MutableLiveData<CounterSummary>? = summaryMap.remove(oldName)
+            if (counter == null) {
+                Log.e("BetterCounter", "Trying to rename a counter but the old counter doesn't exist")
+                return@launch
             }
-
-            for (observer in counterObservers) {
-                withContext(Dispatchers.Main) {
+            summaryMap[newName] = counter
+            counter.postValue(repo.getCounterSummary(newName))
+            withContext(Dispatchers.Main) {
+                for (observer in counterObservers) {
                     observer.onCounterRenamed(oldName, newName)
                 }
             }
-
         }
     }
 
@@ -139,6 +145,10 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun counterExists(name: String): Boolean = repo.getCounterList().contains(name)
+
+    fun getCounterList() = repo.getCounterList()
+
+    fun saveCounterOrder(value : List<String>) = repo.setCounterList(value)
 
     fun resetCounter(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -150,8 +160,8 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteCounter(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.removeAllEntries(name)
-            for (observer in counterObservers) {
-                withContext(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
+                for (observer in counterObservers) {
                     observer.onCounterRemoved(name)
                 }
             }
