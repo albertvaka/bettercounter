@@ -1,0 +1,11 @@
+Fes-la servir per al que vulguis:
+- Seguiment d'hàbits, bons o dolents (pe: fer esport, fumar, beure alcohol...)
+- Recordar quan és l'última vegada que vas fer alguna cosa (pe: regar les plantes, canviar els llençols...)
+- Contar vides a una partida de Màgic
+
+Funcions principals:
+- Crea comptadors amb diferents noms i colors
+- Visualitza l'històric de cada comptador
+- Exporta les dades
+- Les teves dades mai surten del teu dispositiu (exceptuant, si estan activades, les còpies de seguretat de Google)
+- Una app molt senzilla, que continuarà sent així
