@@ -1,5 +1,4 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widgetBackground"
     android:orientation="vertical"
@@ -25,11 +24,16 @@
 
     <TextView
         android:id="@+id/widgetCounter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:text="20"
+        android:layout_weight="1"
         android:textColor="@color/colorAccent"
-        android:textSize="24sp"
+        android:textSize="32sp"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="24sp"
+        android:autoSizeMaxTextSize="64sp"
+        android:autoSizeStepGranularity="2sp"
         android:maxLines="1"
         android:gravity="center"
         tools:ignore="HardcodedText" />
