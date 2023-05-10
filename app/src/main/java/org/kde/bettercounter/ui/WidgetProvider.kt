@@ -37,7 +37,7 @@ class WidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         Log.d("WidgetProvider", "onReceive " + intent.action)
-        if (intent.action == ACTION_CLICKED) {
+        if (intent.action == ACTION_COUNT) {
             val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
             if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
                 Log.e("BetterCounterWidget","No widget id extra set")
@@ -85,7 +85,7 @@ fun forceRefreshWidgets(context : Context) {
     context.sendBroadcast(intent)
 }
 
-private const val ACTION_CLICKED = "org.kde.bettercounter.WidgetProvider.CLICKED"
+private const val ACTION_COUNT = "org.kde.bettercounter.WidgetProvider.COUNT"
 private const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"
 
 internal fun updateAppWidget(
@@ -109,10 +109,9 @@ internal fun updateAppWidget(
 
     val views = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.widget)
 
-    val intent = Intent(context, WidgetProvider::class.java)
-    intent.action = ACTION_CLICKED
-    intent.putExtra(EXTRA_WIDGET_ID, appWidgetId)
-    views.setOnClickPendingIntent(R.id.widgetBackground, PendingIntent.getBroadcast(context, appWidgetId, intent, PendingIntent.FLAG_IMMUTABLE))
+    val openAppIntent = Intent(context, MainActivity::class.java)
+    val openAppPendingIntent = PendingIntent.getActivity(context, 0, openAppIntent, PendingIntent.FLAG_IMMUTABLE)
+    views.setOnClickPendingIntent(R.id.widgetName, openAppPendingIntent)
 
     if (!viewModel.counterExists(counterName)) {
         Log.e("BetterCounterWidget","The counter for this widget doesn't exist")
@@ -123,6 +122,12 @@ internal fun updateAppWidget(
         appWidgetManager.updateAppWidget(appWidgetId, views)
         return
     }
+
+    val countIntent = Intent(context, WidgetProvider::class.java)
+    countIntent.action = ACTION_COUNT
+    countIntent.putExtra(EXTRA_WIDGET_ID, appWidgetId)
+    val countPendingIntent = PendingIntent.getBroadcast(context, appWidgetId, countIntent, PendingIntent.FLAG_IMMUTABLE)
+    views.setOnClickPendingIntent(R.id.widgetBackground, countPendingIntent)
 
     var prevCounterName = counterName
     // observeForever means it's not attached to any lifecycle so we need to call removeObserver manually
