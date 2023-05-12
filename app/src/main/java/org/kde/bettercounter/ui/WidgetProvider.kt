@@ -52,6 +52,7 @@ class WidgetProvider : AppWidgetProvider() {
             viewModel.incrementCounterWithCallback(counterName) {
                 if (!viewModel.getCounterSummary(counterName).hasObservers()) {
                     // The app was terminated and we got unsubscribed
+                    Log.d("WidgetProvider", "CounterSummary has no observers")
                     updateAppWidget(context, viewModel, AppWidgetManager.getInstance(context), appWidgetId)
                 }
             }

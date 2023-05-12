@@ -139,7 +139,7 @@ class EntryListViewAdapter(
         if (counter != null) {
             holder.onBind(counter)
         } else {
-            Log.e("EntryListAdapter", "Counter not found?")
+            Log.d("EntryListAdapter", "Counter not found or still loading at pos $position")
         }
     }
 
