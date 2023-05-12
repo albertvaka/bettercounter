@@ -9,7 +9,7 @@ class BetterApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        viewModel = ViewModelProvider.AndroidViewModelFactory(this).create(ViewModel::class.java)
+        viewModel = ViewModel(this)
     }
 
 }

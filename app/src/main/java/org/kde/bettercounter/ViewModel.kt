@@ -7,6 +7,7 @@ import android.os.Message
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -16,8 +17,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
 
-
-class ViewModel(application: Application) : AndroidViewModel(application) {
+class ViewModel(application: Application) {
 
     interface CounterObserver {
         fun onInitialCountersLoaded()
@@ -39,7 +39,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         for (name in initialCounters) {
             summaryMap[name] = MutableLiveData()
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             val counters = mutableListOf<CounterSummary>()
             for (name in initialCounters) {
                 counters.add(repo.getCounterSummary(name))
@@ -57,6 +57,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     @MainThread
     fun observeCounterChange(observer: CounterObserver) {
+        Log.e("observeCounterChange", "SIZE" + counterObservers.size)
         counterObservers.add(observer)
         observer.onInitialCountersLoaded()
     }
@@ -64,7 +65,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun addCounter(name : String, interval : Interval, color : Int) {
         repo.setCounterList(repo.getCounterList().toMutableList() + name)
         repo.setCounterMetadata(name, color, interval)
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             summaryMap[name] = MutableLiveData(repo.getCounterSummary(name))
             withContext(Dispatchers.Main) {
                 for (observer in counterObservers) {
@@ -79,14 +80,14 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun incrementCounter(name : String, date : Date = Calendar.getInstance().time) {
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             repo.addEntry(name, date)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
         }
     }
 
     fun decrementCounter(name : String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             val oldEntryDate = repo.removeEntry(name)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
             if (oldEntryDate != null) {
@@ -107,7 +108,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun editCounterSameName(name : String, interval : Interval, color : Int) {
         repo.setCounterMetadata(name, color, interval)
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
         }
     }
@@ -119,7 +120,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         list[list.indexOf(oldName)] = newName
         repo.setCounterList(list)
 
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             repo.renameCounter(oldName, newName)
             val counter : MutableLiveData<CounterSummary>? = summaryMap.remove(oldName)
             if (counter == null) {
@@ -147,14 +148,14 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun saveCounterOrder(value : List<String>) = repo.setCounterList(value)
 
     fun resetCounter(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             repo.removeAllEntries(name)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
         }
     }
 
     fun deleteCounter(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             repo.removeAllEntries(name)
             withContext(Dispatchers.Main) {
                 for (observer in counterObservers) {
@@ -178,7 +179,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
             progressHandler?.sendMessage(message)
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             stream.use {
                 it.bufferedWriter().use { writer ->
                     for ((i, name) in repo.getCounterList().withIndex()) {
@@ -206,7 +207,7 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
             progressHandler?.sendMessage(message)
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             stream.use { stream ->
                 // We read everything into memory before we update the DB so we know there are no errors
                 val entriesToImport : MutableList<Entry> = mutableListOf()
@@ -241,10 +242,10 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getEntriesForRangeSortedByDate(name : String, since: Date, until: Date): LiveData<List<Entry>> {
         val ret = MutableLiveData<List<Entry>>()
-        viewModelScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             val entries = repo.getEntriesForRangeSortedByDate(name, since, until)
             //Log.e("Repository", "Queried ${entries.size} entries")
-            viewModelScope.launch(Dispatchers.Main) {
+            CoroutineScope(Dispatchers.Main).launch {
                 ret.value = entries
             }
         }
