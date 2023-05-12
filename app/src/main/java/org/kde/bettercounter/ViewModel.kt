@@ -86,6 +86,16 @@ class ViewModel(application: Application) {
         }
     }
 
+    fun incrementCounterWithCallback(name : String, date : Date = Calendar.getInstance().time, callback : () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            repo.addEntry(name, date)
+            summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            CoroutineScope(Dispatchers.Main).launch {
+                callback()
+            }
+        }
+    }
+
     fun decrementCounter(name : String) {
         CoroutineScope(Dispatchers.IO).launch {
             val oldEntryDate = repo.removeEntry(name)

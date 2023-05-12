@@ -49,10 +49,14 @@ class WidgetProvider : AppWidgetProvider() {
             }
             val counterName = loadWidgetCounterNamePref(context, appWidgetId)
             val viewModel = (context.applicationContext as BetterApplication).viewModel
-            viewModel.incrementCounter(counterName)
+            viewModel.incrementCounterWithCallback(counterName) {
+                if (!viewModel.getCounterSummary(counterName).hasObservers()) {
+                    // The app was terminated and we got unsubscribed
+                    updateAppWidget(context, viewModel, AppWidgetManager.getInstance(context), appWidgetId)
+                }
+            }
         }
     }
-
 }
 
 fun getAllWidgetIds(context : Context) : IntArray {
@@ -90,6 +94,8 @@ internal fun updateAppWidget(
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int
 ) {
+    Log.d("WidgetProvider", "updateAppWidget")
+
     if (!existsWidgetCounterNamePref(context, appWidgetId)) {
         // This gets called right after placing the widget even if it hasn't been configured yet.
         // In that case we can't do anything. This is useful for reconfigurable widgets, which don't
@@ -122,6 +128,7 @@ internal fun updateAppWidget(
     // observeForever means it's not attached to any lifecycle so we need to call removeObserver manually
     viewModel.getCounterSummary(counterName).observeForever(object : Observer<CounterSummary> {
         override fun onChanged(value: CounterSummary) {
+            Log.d("WidgetProvider", "onChanged")
             if (!existsWidgetCounterNamePref(context, appWidgetId)) {
                 // Prevent leaking the observer once the widget has been deleted by deleting it here
                 viewModel.getCounterSummary(value.name).removeObserver(this)
@@ -154,6 +161,6 @@ internal fun updateAppWidget(
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     })
-    appWidgetManager.updateAppWidget(appWidgetId, views)
+
 }
 
