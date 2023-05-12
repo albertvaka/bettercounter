@@ -1,11 +1,14 @@
+3.0:
+* Added widgets
+
 2.5:
-* Add the option to reset a counter
+* Counters can be reset
 
 2.4:
-* Allows changing the app language in Android 13+
+* Per-app language in Android 13+
 
 2.3:
-* Adds support for importing counters
+* Support for importing counters
 
 2.2:
 * Adds an undo button after decreasing a counter.
