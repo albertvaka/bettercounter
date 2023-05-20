@@ -48,4 +48,5 @@
     <string name="fake_example_title">Sortir a córrer</string>
     <string name="app_widget_description">Afegeix un comptador a la pantalla principal</string>
     <string name="no_counters">No existeix cap comptador</string>
+    <string name="color_hint">Color %1$d</string>
 </resources>

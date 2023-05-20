@@ -48,4 +48,5 @@
     <string name="fake_example_title">Go jogging</string>
     <string name="app_widget_description">Add a counter to your home screen</string>
     <string name="no_counters">No counters exist: Create some first</string>
+    <string name="color_hint">Color %1$d</string>
 </resources>

@@ -49,4 +49,5 @@
     <string name="fake_example_title">Пробежку</string>
     <string name="app_widget_description">Добавьте счетчик на главный экран</string>
     <string name="no_counters">Счетчиков не существует</string>
+    <string name="color_hint">Цвет %1$d</string>
 </resources>

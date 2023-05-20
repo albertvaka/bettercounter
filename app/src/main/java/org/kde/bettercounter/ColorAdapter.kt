@@ -11,7 +11,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 
 // Based on https://github.com/kristiyanP/colorpicker
-class ColorAdapter(context: Context) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
+class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
 
     var selectedColor : Int
         get() {
@@ -79,6 +79,7 @@ class ColorAdapter(context: Context) : RecyclerView.Adapter<ColorAdapter.ViewHol
 
         holder.colorButton.text = tickText
         holder.colorButton.setTextColor(textColor)
+        holder.colorButton.contentDescription = context.getString(R.string.color_hint, position+1)
         val background = DrawableCompat.wrap(holder.colorButton.background)
         DrawableCompat.setTint(background, color)
         holder.colorButton.background = background
