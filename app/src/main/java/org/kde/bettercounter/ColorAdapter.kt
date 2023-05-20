@@ -46,8 +46,7 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
         colors = colorList
     }
 
-    inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v), View.OnClickListener {
-        var colorButton: AppCompatButton = v as AppCompatButton
+    inner class ViewHolder(val colorButton: AppCompatButton) : RecyclerView.ViewHolder(colorButton), View.OnClickListener {
         init {
             colorButton.setOnClickListener(this)
         }
@@ -58,7 +57,7 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.color_circle, parent, false)
-        return ViewHolder(view)
+        return ViewHolder(view as AppCompatButton)
     }
 
     private fun isDarkColor(@ColorInt color: Int): Boolean {
