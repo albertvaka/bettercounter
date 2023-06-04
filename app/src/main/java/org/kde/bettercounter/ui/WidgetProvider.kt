@@ -127,6 +127,9 @@ internal fun updateAppWidget(
     val countIntent = Intent(context, WidgetProvider::class.java)
     countIntent.action = ACTION_COUNT
     countIntent.putExtra(EXTRA_WIDGET_ID, appWidgetId)
+    // We pass appWidgetId as requestCode even if it's not used to force the creation a new PendingIntent
+    // instead of reusing an existing one, which is what happens if only the "extras" field differs.
+    // Docs: https://developer.android.com/reference/android/app/PendingIntent.html
     val countPendingIntent = PendingIntent.getBroadcast(context, appWidgetId, countIntent, PendingIntent.FLAG_IMMUTABLE)
     views.setOnClickPendingIntent(R.id.widgetBackground, countPendingIntent)
 
