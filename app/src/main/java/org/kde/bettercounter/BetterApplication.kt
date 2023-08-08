@@ -1,7 +1,6 @@
 package org.kde.bettercounter
 
 import android.app.Application
-import androidx.lifecycle.ViewModelProvider
 
 class BetterApplication : Application() {
 
