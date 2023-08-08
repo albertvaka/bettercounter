@@ -1,0 +1,17 @@
+3.1:
+* Added content description for color buttons to improve accessibility
+
+3.0:
+* Added widgets
+
+2.5:
+* Counters can be reset
+
+2.4:
+* Per-app language in Android 13+
+
+2.3:
+* Support for importing counters
+
+2.2:
+* Adds an undo button after decreasing a counter.
