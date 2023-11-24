@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var entryViewAdapter : EntryListViewAdapter
     private lateinit var binding: ActivityMainBinding
     private lateinit var sheetBehavior : BottomSheetBehavior<View>
+    private var intervalOverride : Interval? = null
     private var sheetIsExpanding = false
     private var onBackPressedCloseSheetCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -71,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
         var sheetUnfoldedPadding = 0  // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
         // FIXME: Hack so the size of the sheet is known from the beginning, since we only compute it once.
-        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Color.BLACK, Interval.DAY, 0, 0, null, null))
+        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Color.BLACK, Interval.DAY, 0, 0, null, null), Interval.DAY) {}
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 sheetUnfoldedPadding = binding.bottomSheet.height + 50
@@ -122,7 +123,17 @@ class MainActivity : AppCompatActivity() {
             setFabToEdit(counter)
 
             binding.detailsTitle.text = counter.name
-            val adapter = ChartsAdapter(this, viewModel, counter)
+
+            val currentAdapter = (binding.charts.adapter as ChartsAdapter)
+            if (currentAdapter.getCounterName() != counter.name) {
+                intervalOverride = null
+            }
+
+            val interval = intervalOverride ?: counter.intervalForChart
+            val adapter = ChartsAdapter(this, viewModel, counter, interval) { newInterval ->
+                intervalOverride = newInterval
+                entryViewAdapter.onItemSelected?.invoke(position, counter)
+            }
             binding.charts.swapAdapter(adapter, true)
             binding.charts.scrollToPosition(adapter.itemCount-1)
         }
