@@ -28,7 +28,6 @@ class ChartsAdapter(
 
     private var numCharts : Int = countNumCharts(counter)
     override fun getItemCount(): Int = numCharts
-    fun getCounterName(): String = counter.name
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartHolder {
         val binding = FragmentChartBinding.inflate(inflater, parent, false)

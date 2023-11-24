@@ -109,35 +109,36 @@ class MainActivity : AppCompatActivity() {
 
         // Counter list
         // ------------
-        entryViewAdapter = EntryListViewAdapter(this, viewModel)
-        entryViewAdapter.onItemAdded = { pos -> binding.recycler.smoothScrollToPosition(pos) }
-        entryViewAdapter.onItemSelected = { position: Int, counter: CounterSummary ->
-            if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                onBackPressedCloseSheetCallback.isEnabled = true
-                sheetIsExpanding = true
+        entryViewAdapter = EntryListViewAdapter(this, viewModel, object : EntryListViewAdapter.EntryListObserver {
+            override fun onItemAdded(position: Int) {
+                binding.recycler.smoothScrollToPosition(position)
             }
-            binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
-            binding.recycler.smoothScrollToPosition(position)
+            override fun onSelectedItemUpdated(position: Int, counter: CounterSummary) {
+                binding.detailsTitle.text = counter.name
+                val interval = intervalOverride ?: counter.intervalForChart
+                val adapter = ChartsAdapter(this@MainActivity, viewModel, counter, interval) { newInterval ->
+                    intervalOverride = newInterval
+                    onSelectedItemUpdated(position, counter)
+                }
+                binding.charts.swapAdapter(adapter, true)
+                binding.charts.scrollToPosition(adapter.itemCount-1) // Select the latest chart
+            }
+            override fun onItemSelected(position: Int, counter: CounterSummary) {
+                if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                    sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    onBackPressedCloseSheetCallback.isEnabled = true
+                    sheetIsExpanding = true
+                }
+                binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
+                binding.recycler.smoothScrollToPosition(position)
 
-            setFabToEdit(counter)
+                setFabToEdit(counter)
 
-            binding.detailsTitle.text = counter.name
-
-            val currentAdapter = (binding.charts.adapter as ChartsAdapter)
-            if (currentAdapter.getCounterName() != counter.name) {
                 intervalOverride = null
-            }
 
-            val interval = intervalOverride ?: counter.intervalForChart
-            val adapter = ChartsAdapter(this, viewModel, counter, interval) { newInterval ->
-                intervalOverride = newInterval
-                entryViewAdapter.onItemSelected?.invoke(position, counter)
+                onSelectedItemUpdated(position, counter)
             }
-            binding.charts.swapAdapter(adapter, true)
-            binding.charts.scrollToPosition(adapter.itemCount-1)
-        }
-
+        })
         binding.recycler.adapter = entryViewAdapter
         binding.recycler.layoutManager = LinearLayoutManager(this)
 
