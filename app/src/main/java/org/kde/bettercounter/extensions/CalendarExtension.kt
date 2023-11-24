@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 fun Calendar.truncate(field: Int) {
+    set(Calendar.MILLISECOND, 0)
     set(Calendar.SECOND, 0)
     if (field == Calendar.MINUTE) return
     set(Calendar.MINUTE, 0)
@@ -24,9 +25,8 @@ fun Calendar.truncate(field: Int) {
     set(Calendar.DATE, 1)
     if (field == Calendar.MONTH) return
     set(Calendar.MONTH, Calendar.JANUARY)
-    if (field in listOf(Calendar.HOUR)) {
-        throw RuntimeException("truncate by $field not implemented")
-    }
+    if (field == Calendar.YEAR) return
+    throw RuntimeException("truncate by $field not implemented")
 }
 
 fun Calendar.truncate(field: Interval) {
