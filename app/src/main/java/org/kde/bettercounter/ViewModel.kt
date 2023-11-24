@@ -31,6 +31,8 @@ class ViewModel(application: Application) {
     private val counterObservers = HashSet<CounterObserver>()
     private val summaryMap = HashMap<String, MutableLiveData<CounterSummary>>()
 
+    private var initialized = false
+
     init {
         val db  = AppDatabase.getInstance(application)
         val prefs =  application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
@@ -48,8 +50,11 @@ class ViewModel(application: Application) {
                 for (counter in counters) {
                     summaryMap[counter.name]!!.value = counter
                 }
-                for (observer in counterObservers) {
-                    observer.onInitialCountersLoaded()
+                synchronized(this) {
+                    for (observer in counterObservers) {
+                        observer.onInitialCountersLoaded()
+                    }
+                    initialized = true
                 }
             }
         }
@@ -58,8 +63,12 @@ class ViewModel(application: Application) {
     @MainThread
     fun observeCounterChange(observer: CounterObserver) {
         Log.e("observeCounterChange", "SIZE" + counterObservers.size)
-        counterObservers.add(observer)
-        observer.onInitialCountersLoaded()
+        synchronized(this) {
+            counterObservers.add(observer)
+            if (initialized) {
+                observer.onInitialCountersLoaded()
+            }
+        }
     }
 
     fun addCounter(name : String, interval : Interval, color : Int) {
