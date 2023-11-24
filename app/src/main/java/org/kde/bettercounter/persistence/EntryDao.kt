@@ -18,7 +18,8 @@ interface EntryDao {
     @Query("SELECT COUNT(*) FROM entry WHERE name = (:name)")
     fun getCount(name : String) : Int
 
-    @Query("SELECT (SELECT date FROM entry WHERE name = (:name) ORDER BY date ASC LIMIT 1) as first," +
+    @Query("SELECT " +
+            "(SELECT date FROM entry WHERE name = (:name) ORDER BY date ASC LIMIT 1) as first," +
             "(SELECT date FROM entry WHERE name = (:name) ORDER BY date DESC LIMIT 1) as last," +
             "(SELECT COUNT(*) FROM entry WHERE name = (:name)) as count")
     fun getFirstLastAndCount(name : String) : FirstLastAndCount

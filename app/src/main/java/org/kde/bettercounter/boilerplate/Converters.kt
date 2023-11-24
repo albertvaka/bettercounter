@@ -2,7 +2,7 @@ package org.kde.bettercounter.boilerplate
 
 import androidx.room.TypeConverter
 import org.json.JSONArray
-import java.util.*
+import java.util.Date
 
 
 class Converters {

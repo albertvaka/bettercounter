@@ -1,8 +1,7 @@
 package org.kde.bettercounter.persistence
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.kde.bettercounter.persistence.Interval
 import java.util.Date
 
 class IntervalTest {

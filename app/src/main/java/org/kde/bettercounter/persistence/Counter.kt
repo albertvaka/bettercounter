@@ -1,6 +1,7 @@
 package org.kde.bettercounter.persistence
 
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 class CounterSummary(var name : String,
                      var color : Int,

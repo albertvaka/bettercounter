@@ -6,7 +6,8 @@ import org.kde.bettercounter.extensions.toCalendar
 import org.kde.bettercounter.extensions.toZonedDateTime
 import org.kde.bettercounter.extensions.truncate
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 enum class Interval(val humanReadableResource : Int) {
     DAY(R.string.interval_day),

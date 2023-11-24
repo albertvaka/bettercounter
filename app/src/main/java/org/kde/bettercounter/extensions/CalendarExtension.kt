@@ -2,7 +2,8 @@ package org.kde.bettercounter.extensions
 
 import org.kde.bettercounter.persistence.Interval
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 fun Calendar.truncate(field: Int) {
     set(Calendar.MILLISECOND, 0)

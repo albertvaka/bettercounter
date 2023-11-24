@@ -6,16 +6,23 @@ import android.os.Handler
 import android.os.Message
 import android.util.Log
 import androidx.annotation.MainThread
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kde.bettercounter.boilerplate.AppDatabase
-import org.kde.bettercounter.persistence.*
+import org.kde.bettercounter.persistence.CounterSummary
+import org.kde.bettercounter.persistence.Entry
+import org.kde.bettercounter.persistence.Interval
+import org.kde.bettercounter.persistence.Repository
+import org.kde.bettercounter.persistence.Tutorial
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import kotlin.collections.set
 
 class ViewModel(application: Application) {
 

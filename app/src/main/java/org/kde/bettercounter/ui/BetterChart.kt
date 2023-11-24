@@ -18,7 +18,8 @@ import org.kde.bettercounter.persistence.Interval
 import java.text.DateFormatSymbols
 import java.text.FieldPosition
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 class BetterChart : BarChart {
 

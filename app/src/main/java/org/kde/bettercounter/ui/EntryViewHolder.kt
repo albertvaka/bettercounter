@@ -11,7 +11,7 @@ import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
-import java.util.*
+import java.util.Calendar
 
 
 class EntryViewHolder(

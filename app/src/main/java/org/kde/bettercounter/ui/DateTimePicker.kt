@@ -3,7 +3,7 @@ package org.kde.bettercounter.ui
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
-import java.util.*
+import java.util.Calendar
 
 fun showDateTimePicker(context : Context, initialDateTime : Calendar, callback : (Calendar) -> Unit) {
     val initialYear = initialDateTime.get(Calendar.YEAR)

@@ -9,7 +9,8 @@ import org.kde.bettercounter.boilerplate.Converters
 import org.kde.bettercounter.extensions.addInterval
 import org.kde.bettercounter.extensions.copy
 import org.kde.bettercounter.extensions.truncate
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 const val alwaysShowTutorialsInDebugBuilds = true
 
