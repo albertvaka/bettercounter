@@ -2,12 +2,7 @@ package org.kde.bettercounter.persistence
 
 import android.content.Context
 import org.kde.bettercounter.R
-import org.kde.bettercounter.extensions.toCalendar
-import org.kde.bettercounter.extensions.toZonedDateTime
-import org.kde.bettercounter.extensions.truncate
 import java.time.temporal.ChronoUnit
-import java.util.Calendar
-import java.util.Date
 
 enum class Interval(val humanReadableResource : Int) {
     DAY(R.string.interval_day),
@@ -22,27 +17,15 @@ enum class Interval(val humanReadableResource : Int) {
         }
     }
 
-    // Rounds up. Both dates included. Eg: returns 2 weeks from Monday at 00:00 to next Monday at 00:00
-    fun count(from : Date, to : Date) : Int {
-        val count = when (this) {
-            DAY -> {
-                val dayTruncatedFrom = from.toCalendar().apply { truncate(Calendar.DAY_OF_MONTH) }.time.toZonedDateTime()
-                val dayTruncatedTo = to.toCalendar().apply { truncate(Calendar.DAY_OF_MONTH) }.time.toZonedDateTime()
-                ChronoUnit.DAYS.between(dayTruncatedFrom, dayTruncatedTo).toInt()
-            }
-            WEEK -> {
-                val weekTruncatedFrom = from.toCalendar().apply {truncate(Calendar.WEEK_OF_YEAR) }.time.toZonedDateTime()
-                val weekTruncatedTo = to.toCalendar().apply { truncate(Calendar.WEEK_OF_YEAR) }.time.toZonedDateTime()
-                ChronoUnit.WEEKS.between(weekTruncatedFrom, weekTruncatedTo).toInt()
-            }
-            MONTH -> (to.month - from.month) + (to.year - from.year)*12
-            YEAR -> to.year - from.year
-            LIFETIME -> 0
+    fun toChronoUnit() : ChronoUnit {
+        return when(this) {
+            DAY -> ChronoUnit.DAYS
+            WEEK -> ChronoUnit.WEEKS
+            MONTH -> ChronoUnit.MONTHS
+            YEAR -> ChronoUnit.YEARS
+            LIFETIME -> throw RuntimeException("$this can't be converted to ChronoUnit")
         }
-        //Log.e("Interval", "${count+1} $this between ${from.toCalendar().toSimpleDateString()} and ${to.toCalendar().toSimpleDateString()}")
-        return count + 1
     }
-
 }
 
 val DEFAULT_INTERVAL = Interval.LIFETIME

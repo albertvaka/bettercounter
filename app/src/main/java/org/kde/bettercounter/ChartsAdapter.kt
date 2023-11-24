@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.databinding.FragmentChartBinding
 import org.kde.bettercounter.extensions.addInterval
 import org.kde.bettercounter.extensions.copy
+import org.kde.bettercounter.extensions.count
 import org.kde.bettercounter.extensions.truncate
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
@@ -62,7 +63,7 @@ class ChartsAdapter(
     private fun countNumCharts(counter: CounterSummary) : Int {
         val firstDate = counter.leastRecent ?: return 1
         val lastDate = counter.latestBetweenNowAndMostRecentEntry()
-        return interval.count(firstDate, lastDate)
+        return interval.toChronoUnit().count(firstDate, lastDate)
     }
 
 /*

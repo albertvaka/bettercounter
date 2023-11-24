@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
-import org.kde.bettercounter.extensions.toZonedDateTime
+import org.kde.bettercounter.extensions.count
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
@@ -116,8 +116,7 @@ class ChartHolder(
     }
 
     private fun getAverageStringPerDay(count: Int, startDate: Date, endDate: Date): String {
-        var days = ChronoUnit.DAYS.between(startDate.toZonedDateTime(), endDate.toZonedDateTime())
-        days += 1L
+        var days = ChronoUnit.DAYS.count(startDate, endDate)
         val avgPerDay = count.toFloat()/days
         return if (avgPerDay > 1) {
             context.getString(R.string.stats_average_per_day, avgPerDay)
@@ -127,8 +126,7 @@ class ChartHolder(
     }
 
     private fun getAverageStringPerHour(count: Int, startDate: Date, endDate: Date): String {
-        var hours = ChronoUnit.HOURS.between(startDate.toZonedDateTime(), endDate.toZonedDateTime())
-        hours += 1L
+        var hours = ChronoUnit.HOURS.count(startDate, endDate)
         val avgPerHour = count.toFloat()/hours
         return if (avgPerHour > 1) {
             context.getString(R.string.stats_average_per_hour, avgPerHour)
