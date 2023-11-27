@@ -27,7 +27,7 @@ fun Calendar.truncate(field: Int) {
     if (field == Calendar.MONTH) return
     set(Calendar.MONTH, Calendar.JANUARY)
     if (field == Calendar.YEAR) return
-    throw RuntimeException("truncate by $field not implemented")
+    throw UnsupportedOperationException("truncate by $field not implemented")
 }
 
 fun Calendar.truncate(field: Interval) {
@@ -36,7 +36,7 @@ fun Calendar.truncate(field: Interval) {
         Interval.WEEK -> truncate(Calendar.WEEK_OF_YEAR)
         Interval.MONTH -> truncate(Calendar.MONTH)
         Interval.YEAR -> truncate(Calendar.YEAR)
-        Interval.LIFETIME -> throw RuntimeException("truncate by $field not implemented")
+        Interval.LIFETIME -> throw UnsupportedOperationException("truncate by $field not implemented")
     }
 }
 

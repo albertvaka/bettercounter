@@ -2,6 +2,7 @@ package org.kde.bettercounter.boilerplate
 
 import androidx.room.TypeConverter
 import org.json.JSONArray
+import org.json.JSONException
 import java.util.Date
 
 
@@ -33,7 +34,7 @@ class Converters {
                     ret.add(json.getString(i))
                 }
                 ret
-            } catch(e : Exception) {
+            } catch(e : JSONException) {
                 e.printStackTrace()
                 emptyList()
             }

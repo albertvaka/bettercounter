@@ -75,7 +75,7 @@ internal fun saveWidgetCounterNamePref(context: Context, appWidgetId: Int, count
 internal fun loadWidgetCounterNamePref(context: Context, appWidgetId: Int): String {
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     return prefs.getString(PREF_PREFIX_KEY + appWidgetId, null)
-        ?: throw RuntimeException("Counter preference not found for widget id: $appWidgetId")
+        ?: throw NoSuchElementException("Counter preference not found for widget id: $appWidgetId")
 }
 
 internal fun deleteWidgetCounterNamePref(context: Context, appWidgetId: Int) {

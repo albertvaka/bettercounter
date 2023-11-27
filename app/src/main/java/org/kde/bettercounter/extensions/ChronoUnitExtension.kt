@@ -24,7 +24,7 @@ fun ChronoUnit.count(from : Date, to : Date) : Int {
         }
         ChronoUnit.MONTHS -> (to.month - from.month) + (to.year - from.year)*12
         ChronoUnit.YEARS -> to.year - from.year
-        else -> throw RuntimeException("Counting by $this is not supported")
+        else -> throw UnsupportedOperationException("Counting by $this is not supported")
     }
     //Log.e("Interval", "${count+1} $this between ${from.toCalendar().toSimpleDateString()} and ${to.toCalendar().toSimpleDateString()}")
     return count + 1

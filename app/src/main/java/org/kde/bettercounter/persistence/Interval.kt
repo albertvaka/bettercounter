@@ -23,7 +23,7 @@ enum class Interval(val humanReadableResource : Int) {
             WEEK -> ChronoUnit.WEEKS
             MONTH -> ChronoUnit.MONTHS
             YEAR -> ChronoUnit.YEARS
-            LIFETIME -> throw RuntimeException("$this can't be converted to ChronoUnit")
+            LIFETIME -> throw UnsupportedOperationException("$this can't be converted to ChronoUnit")
         }
     }
 }
