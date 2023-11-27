@@ -12,7 +12,6 @@ import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.WidgetConfigureBinding
 
-
 class WidgetConfigureActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ViewModel
@@ -47,7 +46,7 @@ class WidgetConfigureActivity : AppCompatActivity() {
         }
 
         binding.counterNamesList.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, counterNames)
-        binding.counterNamesList.setOnItemClickListener  { _, _, position, _ ->
+        binding.counterNamesList.setOnItemClickListener { _, _, position, _ ->
 
             val counterName = counterNames[position]
             saveWidgetCounterNamePref(this, appWidgetId, counterName)
@@ -84,7 +83,7 @@ internal fun deleteWidgetCounterNamePref(context: Context, appWidgetId: Int) {
     prefs.apply()
 }
 
-internal fun existsWidgetCounterNamePref(context: Context, appWidgetId: Int) : Boolean {
+internal fun existsWidgetCounterNamePref(context: Context, appWidgetId: Int): Boolean {
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     return prefs.contains(PREF_PREFIX_KEY + appWidgetId)
 }

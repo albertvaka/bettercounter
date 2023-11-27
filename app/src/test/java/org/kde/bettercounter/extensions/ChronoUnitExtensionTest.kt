@@ -70,5 +70,4 @@ class ChronoUnitExtensionTest {
         val count = ChronoUnit.MONTHS.count(from, to)
         assertEquals(2, count)
     }
-
 }

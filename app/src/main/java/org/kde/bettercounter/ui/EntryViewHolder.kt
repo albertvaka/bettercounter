@@ -13,13 +13,12 @@ import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
 import java.util.Calendar
 
-
 class EntryViewHolder(
     private val context: Context,
     val binding: FragmentEntryBinding,
     private var viewModel: ViewModel,
     private val touchHelper: ItemTouchHelper,
-    private val onClickListener: (counter : CounterSummary) -> Unit?,
+    private val onClickListener: (counter: CounterSummary) -> Unit?,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun onBind(counter: CounterSummary) {

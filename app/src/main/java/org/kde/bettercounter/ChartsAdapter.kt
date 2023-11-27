@@ -18,15 +18,14 @@ class ChartsAdapter(
     private val activity: AppCompatActivity,
     private val viewModel: ViewModel,
     private val counter: CounterSummary,
-    private val interval : Interval,
+    private val interval: Interval,
     private val onIntervalChange: (Interval) -> Unit
-) : RecyclerView.Adapter<ChartHolder>()
-{
+) : RecyclerView.Adapter<ChartHolder>() {
     private val boundViewHolders = mutableListOf<ChartHolder>()
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)
 
-    private var numCharts : Int = countNumCharts(counter)
+    private var numCharts: Int = countNumCharts(counter)
     override fun getItemCount(): Int = numCharts
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartHolder {
@@ -39,7 +38,11 @@ class ChartsAdapter(
         val rangeEnd = rangeStart.copy().apply { addInterval(interval, 1) }
         //Log.e("ChartsAdapter", "${rangeStart.toSimpleDateString()} plus ${counter.intervalForChart} equals ${rangeEnd.toSimpleDateString()}")
         boundViewHolders.add(holder)
-        viewModel.getEntriesForRangeSortedByDate(counter.name, rangeStart.time, rangeEnd.time).observe(activity) { entries ->
+        viewModel.getEntriesForRangeSortedByDate(
+            counter.name,
+            rangeStart.time,
+            rangeEnd.time
+        ).observe(activity) { entries ->
             holder.onBind(counter, entries, interval, rangeStart, rangeEnd, onIntervalChange)
         }
     }
@@ -59,7 +62,7 @@ class ChartsAdapter(
         boundViewHolders.remove(holder)
     }
 
-    private fun countNumCharts(counter: CounterSummary) : Int {
+    private fun countNumCharts(counter: CounterSummary): Int {
         val firstDate = counter.leastRecent ?: return 1
         val lastDate = counter.latestBetweenNowAndMostRecentEntry()
         return interval.toChronoUnit().count(firstDate, lastDate)
@@ -73,4 +76,3 @@ class ChartsAdapter(
     }
 */
 }
-

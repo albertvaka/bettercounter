@@ -36,14 +36,13 @@ import org.kde.bettercounter.persistence.DEFAULT_INTERVAL
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ViewModel
-    private lateinit var entryViewAdapter : EntryListViewAdapter
+    private lateinit var entryViewAdapter: EntryListViewAdapter
     private lateinit var binding: ActivityMainBinding
-    private lateinit var sheetBehavior : BottomSheetBehavior<View>
-    private var intervalOverride : Interval? = null
+    private lateinit var sheetBehavior: BottomSheetBehavior<View>
+    private var intervalOverride: Interval? = null
     private var sheetIsExpanding = false
     private var onBackPressedCloseSheetCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -70,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
         sheetIsExpanding = false
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
-        var sheetUnfoldedPadding = 0  // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
+        var sheetUnfoldedPadding = 0 // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
         // FIXME: Hack so the size of the sheet is known from the beginning, since we only compute it once.
         binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Color.BLACK, Interval.DAY, 0, 0, null, null), Interval.DAY) {}
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -85,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     onBackPressedCloseSheetCallback.isEnabled = true
                     sheetIsExpanding = false
-                } else if (newState == BottomSheetBehavior.STATE_HIDDEN){
+                } else if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     onBackPressedCloseSheetCallback.isEnabled = false
                     setFabToCreate()
                     entryViewAdapter.clearItemSelected()
@@ -121,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                     onSelectedItemUpdated(position, counter)
                 }
                 binding.charts.swapAdapter(adapter, true)
-                binding.charts.scrollToPosition(adapter.itemCount-1) // Select the latest chart
+                binding.charts.scrollToPosition(adapter.itemCount - 1) // Select the latest chart
             }
             override fun onItemSelected(position: Int, counter: CounterSummary) {
                 if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
@@ -163,7 +162,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.export_csv -> {
-                exportFilePicker.launch(CreateFileParams("text/csv","bettercounter-export.csv"))
+                exportFilePicker.launch(CreateFileParams("text/csv", "bettercounter-export.csv"))
                 true
             }
             R.id.import_csv -> {
@@ -174,7 +173,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val importFilePicker : ActivityResultLauncher<OpenFileParams> = registerForActivityResult(OpenFileResultContract()) { uri: Uri? ->
+    private val importFilePicker: ActivityResultLauncher<OpenFileParams> = registerForActivityResult(
+        OpenFileResultContract()
+    ) { uri: Uri? ->
         if (uri != null) {
             contentResolver.openInputStream(uri)?.let { stream ->
 
@@ -216,7 +217,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val exportFilePicker : ActivityResultLauncher<CreateFileParams> = registerForActivityResult(CreateFileResultContract()) { uri: Uri? ->
+    private val exportFilePicker: ActivityResultLauncher<CreateFileParams> = registerForActivityResult(
+        CreateFileResultContract()
+    ) { uri: Uri? ->
         if (uri != null) {
             contentResolver.openOutputStream(uri)?.let { stream ->
 
@@ -254,7 +257,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setFabToEdit(counter : CounterSummary) {
+    private fun setFabToEdit(counter: CounterSummary) {
         binding.fab.setImageResource(R.drawable.ic_edit)
         binding.fab.setOnClickListener {
             binding.fab.visibility = View.GONE

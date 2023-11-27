@@ -25,7 +25,7 @@ open class BetterRelativeTimeTextView : androidx.appcompat.widget.AppCompatTextV
             // Hence, we need to first stop any currently running schedules (for example from the recycled view.
             stopTaskForPeriodicallyUpdatingRelativeTime()
 
-            //Instantiate a new runnable with the new reference time
+            // Instantiate a new runnable with the new reference time
             initUpdateTimeTask()
 
             // Start a new schedule.
@@ -162,8 +162,7 @@ open class BetterRelativeTimeTextView : androidx.appcompat.widget.AppCompatTextV
         }
     }
 
-    private class UpdateTimeRunnable(view: BetterRelativeTimeTextView?, private val mRefTime: Long) : Runnable
-    {
+    private class UpdateTimeRunnable(view: BetterRelativeTimeTextView?, private val mRefTime: Long) : Runnable {
         private val viewWeakRef: WeakReference<BetterRelativeTimeTextView?> = WeakReference(view)
 
         val isDetached: Boolean
@@ -176,9 +175,9 @@ open class BetterRelativeTimeTextView : androidx.appcompat.widget.AppCompatTextV
         override fun run() {
             val view = viewWeakRef.get() ?: return
             val difference = abs(System.currentTimeMillis() - mRefTime)
-            val differenceRoundedToMinute = (difference/DateUtils.MINUTE_IN_MILLIS)*DateUtils.MINUTE_IN_MILLIS
+            val differenceRoundedToMinute = (difference / DateUtils.MINUTE_IN_MILLIS) * DateUtils.MINUTE_IN_MILLIS
             view.updateTextDisplay()
-            view.mHandler.postDelayed(this, difference-differenceRoundedToMinute)
+            view.mHandler.postDelayed(this, difference - differenceRoundedToMinute)
         }
     }
 }

@@ -18,7 +18,6 @@ import org.kde.bettercounter.persistence.CounterSummary
 import java.text.SimpleDateFormat
 import java.util.Date
 
-
 class WidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
@@ -40,11 +39,11 @@ class WidgetProvider : AppWidgetProvider() {
         if (intent.action == ACTION_COUNT) {
             val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
             if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-                Log.e("BetterCounterWidget","No widget id extra set")
+                Log.e("BetterCounterWidget", "No widget id extra set")
                 return
             }
             if (!existsWidgetCounterNamePref(context, appWidgetId)) {
-                Log.e("BetterCounterWidget","Counter doesn't exist")
+                Log.e("BetterCounterWidget", "Counter doesn't exist")
                 return
             }
             val counterName = loadWidgetCounterNamePref(context, appWidgetId)
@@ -60,13 +59,13 @@ class WidgetProvider : AppWidgetProvider() {
     }
 }
 
-fun getAllWidgetIds(context : Context) : IntArray {
+fun getAllWidgetIds(context: Context): IntArray {
     return AppWidgetManager.getInstance(context).getAppWidgetIds(
         ComponentName(context, WidgetProvider::class.java)
     )
 }
 
-fun removeWidgets(context : Context, counterName : String) {
+fun removeWidgets(context: Context, counterName: String) {
     val ids = getAllWidgetIds(context)
     val host = AppWidgetHost(context, 0)
     for (appWidgetId in ids) {
@@ -79,7 +78,7 @@ fun removeWidgets(context : Context, counterName : String) {
     }
 }
 
-fun forceRefreshWidgets(context : Context) {
+fun forceRefreshWidgets(context: Context) {
     val intent = Intent(context, WidgetProvider::class.java)
     intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
     intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, getAllWidgetIds(context))
@@ -102,7 +101,7 @@ internal fun updateAppWidget(
         // In that case we can't do anything. This is useful for reconfigurable widgets, which don't
         // require an initial configuration dialog. Our widget isn't reconfigurable though (because
         // I didn't find a way to stop observing the previous livedata).
-        Log.e("BetterCounterWidget","Ignoring updateAppWidget for an unconfigured widget")
+        Log.e("BetterCounterWidget", "Ignoring updateAppWidget for an unconfigured widget")
         return
     }
 
@@ -115,7 +114,7 @@ internal fun updateAppWidget(
     views.setOnClickPendingIntent(R.id.widgetName, openAppPendingIntent)
 
     if (!viewModel.counterExists(counterName)) {
-        Log.e("BetterCounterWidget","The counter for this widget doesn't exist")
+        Log.e("BetterCounterWidget", "The counter for this widget doesn't exist")
         //val host = AppWidgetHost(context, 0)
         //host.deleteAppWidgetId(appWidgetId)
         views.setTextViewText(R.id.widgetCounter, "error")
@@ -170,6 +169,4 @@ internal fun updateAppWidget(
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     })
-
 }
-

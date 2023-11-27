@@ -27,10 +27,10 @@ class BetterChart : BarChart {
     constructor(ctx: Context, attrs: AttributeSet?) : super(ctx, attrs)
     constructor(ctx: Context, attrs: AttributeSet?, defStyle: Int) : super(ctx, attrs, defStyle)
 
-    private val yAxis : YAxis get() { return axisLeft } // alias
+    private val yAxis: YAxis get() { return axisLeft } // alias
 
-    private lateinit var mDataSet : BarDataSet
-    private lateinit var mBarData : BarData
+    private lateinit var mDataSet: BarDataSet
+    private lateinit var mBarData: BarData
 
     fun setup() {
         setScaleEnabled(false)
@@ -66,7 +66,7 @@ class BetterChart : BarChart {
             override fun getFormattedValue(value: Float): String {
                 val integer = value.toInt()
                 if (integer == 0) {
-                    return  ""
+                    return ""
                 }
                 return integer.toString()
             }
@@ -89,7 +89,7 @@ class BetterChart : BarChart {
         intervalEntries: List<Entry>,
         rangeStart: Calendar,
         totalInterval: Interval,
-        color : Int
+        color: Int
     ) {
         mDataSet.color = color
 
@@ -99,11 +99,11 @@ class BetterChart : BarChart {
         }
 
         val (numBuckets, bucketIntervalAsCalendarField) = when (totalInterval) {
-            Interval.DAY  -> 24 to Calendar.HOUR_OF_DAY
+            Interval.DAY -> 24 to Calendar.HOUR_OF_DAY
             Interval.WEEK -> 7 to Calendar.DAY_OF_WEEK
             Interval.MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH) to Calendar.DAY_OF_MONTH
             Interval.YEAR -> 12 to Calendar.MONTH
-            Interval.LIFETIME -> 0 to 0.also { assert(false) } //Not a valid display interval
+            Interval.LIFETIME -> 0 to 0.also { assert(false) } // Not a valid display interval
         }
 
         val cal = rangeStart.copy()
@@ -119,9 +119,9 @@ class BetterChart : BarChart {
 
         var maxCount = 0
         var entriesIndex = 0
-        val series : MutableList<BarEntry> = mutableListOf()
+        val series: MutableList<BarEntry> = mutableListOf()
         for (bucket in 0 until numBuckets) {
-            cal.add(bucketIntervalAsCalendarField, 1) //Calendar is now at the end of the current bucket
+            cal.add(bucketIntervalAsCalendarField, 1) // Calendar is now at the end of the current bucket
             var bucketCount = 0
             while (entriesIndex < intervalEntries.size && intervalEntries[entriesIndex].date.time < cal.timeInMillis) {
                 bucketCount++
@@ -130,7 +130,7 @@ class BetterChart : BarChart {
             if (bucketCount > maxCount) {
                 maxCount = bucketCount
             }
-            //Log.e("Bucket", "$bucket (ends ${cal.toSimpleDateString()}) -> $bucketCount")
+            // Log.e("Bucket", "$bucket (ends ${cal.toSimpleDateString()}) -> $bucketCount")
             series.add(BarEntry(bucket.toFloat(), bucketCount.toFloat()))
         }
 
@@ -154,11 +154,11 @@ class BetterChart : BarChart {
             // dayNames are meant to be indexed with Calendar.SATURDAY,
             // Calendar.MONDAY, etc. so the range is [1,7] with 1 being Sunday.
             // The range of bucket indices is [0,6] with 0 being Monday.
-            return dayNames[((value.toInt()+1)%7)+1]
+            return dayNames[((value.toInt() + 1) % 7) + 1]
         }
     }
 
-    class MonthFormatter(private var startDate : Calendar) : ValueFormatter() {
+    class MonthFormatter(private var startDate: Calendar) : ValueFormatter() {
         // We can't use DateFormatSymbols like for week days, because when
         // the user language uses different month name forms for formatting
         // and stand-alone usages, then DateFormatSymbols returns names in
@@ -169,13 +169,12 @@ class BetterChart : BarChart {
             cal.add(Calendar.MONTH, value.toInt())
             monthNamesFormatter.timeZone = cal.timeZone
             return monthNamesFormatter.format(cal.time, StringBuffer(), FieldPosition(0)).toString()
-
         }
     }
 
     class MonthDayFormatter : ValueFormatter() {
         override fun getFormattedValue(value: Float): String {
-            return (value.toInt()+1).toString()
+            return (value.toInt() + 1).toString()
         }
     }
 
@@ -184,6 +183,4 @@ class BetterChart : BarChart {
             return (value.toInt()).toString()
         }
     }
-
-
 }

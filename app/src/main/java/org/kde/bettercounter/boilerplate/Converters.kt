@@ -5,7 +5,6 @@ import org.json.JSONArray
 import org.json.JSONException
 import java.util.Date
 
-
 class Converters {
     companion object {
         @TypeConverter
@@ -34,7 +33,7 @@ class Converters {
                     ret.add(json.getString(i))
                 }
                 ret
-            } catch(e : JSONException) {
+            } catch (e: JSONException) {
                 e.printStackTrace()
                 emptyList()
             }

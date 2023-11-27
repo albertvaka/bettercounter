@@ -30,19 +30,19 @@ class ViewModel(application: Application) {
         fun onInitialCountersLoaded()
         fun onCounterAdded(counterName: String)
         fun onCounterRemoved(counterName: String)
-        fun onCounterRenamed(oldName : String, newName: String)
+        fun onCounterRenamed(oldName: String, newName: String)
         fun onCounterDecremented(counterName: String, oldEntryDate: Date)
     }
 
-    private val repo : Repository
+    private val repo: Repository
     private val counterObservers = HashSet<CounterObserver>()
     private val summaryMap = HashMap<String, MutableLiveData<CounterSummary>>()
 
     private var initialized = false
 
     init {
-        val db  = AppDatabase.getInstance(application)
-        val prefs =  application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        val db = AppDatabase.getInstance(application)
+        val prefs = application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
         repo = Repository(application, db.entryDao(), prefs)
         val initialCounters = repo.getCounterList()
         for (name in initialCounters) {
@@ -78,7 +78,7 @@ class ViewModel(application: Application) {
         }
     }
 
-    fun addCounter(name : String, interval : Interval, color : Int) {
+    fun addCounter(name: String, interval: Interval, color: Int) {
         repo.setCounterList(repo.getCounterList().toMutableList() + name)
         repo.setCounterMetadata(name, color, interval)
         CoroutineScope(Dispatchers.IO).launch {
@@ -95,14 +95,14 @@ class ViewModel(application: Application) {
         counterObservers.remove(observer)
     }
 
-    fun incrementCounter(name : String, date : Date = Calendar.getInstance().time) {
+    fun incrementCounter(name: String, date: Date = Calendar.getInstance().time) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.addEntry(name, date)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
         }
     }
 
-    fun incrementCounterWithCallback(name : String, date : Date = Calendar.getInstance().time, callback : () -> Unit) {
+    fun incrementCounterWithCallback(name: String, date: Date = Calendar.getInstance().time, callback: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.addEntry(name, date)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
@@ -112,7 +112,7 @@ class ViewModel(application: Application) {
         }
     }
 
-    fun decrementCounter(name : String) {
+    fun decrementCounter(name: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val oldEntryDate = repo.removeEntry(name)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
@@ -128,18 +128,18 @@ class ViewModel(application: Application) {
         repo.setTutorialShown(id)
     }
 
-    fun isTutorialShown(id: Tutorial) : Boolean {
+    fun isTutorialShown(id: Tutorial): Boolean {
         return repo.isTutorialShown(id)
     }
 
-    fun editCounterSameName(name : String, interval : Interval, color : Int) {
+    fun editCounterSameName(name: String, interval: Interval, color: Int) {
         repo.setCounterMetadata(name, color, interval)
         CoroutineScope(Dispatchers.IO).launch {
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
         }
     }
 
-    fun editCounter(oldName : String, newName : String, interval : Interval, color : Int) {
+    fun editCounter(oldName: String, newName: String, interval: Interval, color: Int) {
         repo.deleteCounterMetadata(oldName)
         repo.setCounterMetadata(newName, color, interval)
         val list = repo.getCounterList().toMutableList()
@@ -148,7 +148,7 @@ class ViewModel(application: Application) {
 
         CoroutineScope(Dispatchers.IO).launch {
             repo.renameCounter(oldName, newName)
-            val counter : MutableLiveData<CounterSummary>? = summaryMap.remove(oldName)
+            val counter: MutableLiveData<CounterSummary>? = summaryMap.remove(oldName)
             if (counter == null) {
                 Log.e("BetterCounter", "Trying to rename a counter but the old counter doesn't exist")
                 return@launch
@@ -163,7 +163,7 @@ class ViewModel(application: Application) {
         }
     }
 
-    fun getCounterSummary(name : String) : LiveData<CounterSummary> {
+    fun getCounterSummary(name: String): LiveData<CounterSummary> {
         return summaryMap[name]!!
     }
 
@@ -171,7 +171,7 @@ class ViewModel(application: Application) {
 
     fun getCounterList() = repo.getCounterList()
 
-    fun saveCounterOrder(value : List<String>) = repo.setCounterList(value)
+    fun saveCounterOrder(value: List<String>) = repo.setCounterList(value)
 
     fun resetCounter(name: String) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -196,9 +196,8 @@ class ViewModel(application: Application) {
         repo.setCounterList(list)
     }
 
-    fun exportAll(stream : OutputStream, progressHandler : Handler?) {
-
-        fun sendProgress(progress : Int) {
+    fun exportAll(stream: OutputStream, progressHandler: Handler?) {
+        fun sendProgress(progress: Int) {
             val message = Message()
             message.arg1 = progress
             message.arg2 = repo.getCounterList().size
@@ -224,9 +223,8 @@ class ViewModel(application: Application) {
         }
     }
 
-    fun importAll(stream : InputStream, progressHandler : Handler?, defaultInterval : Interval, defaultColor : Int) {
-
-        fun sendProgress(progress : Int, done : Int) {
+    fun importAll(stream: InputStream, progressHandler: Handler?, defaultInterval: Interval, defaultColor: Int) {
+        fun sendProgress(progress: Int, done: Int) {
             val message = Message()
             message.arg1 = progress
             message.arg2 = done // -1 -> error, 0 -> wip, 1 -> done
@@ -236,8 +234,8 @@ class ViewModel(application: Application) {
         CoroutineScope(Dispatchers.IO).launch {
             stream.use { stream ->
                 // We read everything into memory before we update the DB so we know there are no errors
-                val entriesToImport : MutableList<Entry> = mutableListOf()
-                val namesToImport : MutableList<String> = mutableListOf()
+                val entriesToImport: MutableList<Entry> = mutableListOf()
+                val namesToImport: MutableList<String> = mutableListOf()
                 try {
                     stream.bufferedReader().use { reader ->
                         reader.forEachLine { line ->
@@ -254,11 +252,10 @@ class ViewModel(application: Application) {
                         if (!counterExists(name)) {
                             addCounter(name, defaultInterval, defaultColor)
                         }
-
                     }
                     repo.bulkAddEntries(entriesToImport)
                     sendProgress(namesToImport.size, 1)
-                } catch(e : Exception) {
+                } catch (e: Exception) {
                     e.printStackTrace()
                     sendProgress(namesToImport.size, -1)
                 }
@@ -266,7 +263,7 @@ class ViewModel(application: Application) {
         }
     }
 
-    fun getEntriesForRangeSortedByDate(name : String, since: Date, until: Date): LiveData<List<Entry>> {
+    fun getEntriesForRangeSortedByDate(name: String, since: Date, until: Date): LiveData<List<Entry>> {
         val ret = MutableLiveData<List<Entry>>()
         CoroutineScope(Dispatchers.IO).launch {
             val entries = repo.getEntriesForRangeSortedByDate(name, since, until)

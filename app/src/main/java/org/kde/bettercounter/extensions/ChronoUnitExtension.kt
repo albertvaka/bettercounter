@@ -5,7 +5,7 @@ import java.util.Calendar
 import java.util.Date
 
 // Rounds up to the nearest integer. Both dates included. Eg: returns 2 weeks from Monday at 00:00 to next Monday at 00:00
-fun ChronoUnit.count(from : Date, to : Date) : Int {
+fun ChronoUnit.count(from: Date, to: Date): Int {
     val count = when (this) {
         ChronoUnit.HOURS -> {
             val hourTruncatedFrom = from.toCalendar().apply { truncate(Calendar.HOUR_OF_DAY) }.time.toZonedDateTime()
@@ -18,11 +18,11 @@ fun ChronoUnit.count(from : Date, to : Date) : Int {
             ChronoUnit.DAYS.between(dayTruncatedFrom, dayTruncatedTo).toInt()
         }
         ChronoUnit.WEEKS -> {
-            val weekTruncatedFrom = from.toCalendar().apply {truncate(Calendar.WEEK_OF_YEAR) }.time.toZonedDateTime()
+            val weekTruncatedFrom = from.toCalendar().apply { truncate(Calendar.WEEK_OF_YEAR) }.time.toZonedDateTime()
             val weekTruncatedTo = to.toCalendar().apply { truncate(Calendar.WEEK_OF_YEAR) }.time.toZonedDateTime()
             ChronoUnit.WEEKS.between(weekTruncatedFrom, weekTruncatedTo).toInt()
         }
-        ChronoUnit.MONTHS -> (to.month - from.month) + (to.year - from.year)*12
+        ChronoUnit.MONTHS -> (to.month - from.month) + (to.year - from.year) * 12
         ChronoUnit.YEARS -> to.year - from.year
         else -> throw UnsupportedOperationException("Counting by $this is not supported")
     }

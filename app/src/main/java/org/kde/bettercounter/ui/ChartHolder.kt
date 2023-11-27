@@ -17,18 +17,16 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-
 class ChartHolder(
-    private val context : Context,
-    private val binding : FragmentChartBinding,
+    private val context: Context,
+    private val binding: FragmentChartBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
         binding.chart.setup()
     }
 
-    fun onBind(counter: CounterSummary, entries: List<Entry>, interval : Interval, rangeStart: Calendar, rangeEnd: Calendar, onIntervalChange: (Interval) -> Unit) {
-
+    fun onBind(counter: CounterSummary, entries: List<Entry>, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, onIntervalChange: (Interval) -> Unit) {
         // Chart name
         val dateFormat = when (interval) {
             Interval.DAY, Interval.WEEK -> "dd/MM/yyyy"
@@ -39,8 +37,8 @@ class ChartHolder(
         val dateString = SimpleDateFormat(dateFormat, Locale.getDefault()).format(rangeStart.time)
         binding.chartName.text = context.resources.getQuantityString(R.plurals.chart_title, entries.size, dateString, entries.size)
         binding.chartName.setOnClickListener { view ->
-            val popupMenu = PopupMenu(context, view, Gravity.END);
-            popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu);
+            val popupMenu = PopupMenu(context, view, Gravity.END)
+            popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener { menuItem ->
                 val newInterval = when (menuItem.itemId) {
                     R.id.day -> Interval.DAY
@@ -117,22 +115,21 @@ class ChartHolder(
 
     private fun getAverageStringPerDay(count: Int, startDate: Date, endDate: Date): String {
         var days = ChronoUnit.DAYS.count(startDate, endDate)
-        val avgPerDay = count.toFloat()/days
+        val avgPerDay = count.toFloat() / days
         return if (avgPerDay > 1) {
             context.getString(R.string.stats_average_per_day, avgPerDay)
         } else {
-            context.getString(R.string.stats_average_every_days, 1/avgPerDay)
+            context.getString(R.string.stats_average_every_days, 1 / avgPerDay)
         }
     }
 
     private fun getAverageStringPerHour(count: Int, startDate: Date, endDate: Date): String {
         var hours = ChronoUnit.HOURS.count(startDate, endDate)
-        val avgPerHour = count.toFloat()/hours
+        val avgPerHour = count.toFloat() / hours
         return if (avgPerHour > 1) {
             context.getString(R.string.stats_average_per_hour, avgPerHour)
         } else {
-            context.getString(R.string.stats_average_every_hours, 1/avgPerHour)
+            context.getString(R.string.stats_average_every_hours, 1 / avgPerHour)
         }
     }
-
 }

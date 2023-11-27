@@ -10,5 +10,4 @@ class BetterApplication : Application() {
         super.onCreate()
         viewModel = ViewModel(this)
     }
-
 }

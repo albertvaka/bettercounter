@@ -11,11 +11,11 @@ class IntervalAdapter(
     android.R.layout.simple_spinner_dropdown_item,
     Interval.humanReadableValues(context)
 ) {
-    fun positionOf(interval: Interval) : Int {
+    fun positionOf(interval: Interval): Int {
         return Interval.values().indexOf(interval)
     }
 
-    fun itemAt(position: Int) : Interval {
+    fun itemAt(position: Int): Interval {
         return Interval.values()[position]
     }
 }

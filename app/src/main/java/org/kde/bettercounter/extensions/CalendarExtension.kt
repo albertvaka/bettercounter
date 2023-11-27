@@ -31,7 +31,7 @@ fun Calendar.truncate(field: Int) {
 }
 
 fun Calendar.truncate(field: Interval) {
-    when(field) {
+    when (field) {
         Interval.DAY -> truncate(Calendar.DAY_OF_YEAR)
         Interval.WEEK -> truncate(Calendar.WEEK_OF_YEAR)
         Interval.MONTH -> truncate(Calendar.MONTH)
@@ -40,21 +40,21 @@ fun Calendar.truncate(field: Interval) {
     }
 }
 
-fun Calendar.toSimpleDateString() : String {
+fun Calendar.toSimpleDateString(): String {
     val dateFormat = SimpleDateFormat("dd-MM-yyyy HH-mm", Locale.US)
     return dateFormat.format(time)
 }
 
-fun Calendar.copy() : Calendar {
+fun Calendar.copy(): Calendar {
     return clone() as Calendar
 }
 
-fun Calendar.addInterval(interval : Interval, times : Int) {
+fun Calendar.addInterval(interval: Interval, times: Int) {
     when (interval) {
-        Interval.DAY -> add(Calendar.DAY_OF_YEAR, 1*times)
-        Interval.WEEK -> add(Calendar.DAY_OF_YEAR, 7*times)
-        Interval.MONTH -> add(Calendar.MONTH, 1*times)
-        Interval.YEAR -> add(Calendar.YEAR, 1*times)
+        Interval.DAY -> add(Calendar.DAY_OF_YEAR, 1 * times)
+        Interval.WEEK -> add(Calendar.DAY_OF_YEAR, 7 * times)
+        Interval.MONTH -> add(Calendar.MONTH, 1 * times)
+        Interval.YEAR -> add(Calendar.YEAR, 1 * times)
         Interval.LIFETIME -> add(Calendar.YEAR, 1000)
     }
 }

@@ -22,11 +22,11 @@ const val TUTORIALS_PREFS_KEY = "tutorials"
 class Repository(
     private val context: Context,
     private val entryDao: EntryDao,
-    private val sharedPref : SharedPreferences
+    private val sharedPref: SharedPreferences
 ) {
 
     private var tutorials: MutableSet<String>
-    private var counters : List<String>
+    private var counters: List<String>
     private var counterCache = HashMap<String, CounterSummary>()
 
     init {
@@ -38,11 +38,11 @@ class Repository(
         }
     }
 
-    fun getCounterList() : List<String> {
+    fun getCounterList(): List<String> {
         return counters
     }
 
-    fun setCounterList(list : List<String>) {
+    fun setCounterList(list: List<String>) {
         val jsonStr = Converters.stringListToString(list)
         sharedPref.edit().putString(COUNTERS_PREFS_KEY, jsonStr).apply()
         counters = list
@@ -53,40 +53,40 @@ class Repository(
         sharedPref.edit().putStringSet(TUTORIALS_PREFS_KEY, tutorials).apply()
     }
 
-    fun isTutorialShown(id: Tutorial) : Boolean {
+    fun isTutorialShown(id: Tutorial): Boolean {
         return tutorials.contains(id.name)
     }
 
-    private fun getCounterColor(name : String) : Int {
+    private fun getCounterColor(name: String): Int {
         val key = COUNTERS_COLOR_PREFS_KEY.format(name)
         return sharedPref.getInt(key, ContextCompat.getColor(context, R.color.colorPrimary))
     }
 
-    private fun getCounterInterval(name : String) : Interval {
+    private fun getCounterInterval(name: String): Interval {
         val key = COUNTERS_INTERVAL_PREFS_KEY.format(name)
         val str = sharedPref.getString(key, null)
-        return when(str) {
+        return when (str) {
             "YTD" -> Interval.YEAR
             null -> DEFAULT_INTERVAL
             else -> Interval.valueOf(str)
         }
     }
 
-    fun deleteCounterMetadata(name : String) {
+    fun deleteCounterMetadata(name: String) {
         val colorKey = COUNTERS_COLOR_PREFS_KEY.format(name)
         val intervalKey = COUNTERS_INTERVAL_PREFS_KEY.format(name)
         sharedPref.edit().remove(colorKey).remove(intervalKey).apply()
         counterCache.remove(name)
     }
 
-    fun setCounterMetadata(name : String, color : Int, interval : Interval) {
+    fun setCounterMetadata(name: String, color: Int, interval: Interval) {
         val colorKey = COUNTERS_COLOR_PREFS_KEY.format(name)
         val intervalKey = COUNTERS_INTERVAL_PREFS_KEY.format(name)
         sharedPref.edit().putInt(colorKey, color).putString(intervalKey, interval.toString()).apply()
         counterCache.remove(name)
     }
 
-    suspend fun getCounterSummary(name : String): CounterSummary {
+    suspend fun getCounterSummary(name: String): CounterSummary {
         val interval = getCounterInterval(name)
         val color = getCounterColor(name)
         val intervalStartDate = when (interval) {
@@ -101,20 +101,20 @@ class Repository(
                 color = color,
                 interval = interval,
                 lastIntervalCount = entryDao.getCountInRange(name, intervalStartDate.time, intervalEndDate.time),
-                totalCount = firstLastAndCount.count, //entryDao.getCount(name),
-                leastRecent = firstLastAndCount.first, //entryDao.getLeastRecent(name)?.date,
-                mostRecent = firstLastAndCount.last, //entryDao.getMostRecent(name)?.date,
+                totalCount = firstLastAndCount.count, // entryDao.getCount(name),
+                leastRecent = firstLastAndCount.first, // entryDao.getLeastRecent(name)?.date,
+                mostRecent = firstLastAndCount.last, // entryDao.getMostRecent(name)?.date,
             )
         }
     }
 
-    suspend fun renameCounter(oldName : String, newName : String) {
+    suspend fun renameCounter(oldName: String, newName: String) {
         entryDao.renameCounter(oldName, newName)
         counterCache.remove(oldName)
     }
 
     suspend fun addEntry(name: String, date: Date = Calendar.getInstance().time) {
-        entryDao.insert(Entry(name=name, date=date))
+        entryDao.insert(Entry(name = name, date = date))
         counterCache.remove(name)
     }
 
@@ -132,16 +132,15 @@ class Repository(
         counterCache.remove(name)
     }
 
-    suspend fun getEntriesForRangeSortedByDate(name : String, since: Date, until: Date): List<Entry> {
+    suspend fun getEntriesForRangeSortedByDate(name: String, since: Date, until: Date): List<Entry> {
         return entryDao.getAllEntriesInRangeSortedByDate(name, since, until)
     }
-    suspend fun getAllEntriesSortedByDate(name : String): List<Entry> {
+    suspend fun getAllEntriesSortedByDate(name: String): List<Entry> {
         return entryDao.getAllEntriesSortedByDate(name)
     }
 
-    suspend fun bulkAddEntries(entries : List<Entry>) {
+    suspend fun bulkAddEntries(entries: List<Entry>) {
         entryDao.bulkInsert(entries)
         counterCache.clear() // we don't know what changed
     }
-
 }

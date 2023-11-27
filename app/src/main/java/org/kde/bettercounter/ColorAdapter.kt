@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 // Based on https://github.com/kristiyanP/colorpicker
 class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
 
-    var selectedColor : Int
+    var selectedColor: Int
         get() {
             return colors[selectedPosition]
         }
@@ -34,7 +34,7 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
             notifyItemChanged(prevSelected)
         }
 
-    private var colors : List<Int>
+    private var colors: List<Int>
 
     init {
         val colorList = mutableListOf<Int>()
@@ -46,7 +46,9 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
         colors = colorList
     }
 
-    inner class ViewHolder(val colorButton: AppCompatButton) : RecyclerView.ViewHolder(colorButton), View.OnClickListener {
+    inner class ViewHolder(val colorButton: AppCompatButton) :
+        RecyclerView.ViewHolder(colorButton),
+        View.OnClickListener {
         init {
             colorButton.setOnClickListener(this)
         }
@@ -78,7 +80,7 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
 
         holder.colorButton.text = tickText
         holder.colorButton.setTextColor(textColor)
-        holder.colorButton.contentDescription = context.getString(R.string.color_hint, position+1)
+        holder.colorButton.contentDescription = context.getString(R.string.color_hint, position + 1)
         val background = DrawableCompat.wrap(holder.colorButton.background)
         DrawableCompat.setTint(background, color)
         holder.colorButton.background = background
@@ -87,5 +89,4 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
     override fun getItemCount(): Int {
         return colors.size
     }
-
 }

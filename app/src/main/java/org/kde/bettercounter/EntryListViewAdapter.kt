@@ -22,15 +22,14 @@ class EntryListViewAdapter(
     private var viewModel: ViewModel,
     private var listObserver: EntryListObserver,
 
-) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback
-{
+) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback {
     interface EntryListObserver {
-        fun onItemSelected(position : Int, counter : CounterSummary)
-        fun onSelectedItemUpdated(position : Int, counter : CounterSummary)
-        fun onItemAdded(position : Int)
+        fun onItemSelected(position: Int, counter: CounterSummary)
+        fun onSelectedItemUpdated(position: Int, counter: CounterSummary)
+        fun onItemAdded(position: Int)
     }
 
-    var currentSelectedCounterName : String? = null
+    var currentSelectedCounterName: String? = null
     fun clearItemSelected() { currentSelectedCounterName = null }
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)
@@ -40,7 +39,7 @@ class EntryListViewAdapter(
 
     private val touchHelper = ItemTouchHelper(DragAndSwipeTouchHelper(this))
 
-    private var recyclerView : RecyclerView? = null
+    private var recyclerView: RecyclerView? = null
 
     override fun onAttachedToRecyclerView(view: RecyclerView) {
         recyclerView = view
@@ -51,7 +50,7 @@ class EntryListViewAdapter(
     init {
         viewModel.observeCounterChange(object : ViewModel.CounterObserver {
 
-            fun observeNewCounter(counterName : String) {
+            fun observeNewCounter(counterName: String) {
                 viewModel.getCounterSummary(counterName).observe(activity) {
                     notifyItemChanged(counters.indexOf(it.name), Unit)
                     if (currentSelectedCounterName == it.name) {
@@ -92,12 +91,12 @@ class EntryListViewAdapter(
                 }
             }
 
-            override fun onCounterRenamed(oldName : String, newName: String) {
+            override fun onCounterRenamed(oldName: String, newName: String) {
                 val position = counters.indexOf(oldName)
                 counters[position] = newName
                 if (currentSelectedCounterName == oldName) {
                     currentSelectedCounterName = newName
-                    listObserver.onSelectedItemUpdated(position,viewModel.getCounterSummary(newName).value!!)
+                    listObserver.onSelectedItemUpdated(position, viewModel.getCounterSummary(newName).value!!)
                 }
                 activity.runOnUiThread {
                     // passing a second parameter disables the disappear+appear animation
@@ -106,7 +105,11 @@ class EntryListViewAdapter(
             }
 
             override fun onCounterDecremented(counterName: String, oldEntryDate: Date) {
-                Snackbar.make(recyclerView!!, activity.getString(R.string.decreased_entry, counterName), Snackbar.LENGTH_LONG)
+                Snackbar.make(
+                    recyclerView!!,
+                    activity.getString(R.string.decreased_entry, counterName),
+                    Snackbar.LENGTH_LONG
+                )
                     .setAction(R.string.undo) {
                         viewModel.incrementCounter(counterName, oldEntryDate)
                     }
@@ -169,5 +172,4 @@ class EntryListViewAdapter(
     override fun onDragEnd(viewHolder: RecyclerView.ViewHolder?) {
         viewModel.saveCounterOrder(counters)
     }
-
 }

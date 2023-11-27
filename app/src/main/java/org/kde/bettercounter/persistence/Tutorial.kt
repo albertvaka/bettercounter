@@ -4,4 +4,3 @@ enum class Tutorial {
     DRAG,
     PICKDATE,
 }
-
