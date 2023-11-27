@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         sheetIsExpanding = false
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
         var sheetUnfoldedPadding = 0 // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
-        // FIXME: Hack so the size of the sheet is known from the beginning, since we only compute it once.
+        // Hack so the size of the sheet is known from the beginning, since we only compute it once.
         binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Color.BLACK, Interval.DAY, 0, 0, null, null), Interval.DAY) {}
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
