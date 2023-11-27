@@ -31,13 +31,7 @@ fun Calendar.truncate(field: Int) {
 }
 
 fun Calendar.truncate(field: Interval) {
-    when (field) {
-        Interval.DAY -> truncate(Calendar.DAY_OF_YEAR)
-        Interval.WEEK -> truncate(Calendar.WEEK_OF_YEAR)
-        Interval.MONTH -> truncate(Calendar.MONTH)
-        Interval.YEAR -> truncate(Calendar.YEAR)
-        Interval.LIFETIME -> throw UnsupportedOperationException("truncate by $field not implemented")
-    }
+    return truncate(field.toChronoUnit().toCalendarField())
 }
 
 fun Calendar.toSimpleDateString(): String {
