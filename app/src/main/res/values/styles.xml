@@ -12,7 +12,7 @@
         <item name="android:textColorPrimary">@color/colorAccent</item>
         <item name="colorControlNormal">@color/colorAccent</item>
 
-        <!-- Dialog backgronud -->
+        <!-- Dialog background -->
         <item name="colorBackgroundFloating">@color/colorPrimary</item>
 
         <!-- Fab background -->

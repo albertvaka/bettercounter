@@ -12,10 +12,10 @@ class IntervalAdapter(
     Interval.humanReadableValues(context)
 ) {
     fun positionOf(interval: Interval): Int {
-        return Interval.values().indexOf(interval)
+        return Interval.entries.indexOf(interval)
     }
 
     fun itemAt(position: Int): Interval {
-        return Interval.values()[position]
+        return Interval.entries[position]
     }
 }

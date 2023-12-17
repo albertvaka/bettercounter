@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity() {
                             dialog.setCancelable(true)
                             hasImported = true
                             // Hide all tutorials
-                            Tutorial.values().forEach { tuto -> viewModel.setTutorialShown(tuto) }
+                            Tutorial.entries.forEach { tuto -> viewModel.setTutorialShown(tuto) }
                         }
                     }
                     true

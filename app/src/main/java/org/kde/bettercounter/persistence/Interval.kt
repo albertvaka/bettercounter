@@ -13,7 +13,7 @@ enum class Interval(val humanReadableResource: Int) {
 
     companion object {
         fun humanReadableValues(context: Context): List<String> {
-            return values().map { context.getString(it.humanReadableResource) }
+            return entries.map { context.getString(it.humanReadableResource) }
         }
     }
 
