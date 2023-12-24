@@ -32,7 +32,7 @@ class ChartHolder(
             Interval.DAY, Interval.WEEK -> "dd/MM/yyyy"
             Interval.MONTH -> "MM/yyyy"
             Interval.YEAR -> "yyyy"
-            Interval.LIFETIME -> "".also { assert(false) } // Not a valid display interval
+            Interval.LIFETIME -> throw IllegalStateException("Interval not valid as a chart display interval")
         }
         val dateString = SimpleDateFormat(dateFormat, Locale.getDefault()).format(rangeStart.time)
         binding.chartName.text = context.resources.getQuantityString(R.plurals.chart_title, entries.size, dateString, entries.size)
@@ -40,6 +40,7 @@ class ChartHolder(
             val popupMenu = PopupMenu(context, view, Gravity.END)
             popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener { menuItem ->
+                menuItem.isChecked = true
                 val newInterval = when (menuItem.itemId) {
                     R.id.day -> Interval.DAY
                     R.id.week -> Interval.WEEK
@@ -49,6 +50,14 @@ class ChartHolder(
                 onIntervalChange(newInterval)
                 return@setOnMenuItemClickListener true
             }
+            val selectedItem = when (interval) {
+                Interval.DAY -> R.id.day
+                Interval.WEEK -> R.id.week
+                Interval.MONTH -> R.id.month
+                Interval.YEAR -> R.id.year
+                else -> throw IllegalStateException("Interval not valid as a chart display interval")
+            }
+            popupMenu.menu.findItem(selectedItem).isChecked = true
             popupMenu.show()
         }
 
