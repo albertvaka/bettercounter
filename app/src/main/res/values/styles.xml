@@ -6,7 +6,7 @@
 
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:editTextColor">@color/colorAccent</item>
-        <item name="android:textColorHint">@color/colorAccentDisabled</item>
+        <item name="android:textColorHint">@color/colorTextHint</item>
 
         <!-- ActionBar text and overflow menu icon -->
         <item name="android:textColorPrimary">@color/colorAccent</item>

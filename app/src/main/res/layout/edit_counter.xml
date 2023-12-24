@@ -8,27 +8,69 @@
     android:paddingRight="16dp"
     android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/editText"
-        android:inputType="text|textCapSentences"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="14dp"
         android:hint="@string/counter_name"
-        android:importantForAutofill="no" />
+        android:labelFor="@id/editText"
+        app:boxStrokeWidthFocused="1dp"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeColor="@color/outlinebox"
+        app:hintTextColor="@color/outlinebox"
+        android:textColorHint="@color/outlinebox"
+        app:cursorColor="@color/outlinebox"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText"
+            android:inputType="text|textCapSentences"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="My Counter"
+            android:importantForAutofill="no" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/fakeSpinnerIntervalBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:hint="@string/display_interval"
+        app:hintAnimationEnabled="false"
+        android:labelFor="@id/fakeSpinnerInterval"
+        app:boxStrokeWidthFocused="1dp"
+        app:boxStrokeWidth="1dp"
+        android:focusable="true"
+        app:hintTextColor="@color/outlinebox"
+        app:boxStrokeColor="@color/outlinebox"
+        android:textColorHint="@color/outlinebox"
+        app:cursorColor="@color/colorPrimary"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/fakeSpinnerInterval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:textIsSelectable="false"
+            tools:text="Daily"
+            android:inputType="none" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Spinner
+        android:id="@+id/spinnerInterval"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/colorpicker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="2dp"
         android:orientation="horizontal" />
-
-    <Spinner
-        android:id="@+id/spinnerInterval"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:popupBackground="@color/colorPrimaryDark" />
 
 </LinearLayout>

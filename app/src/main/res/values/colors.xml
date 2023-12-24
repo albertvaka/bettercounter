@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#171717</color>
     <color name="colorAccent">#D0D0D0</color>
     <color name="colorAccentDisabled">#505050</color>
+    <color name="colorTextHint">#D0D0D0</color>
 
     <array name="picker_colors">
         <item>@color/colorPrimary</item>
