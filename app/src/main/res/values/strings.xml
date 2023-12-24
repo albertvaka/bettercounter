@@ -49,5 +49,5 @@
     <string name="app_widget_description">Add a counter to your home screen</string>
     <string name="no_counters">No counters exist: Create some first</string>
     <string name="color_hint">Color %1$d</string>
-    <string name="display_interval">Display interval</string>
+    <string name="display_interval">Interval to display</string>
 </resources>
