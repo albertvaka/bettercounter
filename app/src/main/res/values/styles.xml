@@ -1,19 +1,21 @@
 <resources>
     <style name="AppTheme" parent="Theme.MaterialComponents.Bridge">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/colorAccent</item>
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:editTextColor">@color/colorAccent</item>
         <item name="android:textColorHint">@color/colorTextHint</item>
 
+        <!-- Notification bar background -->
+        <item name="colorPrimaryDark">@color/colorLightBackground</item>
+
         <!-- ActionBar text and overflow menu icon -->
         <item name="android:textColorPrimary">@color/colorAccent</item>
         <item name="colorControlNormal">@color/colorAccent</item>
 
         <!-- Dialog background -->
-        <item name="colorBackgroundFloating">@color/colorPrimary</item>
+        <item name="colorBackgroundFloating">@color/colorLightBackground</item>
 
         <!-- Fab background -->
         <item name="colorSecondary">@color/colorAccent</item>
@@ -24,11 +26,11 @@
 
     <style name="AppTheme.PopupMenu" parent="Theme.MaterialComponents.Bridge" >
         <!-- ActionBar menu background -->
-        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:background">@color/colorDarkBackground</item>
     </style>
 
     <style name="Divider">
-        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:background">@color/colorDarkBackground</item>
     </style>
     <style name="Divider.Vertical" parent="Divider">
         <item name="android:layout_width">@dimen/dividerSpacing</item>

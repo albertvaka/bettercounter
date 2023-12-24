@@ -1,5 +1,8 @@
 package org.kde.bettercounter.persistence
 
+import android.content.Context
+import androidx.core.content.ContextCompat
+import org.kde.bettercounter.R
 import java.util.Calendar
 import java.util.Date
 
@@ -19,5 +22,10 @@ class CounterSummary(
         val now = Calendar.getInstance().time
         val lastEntry = mostRecent
         return if (lastEntry != null && lastEntry > now) lastEntry else now
+    }
+
+    companion object {
+        private val defaultColorId = R.color.colorLightBackground
+        fun getDefaultColor(context: Context) = ContextCompat.getColor(context, defaultColorId)
     }
 }

@@ -26,6 +26,11 @@ enum class Interval(val humanReadableResource: Int) {
             LIFETIME -> throw UnsupportedOperationException("$this can't be converted to ChronoUnit")
         }
     }
+
+    fun toHumanReadableResourceId(): Int {
+        return humanReadableResource
+    }
+
 }
 
 val DEFAULT_INTERVAL = Interval.LIFETIME

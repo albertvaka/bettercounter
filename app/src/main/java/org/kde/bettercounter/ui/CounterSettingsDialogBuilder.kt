@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager.LayoutParams
 import android.widget.AdapterView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -69,6 +68,7 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
 
     fun forNewCounter(): CounterSettingsDialogBuilder {
         builder.setTitle(R.string.add_counter)
+        binding.fakeSpinnerInterval.setText(DEFAULT_INTERVAL.toHumanReadableResourceId())
         binding.spinnerInterval.setSelection(intervalAdapter.positionOf(DEFAULT_INTERVAL))
         return this
     }
@@ -76,6 +76,7 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
     fun forExistingCounter(counter: CounterSummary): CounterSettingsDialogBuilder {
         builder.setTitle(R.string.edit_counter)
         binding.editText.setText(counter.name)
+        binding.fakeSpinnerInterval.setText(counter.interval.toHumanReadableResourceId())
         binding.spinnerInterval.setSelection(intervalAdapter.positionOf(counter.interval))
         colorAdapter.selectedColor = counter.color
         previousName = counter.name
@@ -104,18 +105,10 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
             val name = binding.editText.text.toString().trim()
             when {
                 name.isBlank() -> {
-                    Toast.makeText(
-                        context,
-                        R.string.name_cant_be_blank,
-                        Toast.LENGTH_LONG
-                    ).show()
+                    binding.editText.error = context.getString(R.string.name_cant_be_blank)
                 }
                 name != previousName && viewModel.counterExists(name) -> {
-                    Toast.makeText(
-                        context,
-                        R.string.already_exists,
-                        Toast.LENGTH_LONG
-                    ).show()
+                    binding.editText.error = context.getString(R.string.already_exists)
                 }
                 else -> {
                     onSaveListener(

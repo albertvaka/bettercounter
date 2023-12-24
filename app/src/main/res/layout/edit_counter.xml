@@ -9,6 +9,7 @@
     android:layout_height="wrap_content">
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/editTextBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
@@ -19,7 +20,6 @@
         app:boxStrokeColor="@color/outlinebox"
         app:hintTextColor="@color/outlinebox"
         android:textColorHint="@color/outlinebox"
-        app:cursorColor="@color/outlinebox"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -40,13 +40,13 @@
         android:hint="@string/display_interval"
         app:hintAnimationEnabled="false"
         android:labelFor="@id/fakeSpinnerInterval"
+        android:focusable="true"
         app:boxStrokeWidthFocused="1dp"
         app:boxStrokeWidth="1dp"
-        android:focusable="true"
-        app:hintTextColor="@color/outlinebox"
         app:boxStrokeColor="@color/outlinebox"
+        app:hintTextColor="@color/outlinebox"
         android:textColorHint="@color/outlinebox"
-        app:cursorColor="@color/colorPrimary"
+        app:cursorColor="@color/colorLightBackground"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" >
 
         <com.google.android.material.textfield.TextInputEditText

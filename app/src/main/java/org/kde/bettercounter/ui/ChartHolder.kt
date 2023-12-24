@@ -53,8 +53,9 @@ class ChartHolder(
         }
 
         // Chart
-        val defaultColor = ContextCompat.getColor(context, R.color.colorPrimary)
-        val color = if (counter.color == defaultColor) ContextCompat.getColor(context, R.color.colorAccent) else counter.color
+        val defaultCounterColor = CounterSummary.getDefaultColor(context)
+        val defaultSubstituteColor = ContextCompat.getColor(context, R.color.colorAccent)
+        val color = counter.color.takeUnless { it == defaultCounterColor } ?: defaultSubstituteColor
         binding.chart.setDataBucketized(entries, rangeStart, interval, color)
 
         // Stats

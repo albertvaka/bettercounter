@@ -17,7 +17,7 @@
     <org.kde.bettercounter.ui.BetterChart
         android:id="@+id/chart"
         android:layout_width="match_parent"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorDarkBackground"
         android:layout_height="260dip" />
 
     <TextView

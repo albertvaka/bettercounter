@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#303030</color>
-    <color name="colorPrimaryDark">#171717</color>
+    <color name="colorLightBackground">#303030</color>
+    <color name="colorDarkBackground">#171717</color>
     <color name="colorAccent">#D0D0D0</color>
     <color name="colorAccentDisabled">#505050</color>
     <color name="colorTextHint">#D0D0D0</color>
 
     <array name="picker_colors">
-        <item>@color/colorPrimary</item>
+        <item>@color/colorLightBackground</item>
         <item>#2062af</item>
         <item>#8c47fb</item>
         <item>#CE6767</item>

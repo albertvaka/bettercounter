@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
+    android:background="@color/colorDarkBackground"
     tools:context=".ui.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -15,7 +15,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/colorLightBackground"
             app:popupTheme="@style/AppTheme.PopupMenu" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -34,7 +34,7 @@
         android:id="@+id/bottomSheet"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="true"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorDarkBackground"
         android:layout_width = "match_parent"
         android:orientation="vertical"
         android:paddingTop="10dp"

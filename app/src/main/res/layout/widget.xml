@@ -3,7 +3,7 @@
     android:id="@+id/widgetBackground"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@color/colorPrimaryDark"
+    android:background="@color/colorDarkBackground"
     android:layout_margin="0dp"
     android:paddingHorizontal="4dp"
     android:paddingVertical="2dp"
