@@ -1,0 +1,21 @@
+3.2:
+* UI improvements.
+
+3.1:
+* Click on a chart header to temporarily change the time interval of the chart.
+
+3.0:
+* Added widgets
+* Improved accessibility.
+
+2.5:
+* Counters can be reset
+
+2.4:
+* Per-app language in Android 13+
+
+2.3:
+* Support for importing counters
+
+2.2:
+* Adds an undo button after decreasing a counter.
