@@ -11,6 +11,7 @@
     <string name="save">Desa</string>
     <string name="edit_counter">Edita el comptador</string>
     <string name="delete">Esborra</string>
+    <string name="delete_or_reset">Esborra/Reinicia</string>
     <string name="interval_day">Diari</string>
     <string name="interval_week">Setmanal</string>
     <string name="interval_month">Mensual</string>

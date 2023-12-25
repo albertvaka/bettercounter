@@ -89,7 +89,7 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
     }
 
     fun setOnDeleteListener(onClickListener: DialogInterface.OnClickListener): CounterSettingsDialogBuilder {
-        builder.setNeutralButton(R.string.delete, onClickListener)
+        builder.setNeutralButton(R.string.delete_or_reset, onClickListener)
         return this
     }
 

@@ -11,6 +11,7 @@
     <string name="save">Сохранить</string>
     <string name="edit_counter">Редактировать счетчик</string>
     <string name="delete">Удалить</string>
+    <string name="delete_or_reset">Удалить/сбросить</string>
     <string name="interval_day">Ежедневно</string>
     <string name="interval_week">Еженедельно</string>
     <string name="interval_month">Ежемесячно</string>
