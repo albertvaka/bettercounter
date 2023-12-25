@@ -35,7 +35,7 @@ fun Calendar.truncate(field: Interval) {
 }
 
 fun Calendar.toSimpleDateString(): String {
-    val dateFormat = SimpleDateFormat("dd-MM-yyyy HH-mm", Locale.US)
+    val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.US)
     return dateFormat.format(time)
 }
 

@@ -24,6 +24,8 @@ import java.util.Calendar
 import java.util.Date
 import kotlin.collections.set
 
+private const val TAG = "ViewModel"
+
 class ViewModel(application: Application) {
 
     interface CounterObserver {
@@ -69,7 +71,7 @@ class ViewModel(application: Application) {
 
     @MainThread
     fun observeCounterChange(observer: CounterObserver) {
-        Log.e("observeCounterChange", "SIZE" + counterObservers.size)
+        Log.d(TAG, "observeCounterChange SIZE" + counterObservers.size)
         synchronized(this) {
             counterObservers.add(observer)
             if (initialized) {
@@ -150,7 +152,7 @@ class ViewModel(application: Application) {
             repo.renameCounter(oldName, newName)
             val counter: MutableLiveData<CounterSummary>? = summaryMap.remove(oldName)
             if (counter == null) {
-                Log.e("BetterCounter", "Trying to rename a counter but the old counter doesn't exist")
+                Log.e(TAG, "Trying to rename a counter but the old counter doesn't exist")
                 return@launch
             }
             summaryMap[newName] = counter
@@ -267,7 +269,7 @@ class ViewModel(application: Application) {
         val ret = MutableLiveData<List<Entry>>()
         CoroutineScope(Dispatchers.IO).launch {
             val entries = repo.getEntriesForRangeSortedByDate(name, since, until)
-            //Log.e("Repository", "Queried ${entries.size} entries")
+            //Log.e(TAG, "Queried ${entries.size} entries")
             CoroutineScope(Dispatchers.Main).launch {
                 ret.value = entries
             }

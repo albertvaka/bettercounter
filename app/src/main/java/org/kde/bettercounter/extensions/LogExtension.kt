@@ -6,7 +6,7 @@ fun <T> T.andLog(): T {
     return this.andLog("LOGGERINO")
 }
 
-fun <T> T.andLog(label: String): T {
-    Log.e(label, this.toString())
+fun <T> T.andLog(tag: String): T {
+    Log.e(tag, this.toString())
     return this
 }

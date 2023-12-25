@@ -18,6 +18,11 @@ import org.kde.bettercounter.persistence.CounterSummary
 import java.text.SimpleDateFormat
 import java.util.Date
 
+private const val ACTION_COUNT = "org.kde.bettercounter.WidgetProvider.COUNT"
+private const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"
+
+private const val TAG = "WidgetProvider"
+
 class WidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
@@ -35,15 +40,15 @@ class WidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        Log.d("WidgetProvider", "onReceive " + intent.action)
+        Log.d(TAG, "onReceive " + intent.action)
         if (intent.action == ACTION_COUNT) {
             val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
             if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-                Log.e("BetterCounterWidget", "No widget id extra set")
+                Log.e(TAG, "No widget id extra set")
                 return
             }
             if (!existsWidgetCounterNamePref(context, appWidgetId)) {
-                Log.e("BetterCounterWidget", "Counter doesn't exist")
+                Log.e(TAG, "Counter doesn't exist")
                 return
             }
             val counterName = loadWidgetCounterNamePref(context, appWidgetId)
@@ -51,7 +56,7 @@ class WidgetProvider : AppWidgetProvider() {
             viewModel.incrementCounterWithCallback(counterName) {
                 if (!viewModel.getCounterSummary(counterName).hasObservers()) {
                     // The app was terminated and we got unsubscribed
-                    Log.d("WidgetProvider", "CounterSummary has no observers")
+                    Log.d(TAG, "CounterSummary has no observers")
                     updateAppWidget(context, viewModel, AppWidgetManager.getInstance(context), appWidgetId)
                 }
             }
@@ -70,7 +75,7 @@ fun removeWidgets(context: Context, counterName: String) {
     val host = AppWidgetHost(context, 0)
     for (appWidgetId in ids) {
         if (counterName == loadWidgetCounterNamePref(context, appWidgetId)) {
-            Log.d("BetterCounterWidget", "Deleting widget")
+            Log.d(TAG, "Deleting widget")
             // In Android 5 deleteAppWidgetId doesn't remove the widget but in Android 13 it does.
             host.deleteAppWidgetId(appWidgetId)
             deleteWidgetCounterNamePref(context, appWidgetId)
@@ -85,23 +90,20 @@ fun forceRefreshWidgets(context: Context) {
     context.sendBroadcast(intent)
 }
 
-private const val ACTION_COUNT = "org.kde.bettercounter.WidgetProvider.COUNT"
-private const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"
-
 internal fun updateAppWidget(
     context: Context,
     viewModel: ViewModel,
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int
 ) {
-    Log.d("WidgetProvider", "updateAppWidget")
+    Log.d(TAG, "updateAppWidget")
 
     if (!existsWidgetCounterNamePref(context, appWidgetId)) {
         // This gets called right after placing the widget even if it hasn't been configured yet.
         // In that case we can't do anything. This is useful for reconfigurable widgets, which don't
         // require an initial configuration dialog. Our widget isn't reconfigurable though (because
         // I didn't find a way to stop observing the previous livedata).
-        Log.e("BetterCounterWidget", "Ignoring updateAppWidget for an unconfigured widget")
+        Log.e(TAG, "Ignoring updateAppWidget for an unconfigured widget")
         return
     }
 
@@ -114,7 +116,7 @@ internal fun updateAppWidget(
     views.setOnClickPendingIntent(R.id.widgetName, openAppPendingIntent)
 
     if (!viewModel.counterExists(counterName)) {
-        Log.e("BetterCounterWidget", "The counter for this widget doesn't exist")
+        Log.e(TAG, "The counter for this widget doesn't exist")
         //val host = AppWidgetHost(context, 0)
         //host.deleteAppWidgetId(appWidgetId)
         views.setTextViewText(R.id.widgetCounter, "error")
@@ -136,7 +138,7 @@ internal fun updateAppWidget(
     // observeForever means it's not attached to any lifecycle so we need to call removeObserver manually
     viewModel.getCounterSummary(counterName).observeForever(object : Observer<CounterSummary> {
         override fun onChanged(value: CounterSummary) {
-            Log.d("WidgetProvider", "onChanged")
+            Log.d(TAG, "onChanged")
             if (!existsWidgetCounterNamePref(context, appWidgetId)) {
                 // Prevent leaking the observer once the widget has been deleted by deleting it here
                 viewModel.getCounterSummary(value.name).removeObserver(this)

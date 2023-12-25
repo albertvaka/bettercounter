@@ -36,7 +36,6 @@ class ChartsAdapter(
     override fun onBindViewHolder(holder: ChartHolder, position: Int) {
         val rangeStart = findRangeStartForPosition(position)
         val rangeEnd = rangeStart.copy().apply { addInterval(interval, 1) }
-        //Log.e("ChartsAdapter", "${rangeStart.toSimpleDateString()} plus ${counter.intervalForChart} equals ${rangeEnd.toSimpleDateString()}")
         boundViewHolders.add(holder)
         viewModel.getEntriesForRangeSortedByDate(
             counter.name,

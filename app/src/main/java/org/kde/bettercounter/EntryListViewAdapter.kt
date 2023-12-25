@@ -17,6 +17,8 @@ import org.kde.bettercounter.persistence.Tutorial
 import org.kde.bettercounter.ui.EntryViewHolder
 import java.util.*
 
+private const val TAG = "EntryListAdapter"
+
 class EntryListViewAdapter(
     private var activity: AppCompatActivity,
     private var viewModel: ViewModel,
@@ -147,7 +149,7 @@ class EntryListViewAdapter(
         if (counter != null) {
             holder.onBind(counter)
         } else {
-            Log.d("EntryListAdapter", "Counter not found or still loading at pos $position")
+            Log.d(TAG, "Counter not found or still loading at pos $position")
         }
     }
 
