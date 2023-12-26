@@ -12,6 +12,8 @@ enum class Interval(val humanReadableResource: Int) {
     LIFETIME(R.string.interval_lifetime);
 
     companion object {
+        val DEFAULT = LIFETIME
+
         fun humanReadableValues(context: Context): List<String> {
             return entries.map { context.getString(it.humanReadableResource) }
         }
@@ -31,6 +33,9 @@ enum class Interval(val humanReadableResource: Int) {
         return humanReadableResource
     }
 
+    fun toChartDisplayableInterval(): Interval {
+        // When displaying in a chart, LIFETIME counters will still display year by year
+        return if (this == LIFETIME) YEAR else this
+    }
 }
 
-val DEFAULT_INTERVAL = Interval.LIFETIME

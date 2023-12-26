@@ -13,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kde.bettercounter.boilerplate.AppDatabase
+import org.kde.bettercounter.persistence.CounterColor
+import org.kde.bettercounter.persistence.CounterMetadata
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
@@ -80,9 +82,10 @@ class ViewModel(application: Application) {
         }
     }
 
-    fun addCounter(name: String, interval: Interval, color: Int) {
+    fun addCounter(counter: CounterMetadata) {
+        val name = counter.name
         repo.setCounterList(repo.getCounterList().toMutableList() + name)
-        repo.setCounterMetadata(name, color, interval)
+        repo.setCounterMetadata(counter)
         CoroutineScope(Dispatchers.IO).launch {
             summaryMap[name] = MutableLiveData(repo.getCounterSummary(name))
             withContext(Dispatchers.Main) {
@@ -134,16 +137,18 @@ class ViewModel(application: Application) {
         return repo.isTutorialShown(id)
     }
 
-    fun editCounterSameName(name: String, interval: Interval, color: Int) {
-        repo.setCounterMetadata(name, color, interval)
+    fun editCounterSameName(counterMetadata: CounterMetadata) {
+        val name = counterMetadata.name
+        repo.setCounterMetadata(counterMetadata)
         CoroutineScope(Dispatchers.IO).launch {
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
         }
     }
 
-    fun editCounter(oldName: String, newName: String, interval: Interval, color: Int) {
+    fun editCounter(oldName: String, counterMetadata: CounterMetadata) {
+        val newName = counterMetadata.name
         repo.deleteCounterMetadata(oldName)
-        repo.setCounterMetadata(newName, color, interval)
+        repo.setCounterMetadata(counterMetadata)
         val list = repo.getCounterList().toMutableList()
         list[list.indexOf(oldName)] = newName
         repo.setCounterList(list)
@@ -225,13 +230,15 @@ class ViewModel(application: Application) {
         }
     }
 
-    fun importAll(stream: InputStream, progressHandler: Handler?, defaultInterval: Interval, defaultColor: Int) {
+    fun importAll(context: Context, stream: InputStream, progressHandler: Handler?) {
         fun sendProgress(progress: Int, done: Int) {
             val message = Message()
             message.arg1 = progress
             message.arg2 = done // -1 -> error, 0 -> wip, 1 -> done
             progressHandler?.sendMessage(message)
         }
+
+        val reusedCounterMetadata = CounterMetadata("", Interval.DEFAULT, 0, CounterColor.getDefault(context))
 
         CoroutineScope(Dispatchers.IO).launch {
             stream.use { stream ->
@@ -252,7 +259,8 @@ class ViewModel(application: Application) {
                     }
                     namesToImport.forEach { name ->
                         if (!counterExists(name)) {
-                            addCounter(name, defaultInterval, defaultColor)
+                            reusedCounterMetadata.name = name
+                            addCounter(reusedCounterMetadata)
                         }
                     }
                     repo.bulkAddEntries(entriesToImport)

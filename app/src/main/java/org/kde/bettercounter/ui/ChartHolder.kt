@@ -3,7 +3,6 @@ package org.kde.bettercounter.ui
 import android.content.Context
 import android.view.Gravity
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
@@ -61,11 +60,11 @@ class ChartHolder(
             popupMenu.show()
         }
 
+        // Only show a goal line if the displayed interval is larger than the counter's
+        val goalLine = counter.goal.takeIf { interval > counter.interval } ?: -1
+
         // Chart
-        val defaultCounterColor = CounterSummary.getDefaultColor(context)
-        val defaultSubstituteColor = ContextCompat.getColor(context, R.color.colorAccent)
-        val color = counter.color.takeUnless { it == defaultCounterColor } ?: defaultSubstituteColor
-        binding.chart.setDataBucketized(entries, rangeStart, interval, color)
+        binding.chart.setDataBucketized(entries, rangeStart, interval, counter.color.toColorForChart(context), goalLine)
 
         // Stats
         val periodAverage = getPeriodAverageString(counter, entries, rangeStart, rangeEnd)

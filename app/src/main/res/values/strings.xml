@@ -51,4 +51,6 @@
     <string name="no_counters">No counters exist: Create some first</string>
     <string name="color_hint">Color %1$d</string>
     <string name="display_interval">Interval to display</string>
+    <string name="goal">Goal</string>
+    <string name="no_goal">No</string>
 </resources>

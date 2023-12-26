@@ -51,4 +51,6 @@
     <string name="no_counters">No existeix cap comptador</string>
     <string name="color_hint">Color %1$d</string>
     <string name="display_interval">Interval a mostrar</string>
+    <string name="goal">Objectiu</string>
+    <string name="no_goal">Cap</string>
 </resources>

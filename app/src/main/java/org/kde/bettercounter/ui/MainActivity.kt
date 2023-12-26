@@ -1,7 +1,6 @@
 package org.kde.bettercounter.ui
 
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -31,8 +30,8 @@ import org.kde.bettercounter.boilerplate.OpenFileParams
 import org.kde.bettercounter.boilerplate.OpenFileResultContract
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
+import org.kde.bettercounter.persistence.CounterColor
 import org.kde.bettercounter.persistence.CounterSummary
-import org.kde.bettercounter.persistence.DEFAULT_INTERVAL
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
 
@@ -71,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
         var sheetUnfoldedPadding = 0 // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
         // Hack so the size of the sheet is known from the beginning, since we only compute it once.
-        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Color.BLACK, Interval.DAY, 0, 0, null, null), Interval.DAY) {}
+        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Interval.DAY, 0, CounterColor(0), 0, 0, null, null), Interval.DAY) {}
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 sheetUnfoldedPadding = binding.bottomSheet.height + 50
@@ -114,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             }
             override fun onSelectedItemUpdated(position: Int, counter: CounterSummary) {
                 binding.detailsTitle.text = counter.name
-                val interval = intervalOverride ?: counter.intervalForChart
+                val interval = intervalOverride ?: counter.interval.toChartDisplayableInterval()
                 val adapter = ChartsAdapter(this@MainActivity, viewModel, counter, interval) { newInterval ->
                     intervalOverride = newInterval
                     onSelectedItemUpdated(position, counter)
@@ -211,8 +210,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     true
                 }
-                val defaultColor = resources.obtainTypedArray(R.array.picker_colors).getColor(0, 0)
-                viewModel.importAll(stream, progressHandler, DEFAULT_INTERVAL, defaultColor)
+                viewModel.importAll(this, stream, progressHandler)
             }
         }
     }
@@ -249,8 +247,8 @@ class MainActivity : AppCompatActivity() {
             binding.fab.visibility = View.GONE
             CounterSettingsDialogBuilder(this@MainActivity, viewModel)
                 .forNewCounter()
-                .setOnSaveListener { name, interval, color ->
-                    viewModel.addCounter(name, interval, color)
+                .setOnSaveListener { counterMetadata ->
+                    viewModel.addCounter(counterMetadata)
                 }
                 .setOnDismissListener { binding.fab.visibility = View.VISIBLE }
                 .show()
@@ -264,17 +262,17 @@ class MainActivity : AppCompatActivity() {
 
             CounterSettingsDialogBuilder(this@MainActivity, viewModel)
                 .forExistingCounter(counter)
-                .setOnSaveListener { newName, newInterval, newColor ->
-                    if (counter.name != newName) {
-                        viewModel.editCounter(counter.name, newName, newInterval, newColor)
+                .setOnSaveListener { newCounterMetadata ->
+                    if (counter.name != newCounterMetadata.name) {
+                        viewModel.editCounter(counter.name, newCounterMetadata)
                     } else {
-                        viewModel.editCounterSameName(newName, newInterval, newColor)
+                        viewModel.editCounterSameName(newCounterMetadata)
                     }
                     // We are not subscribed to the summary livedata, so we won't get notified of the change we just made.
                     // Update our local copy so it has the right data if we open the dialog again.
-                    counter.name = newName
-                    counter.interval = newInterval
-                    counter.color = newColor
+                    counter.name = newCounterMetadata.name
+                    counter.interval = newCounterMetadata.interval
+                    counter.color = newCounterMetadata.color
                 }
                 .setOnDismissListener {
                     binding.fab.visibility = View.VISIBLE
