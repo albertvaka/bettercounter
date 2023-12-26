@@ -15,6 +15,7 @@ const val alwaysShowTutorialsInDebugBuilds = true
 const val COUNTERS_PREFS_KEY = "counters"
 const val COUNTERS_INTERVAL_PREFS_KEY = "interval.%s"
 const val COUNTERS_COLOR_PREFS_KEY = "color.%s"
+const val COUNTERS_GOAL_PREFS_KEY = "goal.%s"
 const val TUTORIALS_PREFS_KEY = "tutorials"
 
 class Repository(
@@ -55,9 +56,9 @@ class Repository(
         return tutorials.contains(id.name)
     }
 
-    private fun getCounterColor(name: String): Int {
+    private fun getCounterColor(name: String): CounterColor {
         val key = COUNTERS_COLOR_PREFS_KEY.format(name)
-        return sharedPref.getInt(key, CounterSummary.getDefaultColor(context))
+        return CounterColor(sharedPref.getInt(key, CounterColor.getDefault(context).colorInt))
     }
 
     private fun getCounterInterval(name: String): Interval {
@@ -65,28 +66,44 @@ class Repository(
         val str = sharedPref.getString(key, null)
         return when (str) {
             "YTD" -> Interval.YEAR
-            null -> DEFAULT_INTERVAL
+            null -> Interval.DEFAULT
             else -> Interval.valueOf(str)
         }
+    }
+
+    private fun getCounterGoal(name: String): Int {
+        val key = COUNTERS_GOAL_PREFS_KEY.format(name)
+        return sharedPref.getInt(key, 0)
     }
 
     fun deleteCounterMetadata(name: String) {
         val colorKey = COUNTERS_COLOR_PREFS_KEY.format(name)
         val intervalKey = COUNTERS_INTERVAL_PREFS_KEY.format(name)
-        sharedPref.edit().remove(colorKey).remove(intervalKey).apply()
+        val goalKey = COUNTERS_GOAL_PREFS_KEY.format(name)
+        sharedPref.edit()
+            .remove(colorKey)
+            .remove(intervalKey)
+            .remove(goalKey)
+            .apply()
         counterCache.remove(name)
     }
 
-    fun setCounterMetadata(name: String, color: Int, interval: Interval) {
-        val colorKey = COUNTERS_COLOR_PREFS_KEY.format(name)
-        val intervalKey = COUNTERS_INTERVAL_PREFS_KEY.format(name)
-        sharedPref.edit().putInt(colorKey, color).putString(intervalKey, interval.toString()).apply()
-        counterCache.remove(name)
+    fun setCounterMetadata(counter: CounterMetadata) {
+        val colorKey = COUNTERS_COLOR_PREFS_KEY.format(counter.name)
+        val intervalKey = COUNTERS_INTERVAL_PREFS_KEY.format(counter.name)
+        val goalKey = COUNTERS_GOAL_PREFS_KEY.format(counter.name)
+        sharedPref.edit()
+            .putInt(colorKey, counter.color.colorInt)
+            .putString(intervalKey, counter.interval.toString())
+            .putInt(goalKey, counter.goal)
+            .apply()
+        counterCache.remove(counter.name)
     }
 
     suspend fun getCounterSummary(name: String): CounterSummary {
         val interval = getCounterInterval(name)
         val color = getCounterColor(name)
+        val goal = getCounterGoal(name)
         val intervalStartDate = when (interval) {
             Interval.LIFETIME -> Calendar.getInstance().apply { set(Calendar.YEAR, 1990) }
             else -> Calendar.getInstance().apply { truncate(interval) }
@@ -98,6 +115,7 @@ class Repository(
                 name = name,
                 color = color,
                 interval = interval,
+                goal = goal,
                 lastIntervalCount = entryDao.getCountInRange(name, intervalStartDate.time, intervalEndDate.time),
                 totalCount = firstLastAndCount.count, // entryDao.getCount(name),
                 leastRecent = firstLastAndCount.first, // entryDao.getLeastRecent(name)?.date,

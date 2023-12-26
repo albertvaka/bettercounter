@@ -22,7 +22,7 @@ class EntryViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun onBind(counter: CounterSummary) {
-        binding.root.setBackgroundColor(counter.color)
+        binding.root.setBackgroundColor(counter.color.colorInt)
         binding.increaseButton.setOnClickListener {
             viewModel.incrementCounter(counter.name)
             if (!viewModel.isTutorialShown(Tutorial.PICKDATE)) {
@@ -54,7 +54,11 @@ class EntryViewHolder(
             true
         }
         binding.nameText.text = counter.name
-        binding.countText.text = counter.lastIntervalCount.toString()
+        binding.countText.text = counter.getFormattedCount()
+
+        val checkDrawable = if (counter.isGoalMet()) R.drawable.ic_check else 0
+        binding.countText.setCompoundDrawablesRelativeWithIntrinsicBounds(checkDrawable, 0, 0, 0)
+
         val mostRecentDate = counter.mostRecent
         if (mostRecentDate != null) {
             binding.timestampText.referenceTime = mostRecentDate.time

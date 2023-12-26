@@ -15,8 +15,9 @@ import org.kde.bettercounter.IntervalAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.EditCounterBinding
+import org.kde.bettercounter.persistence.CounterColor
+import org.kde.bettercounter.persistence.CounterMetadata
 import org.kde.bettercounter.persistence.CounterSummary
-import org.kde.bettercounter.persistence.DEFAULT_INTERVAL
 import org.kde.bettercounter.persistence.Interval
 
 class CounterSettingsDialogBuilder(private val context: Context, private val viewModel: ViewModel) {
@@ -25,8 +26,9 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
     private val binding: EditCounterBinding = EditCounterBinding.inflate(LayoutInflater.from(context))
     private val intervalAdapter = IntervalAdapter(context)
     private val colorAdapter = ColorAdapter(context)
-    private var onSaveListener: (name: String, Interval, color: Int) -> Unit = { _, _, _ -> }
+    private var onSaveListener: (counterMetadata: CounterMetadata) -> Unit = { _ -> }
     private var previousName: String? = null
+    private var goal = 0
 
     init {
         builder.setView(binding.root)
@@ -62,28 +64,50 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
         binding.colorpicker.adapter = colorAdapter
         binding.colorpicker.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
+        binding.goalInputBox.setStartIconOnClickListener {
+            if (goal > 0) {
+                goal -= 1
+                updateGoalText()
+            }
+        }
+        binding.goalInputBox.setEndIconOnClickListener {
+            goal += 1
+            updateGoalText()
+        }
+        updateGoalText()
+
         builder.setPositiveButton(R.string.save, null)
         builder.setNegativeButton(R.string.cancel, null)
     }
 
+    private fun updateGoalText() {
+        if (goal > 0) {
+            binding.goalInput.setText(goal.toString())
+        } else {
+            binding.goalInput.setText(R.string.no_goal)
+        }
+    }
+
     fun forNewCounter(): CounterSettingsDialogBuilder {
         builder.setTitle(R.string.add_counter)
-        binding.fakeSpinnerInterval.setText(DEFAULT_INTERVAL.toHumanReadableResourceId())
-        binding.spinnerInterval.setSelection(intervalAdapter.positionOf(DEFAULT_INTERVAL))
+        binding.fakeSpinnerInterval.setText(Interval.DEFAULT.toHumanReadableResourceId())
+        binding.spinnerInterval.setSelection(intervalAdapter.positionOf(Interval.DEFAULT))
         return this
     }
 
     fun forExistingCounter(counter: CounterSummary): CounterSettingsDialogBuilder {
         builder.setTitle(R.string.edit_counter)
-        binding.editText.setText(counter.name)
+        previousName = counter.name
+        binding.nameEdit.setText(counter.name)
         binding.fakeSpinnerInterval.setText(counter.interval.toHumanReadableResourceId())
         binding.spinnerInterval.setSelection(intervalAdapter.positionOf(counter.interval))
-        colorAdapter.selectedColor = counter.color
-        previousName = counter.name
+        colorAdapter.selectedColor = counter.color.colorInt
+        goal = counter.goal
+        updateGoalText()
         return this
     }
 
-    fun setOnSaveListener(onSave: (newName: String, newInterval: Interval, newColor: Int) -> Unit): CounterSettingsDialogBuilder {
+    fun setOnSaveListener(onSave: (counterMetadata: CounterMetadata) -> Unit): CounterSettingsDialogBuilder {
         onSaveListener = onSave
         return this
     }
@@ -102,26 +126,29 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
         val dialog = builder.show()
         // Override the listener last (after showing) instead of passing it to setPositiveButton so we can decide when to dismiss the dialog
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            val name = binding.editText.text.toString().trim()
+            val name = binding.nameEdit.text.toString().trim()
             when {
                 name.isBlank() -> {
-                    binding.editText.error = context.getString(R.string.name_cant_be_blank)
+                    binding.nameEdit.error = context.getString(R.string.name_cant_be_blank)
                 }
                 name != previousName && viewModel.counterExists(name) -> {
-                    binding.editText.error = context.getString(R.string.already_exists)
+                    binding.nameEdit.error = context.getString(R.string.already_exists)
                 }
                 else -> {
                     onSaveListener(
-                        name,
-                        intervalAdapter.itemAt(binding.spinnerInterval.selectedItemPosition),
-                        colorAdapter.selectedColor
+                        CounterMetadata(
+                            name,
+                            intervalAdapter.itemAt(binding.spinnerInterval.selectedItemPosition),
+                            goal,
+                            CounterColor(colorAdapter.selectedColor),
+                        )
                     )
                     dialog.dismiss()
                 }
             }
         }
-        if (binding.editText.text.isNullOrEmpty()) {
-            binding.editText.requestFocus()
+        if (binding.nameEdit.text.isNullOrEmpty()) {
+            binding.nameEdit.requestFocus()
             dialog.window?.setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         }
         return dialog

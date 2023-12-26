@@ -43,6 +43,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="5dip"
+            android:drawablePadding="3dip"
+            app:drawableTint="@color/colorAccent"
             android:textAppearance="?attr/textAppearanceListItem"
             android:textSize="24sp"
             tools:text="0" />

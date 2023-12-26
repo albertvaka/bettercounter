@@ -3,7 +3,6 @@ package org.kde.bettercounter.ui
 import android.content.Context
 import android.view.Gravity
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
@@ -62,10 +61,7 @@ class ChartHolder(
         }
 
         // Chart
-        val defaultCounterColor = CounterSummary.getDefaultColor(context)
-        val defaultSubstituteColor = ContextCompat.getColor(context, R.color.colorAccent)
-        val color = counter.color.takeUnless { it == defaultCounterColor } ?: defaultSubstituteColor
-        binding.chart.setDataBucketized(entries, rangeStart, interval, color)
+        binding.chart.setDataBucketized(entries, rangeStart, interval, counter.color.toColorForChart(context))
 
         // Stats
         val periodAverage = getPeriodAverageString(counter, entries, rangeStart, rangeEnd)
