@@ -1,6 +1,7 @@
 <resources>
-    <style name="AppTheme" parent="Theme.MaterialComponents.Bridge">
+    <style name="AppTheme" parent="Theme.Material3.Dark">
         <item name="colorPrimary">@color/colorAccent</item>
+        <item name="colorSecondary">@color/colorAccent</item>
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:textColor">@color/colorAccent</item>
@@ -17,14 +18,15 @@
         <!-- Dialog background -->
         <item name="colorBackgroundFloating">@color/colorLightBackground</item>
 
-        <!-- Fab background -->
-        <item name="colorSecondary">@color/colorAccent</item>
+        <!-- FAB -->
+        <item name="colorPrimaryContainer">@color/colorAccent</item>
+        <item name="colorOnPrimaryContainer">@color/colorLightBackground</item>
 
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.PopupMenu" parent="Theme.MaterialComponents.Bridge" >
+    <style name="AppTheme.PopupMenu" parent="Theme.Material3.Dark" >
         <!-- ActionBar menu background -->
         <item name="android:background">@color/colorDarkBackground</item>
     </style>

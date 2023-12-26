@@ -20,7 +20,7 @@
         app:boxStrokeColor="@color/outlinebox"
         app:hintTextColor="@color/outlinebox"
         android:textColorHint="@color/outlinebox"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" >
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox" >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editText"
@@ -47,7 +47,7 @@
         app:hintTextColor="@color/outlinebox"
         android:textColorHint="@color/outlinebox"
         app:cursorColor="@color/colorLightBackground"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" >
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox" >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/fakeSpinnerInterval"
