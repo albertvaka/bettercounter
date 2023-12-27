@@ -52,5 +52,5 @@
     <string name="color_hint">Farbe %1$d</string>
     <string name="display_interval">Anzuzeigendes Intervall</string>
     <string name="goal">Ziel</string>
-    <string name="no_goal">N/A</string>
+    <string name="no_goal">n. v.</string>
 </resources>
