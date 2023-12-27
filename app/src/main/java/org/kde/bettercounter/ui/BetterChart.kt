@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarData
@@ -89,7 +90,8 @@ class BetterChart : BarChart {
         intervalEntries: List<Entry>,
         rangeStart: Calendar,
         totalInterval: Interval,
-        color: Int
+        color: Int,
+        goalLine: Float,
     ) {
         mDataSet.color = color
 
@@ -132,6 +134,14 @@ class BetterChart : BarChart {
             }
             // Log.e("Bucket", "$bucket (ends ${cal.toSimpleDateString()}) -> $bucketCount")
             series.add(BarEntry(bucket.toFloat(), bucketCount.toFloat()))
+        }
+
+        yAxis.limitLines.clear()
+        if (goalLine > 0) {
+            val limitLine = LimitLine(goalLine).apply {
+                lineColor = color
+            }
+            yAxis.limitLines.add(limitLine)
         }
 
         yAxis.axisMinimum = 0f

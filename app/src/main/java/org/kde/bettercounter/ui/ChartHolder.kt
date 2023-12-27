@@ -60,14 +60,31 @@ class ChartHolder(
             popupMenu.show()
         }
 
+        // Only show a goal line if the displayed interval is larger than the counter's
+        val goalLine = computeGoalLine(counter, interval)
+
         // Chart
-        binding.chart.setDataBucketized(entries, rangeStart, interval, counter.color.toColorForChart(context))
+        binding.chart.setDataBucketized(entries, rangeStart, interval, counter.color.toColorForChart(context), goalLine)
 
         // Stats
         val periodAverage = getPeriodAverageString(counter, entries, rangeStart, rangeEnd)
         val lifetimeAverage = getLifetimeAverageString(counter)
         val averageString = context.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
         binding.chartAverage.text = averageString
+    }
+
+    private fun computeGoalLine(counter: CounterSummary, displayInterval: Interval): Float {
+        if (counter.goal <= 0) return -1.0f
+        val baseGoal = counter.goal.toFloat()
+        return when (counter.interval to displayInterval) {
+            Interval.DAY to Interval.WEEK -> baseGoal
+            Interval.DAY to Interval.MONTH -> baseGoal
+            Interval.DAY to Interval.YEAR -> baseGoal * 30
+            Interval.WEEK to Interval.MONTH -> baseGoal / 7
+            Interval.WEEK to Interval.YEAR -> (baseGoal / 7) * 30
+            Interval.MONTH to Interval.YEAR -> baseGoal
+            else -> -1.0f
+        }
     }
 
     private fun getLifetimeAverageString(counter: CounterSummary): String {
