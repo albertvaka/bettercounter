@@ -27,8 +27,8 @@
     <string name="stats_average_every_hours">每 %1$.2f 小时一次"</string>
     <string name="stats_average_per_day">每天 %1$.2f 次"</string>
     <string name="stats_average_n_a">无"</string>
-    <string name="stats_average_every_days">每 %1$.2f 天"</string>
-    <string name="stats_averages">平均: %1$s, 一共: %2$s</string>
+    <string name="stats_average_every_days">每 %1$.2f 天一次"</string>
+    <string name="stats_averages">周期内: %1$s, 所有时间: %2$s</string>
     <string name="no_data">在这段时期内没有记录</string>
     <string name="tutorial_pickdate">长按来选择执行的时间</string>
     <string name="tutorial_drag">长按并拖动来重新排序</string>
@@ -51,6 +51,6 @@
     <string name="color_hint">颜色 %1$d</string>
     <string name="display_interval">统计间隔</string>
     <string name="delete_or_reset">删除/重置</string>
-    <string name="goal">目标</string>
+    <string name="goal">目标次数</string>
     <string name="no_goal">无</string>
 </resources>
