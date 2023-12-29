@@ -53,5 +53,4 @@
     <string name="color_hint">Цвет %1$d</string>
     <string name="display_interval">интервал для отображения</string>
     <string name="goal">Цель</string>
-    <string name="no_goal">Нет</string>
 </resources>

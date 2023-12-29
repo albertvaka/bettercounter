@@ -84,7 +84,7 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
         if (goal > 0) {
             binding.goalInput.setText(goal.toString())
         } else {
-            binding.goalInput.setText(R.string.no_goal)
+            binding.goalInput.setText("Ø")
         }
     }
 

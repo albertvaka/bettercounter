@@ -52,5 +52,4 @@
     <string name="display_interval">统计间隔</string>
     <string name="delete_or_reset">删除/重置</string>
     <string name="goal">目标次数</string>
-    <string name="no_goal">无</string>
 </resources>
