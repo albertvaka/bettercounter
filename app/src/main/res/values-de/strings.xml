@@ -12,10 +12,10 @@
     <string name="edit_counter">Zähler bearbeiten</string>
     <string name="delete">Löschen</string>
     <string name="delete_or_reset">Löschen/Zurücksetzen</string>
-    <string name="interval_day">Täglich</string>
-    <string name="interval_week">Wöchentlich</string>
-    <string name="interval_month">Monatlich</string>
-    <string name="interval_year">Jährlich</string>
+    <string name="interval_day">Tag</string>
+    <string name="interval_week">Woche</string>
+    <string name="interval_month">Monat</string>
+    <string name="interval_year">Jahr</string>
     <string name="interval_lifetime">Lebenslang</string>
     <string name="time_ago_dhm">Vor %1$dd %2$dh %3$dm</string>
     <string name="time_ago_hm">Vor %1$dh %2$dm</string>
@@ -39,7 +39,7 @@
     <string name="imported_n">%1$d Zähler importiert</string>
     <string name="import_error">Fehler: Ungültiges Dateiformat</string>
     <string name="delete_confirmation">Sind Sie sicher, dass Sie diesen Zähler löschen wollen?</string>
-    <string name="decreased_entry">\'%1$s\' verringert</string>
+    <string name="decreased_entry">\"%1$s\" verringert</string>
     <string name="undo">Rückgängig</string>
     <string name="reset">Zurücksetzen, aber behalten</string>
     <plurals name="chart_title">
@@ -50,6 +50,6 @@
     <string name="app_widget_description">Einen Zähler zum Startbildschirm hinzufügen</string>
     <string name="no_counters">Keine Zähler gefunden: Erstellen Sie zuerst welche</string>
     <string name="color_hint">Farbe %1$d</string>
-    <string name="display_interval">Anzuzeigendes Intervall</string>
+    <string name="display_interval">Anzeigezeitraum</string>
     <string name="goal">Ziel</string>
 </resources>
