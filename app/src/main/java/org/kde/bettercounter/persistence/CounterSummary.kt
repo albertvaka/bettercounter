@@ -20,7 +20,7 @@ class CounterSummary(
     }
 
     fun isGoalMet(): Boolean {
-        return goal in 1..<lastIntervalCount
+        return goal in 1..lastIntervalCount
     }
 
     fun getFormattedCount(): CharSequence = buildString {
