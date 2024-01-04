@@ -74,7 +74,6 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
             goal += 1
             updateGoalText()
         }
-        updateGoalText()
 
         builder.setPositiveButton(R.string.save, null)
         builder.setNegativeButton(R.string.cancel, null)
@@ -92,13 +91,16 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
         builder.setTitle(R.string.add_counter)
         binding.fakeSpinnerInterval.setText(Interval.DEFAULT.toHumanReadableResourceId())
         binding.spinnerInterval.setSelection(intervalAdapter.positionOf(Interval.DEFAULT))
+        updateGoalText()
         return this
     }
 
     fun forExistingCounter(counter: CounterSummary): CounterSettingsDialogBuilder {
         builder.setTitle(R.string.edit_counter)
         previousName = counter.name
+        binding.nameEditBox.isHintAnimationEnabled = false
         binding.nameEdit.setText(counter.name)
+        binding.nameEditBox.isHintAnimationEnabled = true
         binding.fakeSpinnerInterval.setText(counter.interval.toHumanReadableResourceId())
         binding.spinnerInterval.setSelection(intervalAdapter.positionOf(counter.interval))
         colorAdapter.selectedColor = counter.color.colorInt
