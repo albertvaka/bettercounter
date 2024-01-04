@@ -29,7 +29,7 @@
     <string name="stats_average_per_day">%1$.2f-mal/Tag"</string>
     <string name="stats_average_n_a">n. v."</string>
     <string name="stats_average_every_days">alle %1$.2f Tage"</string>
-    <string name="stats_averages">Ø: %1$s, lebenslang: %2$s</string>
+    <string name="stats_averages">Durchschnitt: %1$s\nLebenslang: %2$s</string>
     <string name="no_data">Es gibt keine Einträge in diesem Zeitraum</string>
     <string name="tutorial_pickdate">Langes Drücken zur Auswahl des Datums</string>
     <string name="tutorial_drag">Langes Drücken und Ziehen zum Anordnen</string>
