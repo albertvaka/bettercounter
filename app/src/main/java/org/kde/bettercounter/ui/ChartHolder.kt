@@ -69,8 +69,10 @@ class ChartHolder(
         // Stats
         val periodAverage = getPeriodAverageString(counter, entries, rangeStart, rangeEnd)
         val lifetimeAverage = getLifetimeAverageString(counter)
-        val averageString = context.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
-        binding.chartAverage.text = averageString
+        binding.chartAverage.text = context.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
+        if (binding.chartAverage.lineCount > 1) {
+            binding.chartAverage.text = context.getString(R.string.stats_averages_multiline, periodAverage, lifetimeAverage)
+        }
     }
 
     private fun computeGoalLine(counter: CounterSummary, displayInterval: Interval): Float {

@@ -30,6 +30,7 @@
     <string name="stats_average_n_a">N/A"</string>
     <string name="stats_average_every_days">every %1$.2f days"</string>
     <string name="stats_averages">Avg: %1$s, lifetime: %2$s</string>
+    <string name="stats_averages_multiline">Avg: %1$s\nLifetime: %2$s</string>
     <string name="no_data">There are no entries in this period</string>
     <string name="tutorial_pickdate">Long press to pick the date</string>
     <string name="tutorial_drag">Long press and drag to reorder</string>

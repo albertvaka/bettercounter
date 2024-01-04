@@ -30,6 +30,7 @@
     <string name="stats_average_n_a">N/A"</string>
     <string name="stats_average_every_days">cada %1$.2f dies"</string>
     <string name="stats_averages">Mitjana: %1$s, de per vida: %2$s</string>
+    <string name="stats_averages_multiline">Mitjana: %1$s\nDe per vida: %2$s</string>
     <string name="no_data">No hi ha entrades en aquest període</string>
     <string name="tutorial_pickdate">Feu una pulsació llarga per escollir la data</string>
     <string name="tutorial_drag">Feu una pulsació llarga i arrossegueu per a reordenar</string>

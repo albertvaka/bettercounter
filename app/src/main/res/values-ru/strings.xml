@@ -30,6 +30,7 @@
     <string name="stats_average_n_a">Н/Д"</string>
     <string name="stats_average_every_days">каждые %1$.2f дней"</string>
     <string name="stats_averages">В среднем: %1$s, Пожизненно: %2$s</string>
+    <string name="stats_averages_multiline">В среднем: %1$s\nПожизненно: %2$s</string>
     <string name="no_data">Отсутствуют записи в выбранном периоде</string>
     <string name="tutorial_pickdate">Долгое нажатие для выбора даты</string>
     <string name="tutorial_drag">Длительное нажатие и перетаскивание для изменения порядка</string>

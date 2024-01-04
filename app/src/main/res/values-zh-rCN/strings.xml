@@ -29,6 +29,7 @@
     <string name="stats_average_n_a">无"</string>
     <string name="stats_average_every_days">每 %1$.2f 天一次"</string>
     <string name="stats_averages">周期内: %1$s, 所有时间: %2$s</string>
+    <string name="stats_averages_multiline">周期内: %1$s\n所有时间: %2$s</string>
     <string name="no_data">在这段时期内没有记录</string>
     <string name="tutorial_pickdate">长按来选择执行的时间</string>
     <string name="tutorial_drag">长按并拖动来重新排序</string>
