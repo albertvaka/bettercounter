@@ -42,13 +42,13 @@
         <item quantity="one">%1$s (%2$d vegada)</item>
         <item quantity="other">%1$s (%2$d vegades)</item>
     </plurals>
-    <string name="decreased_entry">Decrementat \'%1$s\'</string>
+    <string name="decreased_entry">Decrementat \"%1$s\"</string>
     <string name="undo">Desfés</string>
     <string name="import_error">Error: el format no és correcte</string>
     <string name="reset">Reinicia les dades</string>
     <string name="fake_example_title">Sortir a córrer</string>
     <string name="app_widget_description">Afegeix un comptador a la pantalla principal</string>
-    <string name="no_counters">No existeix cap comptador</string>
+    <string name="no_counters">No hi ha cap comptador</string>
     <string name="color_hint">Color %1$d</string>
     <string name="display_interval">Interval a mostrar</string>
     <string name="goal">Objectiu</string>
