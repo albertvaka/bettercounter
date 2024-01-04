@@ -47,6 +47,7 @@ class EntryViewHolder(
         binding.draggableArea.setOnClickListener { onClickListener(counter) }
         binding.draggableArea.setOnLongClickListener {
             touchHelper.startDrag(this@EntryViewHolder)
+            @Suppress("DEPRECATION")
             binding.draggableArea.performHapticFeedback(
                 HapticFeedbackConstants.LONG_PRESS,
                 HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
