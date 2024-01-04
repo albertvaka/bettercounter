@@ -106,7 +106,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:text="No"
-                android:text="@string/no_goal"
+                android:text="-"
                 android:focusable="false"
                 android:textIsSelectable="false"
                 android:importantForAutofill="no" />

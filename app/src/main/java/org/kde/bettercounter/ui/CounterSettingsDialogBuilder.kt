@@ -14,7 +14,7 @@ import org.kde.bettercounter.ColorAdapter
 import org.kde.bettercounter.IntervalAdapter
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
-import org.kde.bettercounter.databinding.EditCounterBinding
+import org.kde.bettercounter.databinding.CounterSettingsBinding
 import org.kde.bettercounter.persistence.CounterColor
 import org.kde.bettercounter.persistence.CounterMetadata
 import org.kde.bettercounter.persistence.CounterSummary
@@ -23,7 +23,7 @@ import org.kde.bettercounter.persistence.Interval
 class CounterSettingsDialogBuilder(private val context: Context, private val viewModel: ViewModel) {
 
     private val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-    private val binding: EditCounterBinding = EditCounterBinding.inflate(LayoutInflater.from(context))
+    private val binding: CounterSettingsBinding = CounterSettingsBinding.inflate(LayoutInflater.from(context))
     private val intervalAdapter = IntervalAdapter(context)
     private val colorAdapter = ColorAdapter(context)
     private var onSaveListener: (counterMetadata: CounterMetadata) -> Unit = { _ -> }
