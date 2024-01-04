@@ -36,7 +36,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="6dp">
+        android:layout_marginTop="6dp"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/goal"
-            android:layout_marginLeft="6dp"
+            android:layout_marginStart="6dp"
             android:labelFor="@id/goalInput"
             app:startIconDrawable="@drawable/ic_minusone"
             app:endIconDrawable="@drawable/ic_plusone"
@@ -106,10 +107,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:text="No"
-                android:text="-"
+                android:text="Ø"
                 android:focusable="false"
                 android:textIsSelectable="false"
-                android:importantForAutofill="no" />
+                android:importantForAutofill="no"
+                tools:ignore="HardcodedText" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
