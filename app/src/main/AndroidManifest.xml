@@ -8,7 +8,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".BetterApplication" >
+        android:name=".BetterApplication"
+        android:enableOnBackInvokedCallback="true">
 
         <receiver
             android:name=".ui.WidgetProvider"
