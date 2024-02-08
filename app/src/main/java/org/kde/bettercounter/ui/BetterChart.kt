@@ -132,7 +132,7 @@ class BetterChart : BarChart {
             if (bucketCount > maxCount) {
                 maxCount = bucketCount
             }
-            // Log.e("Bucket", "$bucket (ends ${cal.toSimpleDateString()}) -> $bucketCount")
+            // Log.e("Bucket", "$bucket (ends ${cal.debugToSimpleDateString()}) -> $bucketCount")
             series.add(BarEntry(bucket.toFloat(), bucketCount.toFloat()))
         }
 

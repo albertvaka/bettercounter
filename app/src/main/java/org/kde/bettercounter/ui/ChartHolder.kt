@@ -28,12 +28,12 @@ class ChartHolder(
     fun onBind(counter: CounterSummary, entries: List<Entry>, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, onIntervalChange: (Interval) -> Unit) {
         // Chart name
         val dateFormat = when (interval) {
-            Interval.DAY, Interval.WEEK -> "dd/MM/yyyy"
-            Interval.MONTH -> "MM/yyyy"
-            Interval.YEAR -> "yyyy"
+            Interval.DAY, Interval.WEEK -> SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)
+            Interval.MONTH -> SimpleDateFormat("LLL yyyy", Locale.getDefault())
+            Interval.YEAR -> SimpleDateFormat("yyyy", Locale.getDefault())
             Interval.LIFETIME -> throw IllegalStateException("Interval not valid as a chart display interval")
         }
-        val dateString = SimpleDateFormat(dateFormat, Locale.getDefault()).format(rangeStart.time)
+        val dateString = dateFormat.format(rangeStart.time)
         binding.chartName.text = context.resources.getQuantityString(R.plurals.chart_title, entries.size, dateString, entries.size)
         binding.chartName.setOnClickListener { view ->
             val popupMenu = PopupMenu(context, view, Gravity.END)
