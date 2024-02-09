@@ -1,0 +1,10 @@
+– Log gode og dårlige vaner (f.eks. træning, rygning, alkoholindtag...)
+– Log hvornår du sidst gjorde noget (f.eks. vandede dine planter, skiftede sengetøj, lavede nummer to...)
+– Tæl dine liv i MtG
+
+Funktioner:
+– Gemmer dato og tidspunkt for hver gang hver individuelle tæller forøges.
+– Laver en graf over dine data og regner statistik over dem.
+– Lader dig eksportere dine data (f.eks. for at analysere dem med andre værktøjer).
+– Dine data bliver aldrig sendt til en server (undtagen Google's app backup, hvis det er slået til).
+– Skide enkel og vil forblive sådan.
