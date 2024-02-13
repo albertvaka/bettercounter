@@ -1,6 +1,6 @@
 # BetterCounter
 
-<img src="app/src/main/res/mipmap-xhdpi/ic_launcher.png" width="64">
+<img alt="BetterCounter icon" src="app/src/main/res/mipmap-xhdpi/ic_launcher.png" width="64">
  
 ###  A multi-purpose counter app
 
@@ -23,4 +23,4 @@
 
 ### Screens
 
-<img src="screenshot.png" width="300">
+<img alt="BetterCounter screenshot" src="screenshot.png" width="300">

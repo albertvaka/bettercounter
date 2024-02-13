@@ -43,7 +43,6 @@
     <string name="undo">撤销</string>
     <string name="reset">仅重置数据，不删除</string>
     <plurals name="chart_title">
-        <item quantity="one">%1$s (%2$d 次)</item>
         <item quantity="other">%1$s (%2$d 次)</item>
     </plurals>
     <string name="fake_example_title">去慢跑</string>

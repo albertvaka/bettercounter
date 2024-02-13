@@ -139,7 +139,7 @@ class ChartHolder(
     }
 
     private fun getAverageStringPerDay(count: Int, startDate: Date, endDate: Date): String {
-        var days = ChronoUnit.DAYS.count(startDate, endDate)
+        val days = ChronoUnit.DAYS.count(startDate, endDate)
         val avgPerDay = count.toFloat() / days
         return if (avgPerDay > 1) {
             context.getString(R.string.stats_average_per_day, avgPerDay)
@@ -149,7 +149,7 @@ class ChartHolder(
     }
 
     private fun getAverageStringPerHour(count: Int, startDate: Date, endDate: Date): String {
-        var hours = ChronoUnit.HOURS.count(startDate, endDate)
+        val hours = ChronoUnit.HOURS.count(startDate, endDate)
         val avgPerHour = count.toFloat() / hours
         return if (avgPerHour > 1) {
             context.getString(R.string.stats_average_per_hour, avgPerHour)

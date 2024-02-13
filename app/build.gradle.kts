@@ -23,7 +23,7 @@ android {
 
         javaCompileOptions {
             annotationProcessorOptions {
-                argument("room.schemaLocation", "$projectDir/schemas".toString())
+                argument("room.schemaLocation", "$projectDir/schemas")
             }
         }
     }
