@@ -1,7 +1,7 @@
 Úsala para lo que quieras:
 - Seguimiento de hábitos, buenos o malos (por ejemplo: hacer deporte, fumar, beber alcohol...)
 - Recordar cuándo fue la última vez que hiciste algo (por ejemplo: regar las plantas, cambiar las sábanas...)
-- Contar vidas en una partida de Màgic
+- Contar vidas en una partida de Magic
 
 Funciones principales:
 - Crea contadores con distintos nombres y colores
