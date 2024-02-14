@@ -1,0 +1,11 @@
+Úsala para lo que quieras:
+- Seguimiento de hábitos, buenos o malos (por ejemplo: hacer deporte, fumar, beber alcohol...)
+- Recordar cuándo fue la última vez que hiciste algo (por ejemplo: regar las plantas, cambiar las sábanas...)
+- Contar vidas en una partida de Magic
+
+Funciones principales:
+- Crea contadores con distintos nombres y colores
+- Visualiza el histórico de cada contador
+- Exporta los datos
+- Tus datos nunca salen de tu dispositivo (exceptuando, si están activadas, las copias de seguridad de Google)
+- Una app muy sencilla, que seguirá siendo así
