@@ -3,12 +3,13 @@ package org.kde.bettercounter.ui
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.text.format.DateFormat
 import java.util.Calendar
 
 fun showDateTimePicker(context: Context, initialDateTime: Calendar, callback: (Calendar) -> Unit) {
     val initialHour = initialDateTime.get(Calendar.HOUR_OF_DAY)
     val initialMinute = initialDateTime.get(Calendar.MINUTE)
-    val use24HourClock = true
+    val use24HourClock = DateFormat.is24HourFormat(context)
     showDatePicker(context, initialDateTime) { cal ->
         TimePickerDialog(context, { _, hour, minute ->
             cal.set(Calendar.MINUTE, minute)
