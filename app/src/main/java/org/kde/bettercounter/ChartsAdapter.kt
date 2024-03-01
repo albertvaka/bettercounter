@@ -6,8 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.databinding.FragmentChartBinding
 import org.kde.bettercounter.extensions.addInterval
+import org.kde.bettercounter.extensions.between
 import org.kde.bettercounter.extensions.copy
 import org.kde.bettercounter.extensions.count
+import org.kde.bettercounter.extensions.toCalendar
 import org.kde.bettercounter.extensions.truncate
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
@@ -19,7 +21,8 @@ class ChartsAdapter(
     private val viewModel: ViewModel,
     private val counter: CounterSummary,
     private val interval: Interval,
-    private val onIntervalChange: (Interval) -> Unit
+    private val onIntervalChange: (Interval) -> Unit,
+    private val onDateChange: ChartsAdapter.(Calendar) -> Unit,
 ) : RecyclerView.Adapter<ChartHolder>() {
     private val boundViewHolders = mutableListOf<ChartHolder>()
 
@@ -42,7 +45,7 @@ class ChartsAdapter(
             rangeStart.time,
             rangeEnd.time
         ).observe(activity) { entries ->
-            holder.onBind(counter, entries, interval, rangeStart, rangeEnd, onIntervalChange)
+            holder.onBind(counter, entries, interval, rangeStart, rangeEnd, onIntervalChange) { this.onDateChange(it) }
         }
     }
 
@@ -55,6 +58,17 @@ class ChartsAdapter(
         cal.truncate(interval)
         cal.addInterval(interval, position)
         return cal
+    }
+
+    fun findPositionForRangeStart(cal: Calendar): Int {
+        val endRange = counter.leastRecent
+        if (endRange != null) {
+            val endCal = endRange.toCalendar()
+            endCal.truncate(interval)
+            val count = interval.toChronoUnit().between(endCal, cal).toInt()
+            return count.coerceIn(0, numCharts-1)
+        }
+        return 0
     }
 
     override fun onViewRecycled(holder: ChartHolder) {

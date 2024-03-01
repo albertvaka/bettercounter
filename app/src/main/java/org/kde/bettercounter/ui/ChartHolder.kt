@@ -25,7 +25,7 @@ class ChartHolder(
         binding.chart.setup()
     }
 
-    fun onBind(counter: CounterSummary, entries: List<Entry>, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, onIntervalChange: (Interval) -> Unit) {
+    fun onBind(counter: CounterSummary, entries: List<Entry>, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, onIntervalChange: (Interval) -> Unit, onDateChange: (Calendar) -> Unit) {
         // Chart name
         val dateFormat = when (interval) {
             Interval.DAY, Interval.WEEK -> SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)
@@ -58,6 +58,10 @@ class ChartHolder(
             }
             popupMenu.menu.findItem(selectedItem).isChecked = true
             popupMenu.show()
+        }
+        binding.chartName.setOnLongClickListener {
+            showDatePicker(context, rangeStart, onDateChange)
+            true
         }
 
         // Only show a goal line if the displayed interval is larger than the counter's

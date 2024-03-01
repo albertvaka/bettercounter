@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
         var sheetUnfoldedPadding = 0 // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
         // Hack so the size of the sheet is known from the beginning, since we only compute it once.
-        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Interval.DAY, 0, CounterColor(0), 0, 0, null, null), Interval.DAY) {}
+        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Interval.DAY, 0, CounterColor(0), 0, 0, null, null), Interval.DAY, {}, {})
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 sheetUnfoldedPadding = binding.bottomSheet.height + 50
@@ -114,10 +114,16 @@ class MainActivity : AppCompatActivity() {
             override fun onSelectedItemUpdated(position: Int, counter: CounterSummary) {
                 binding.detailsTitle.text = counter.name
                 val interval = intervalOverride ?: counter.interval.toChartDisplayableInterval()
-                val adapter = ChartsAdapter(this@MainActivity, viewModel, counter, interval) { newInterval ->
-                    intervalOverride = newInterval
-                    onSelectedItemUpdated(position, counter)
-                }
+                val adapter = ChartsAdapter(this@MainActivity, viewModel, counter, interval,
+                    onIntervalChange = { newInterval ->
+                        intervalOverride = newInterval
+                        onSelectedItemUpdated(position, counter)
+                    },
+                    onDateChange = { newDate ->
+                        val chartPosition = findPositionForRangeStart(newDate)
+                        binding.charts.scrollToPosition(chartPosition)
+                    }
+                )
                 binding.charts.swapAdapter(adapter, true)
                 binding.charts.scrollToPosition(adapter.itemCount - 1) // Select the latest chart
             }
