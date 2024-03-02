@@ -1,6 +1,6 @@
 [versions]
-gradle = "8.2.2"
-kotlin = "1.9.20"
+gradle = "8.3.0"
+kotlin = "1.9.22"
 ksp = "1.9.20-1.0.14"
 coreKtx = "1.12.0"
 lifecycle = "2.7.0"
