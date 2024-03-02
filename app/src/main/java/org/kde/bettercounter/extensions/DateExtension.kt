@@ -8,3 +8,11 @@ fun Date.toCalendar(): Calendar {
     cal.time = this
     return cal
 }
+
+fun max(a: Date, b: Date): Date {
+    return if (a.time > b.time) a else b
+}
+
+fun min(a: Date, b: Date): Date {
+    return if (a.time < b.time) a else b
+}

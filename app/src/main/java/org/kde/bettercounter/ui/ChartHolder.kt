@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
 import org.kde.bettercounter.extensions.count
+import org.kde.bettercounter.extensions.max
+import org.kde.bettercounter.extensions.min
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
@@ -117,24 +119,11 @@ class ChartHolder(
         rangeEnd.add(Calendar.MINUTE, -1)
 
         val firstEntryDate = counter.leastRecent!!
-        val hasEntriesInPreviousPeriods = (firstEntryDate < rangeStart.time)
-        val startDate = if (hasEntriesInPreviousPeriods) {
-            // Use the period start as the start date
-            rangeStart.time
-        } else {
-            // Use the firstEntry as the start date
-            firstEntryDate
-        }
-
         val lastEntryDate = counter.mostRecent!!
         val now = Calendar.getInstance().time
-        val hasEntriesInFuturePeriods = (lastEntryDate > rangeEnd.time)
-        val hasEntriesInTheFuture = (lastEntryDate > now)
-        val endDate = when {
-            hasEntriesInFuturePeriods -> rangeEnd.time // Use the period end as the end date
-            hasEntriesInTheFuture -> lastEntryDate // Use lastEntry as the end date
-            else -> now // Use now as the end date
-        }
+
+        val startDate = max(rangeStart.time, min(firstEntryDate, now))
+        val endDate = min(rangeEnd.time, max(lastEntryDate, now))
 
         return when (counter.interval) {
             Interval.DAY -> getAverageStringPerHour(intervalEntries.size, startDate, endDate)
