@@ -28,7 +28,7 @@
     <string name="stats_average_every_hours">cada %1$.2f horas"</string>
     <string name="stats_average_per_day">%1$.2f veces al día"</string>
     <string name="stats_average_n_a">N/A"</string>
-    <string name="stats_average_every_days">cada %1$.2f díass"</string>
+    <string name="stats_average_every_days">cada %1$.2f días"</string>
     <string name="stats_averages">Media: %1$s, de por vida: %2$s</string>
     <string name="stats_averages_multiline">Media: %1$s\nDe por vida: %2$s</string>
     <string name="no_data">No hay entradas en este período</string>
