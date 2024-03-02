@@ -1,0 +1,30 @@
+4.4.1:
+* Fixes calculating the averages.
+
+4.4:
+* Long tap the cart title to jump to a specific date.
+
+4.1:
+* Format dates with the device's locale.
+
+4.0:
+* Set goals for your counters.
+
+3.1:
+* Click on a chart title to temporarily change the time interval of the chart.
+
+3.0:
+* Added widgets
+* Improved accessibility.
+
+2.5:
+* Counters can be reset.
+
+2.4:
+* Per-app language in Android 13+.
+
+2.3:
+* Support for importing counters.
+
+2.2:
+* Adds an undo button after decreasing a counter.
