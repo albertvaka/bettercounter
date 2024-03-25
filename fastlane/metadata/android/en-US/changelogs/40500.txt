@@ -1,0 +1,20 @@
+4.5:
+* Allow using the keyboard to enter goal numbers.
+
+4.4.1:
+* Fixes calculating the averages.
+
+4.4:
+* Long tap the chart title to jump to a specific date.
+
+4.1:
+* Format dates with the device's locale.
+
+4.0:
+* Set goals for your counters.
+
+3.1:
+* Click on a chart title to temporarily change the time interval of the chart.
+
+3.0:
+* Added widgets.
