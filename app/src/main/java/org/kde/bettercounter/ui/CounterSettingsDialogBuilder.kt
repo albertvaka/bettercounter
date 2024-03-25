@@ -8,6 +8,7 @@ import android.view.WindowManager.LayoutParams
 import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.textfield.TextInputLayout
 import org.kde.bettercounter.ColorAdapter
@@ -75,6 +76,18 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
             updateGoalText()
         }
 
+        binding.goalInput.addTextChangedListener {
+            goal = it.toString().toIntOrNull() ?: 0
+            if (goal == 0) {
+                it?.clear()
+            }
+            binding.goalInput.isCursorVisible = binding.goalInput.hasFocus() && (goal != 0)
+        }
+
+        binding.goalInput.setOnFocusChangeListener { _, hasFocus ->
+            binding.goalInput.isCursorVisible = hasFocus && (goal != 0)
+        }
+
         builder.setPositiveButton(R.string.save, null)
         builder.setNegativeButton(R.string.cancel, null)
     }
@@ -83,7 +96,7 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
         if (goal > 0) {
             binding.goalInput.setText(goal.toString())
         } else {
-            binding.goalInput.setText("Ø")
+            binding.goalInput.text?.clear() // will show the hint, which is "Ø"
         }
     }
 
