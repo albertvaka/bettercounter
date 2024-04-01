@@ -18,8 +18,6 @@
         <!-- Overflow menu backgound -->
         <item name="colorSurfaceContainer">@color/colorDarkBackground</item>
 
-        <!-- Dialog background -->
-        <item name="colorBackgroundFloating">@color/colorLightBackground</item>
 
         <!-- FAB -->
         <item name="colorPrimaryContainer">@color/colorAccent</item>
@@ -27,6 +25,20 @@
 
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
+    </style>
+
+    <!-- MaterialDialog (used in CounterSettingsDialog and the import/export progress dialogs) -->
+    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
+        <item name="android:background">@color/colorLightBackground</item>
+    </style>
+    <style name="MaterialAlertDialog.App" parent="MaterialAlertDialog.Material3">
+        <item name="shapeAppearance">@style/ShapeAppearance.App.MediumComponent</item>
+        <item name="shapeAppearanceOverlay">@null</item>
+    </style>
+    <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerSize">8dp</item>
     </style>
 
     <style name="Divider">

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import org.kde.bettercounter.ColorAdapter
 import org.kde.bettercounter.IntervalAdapter
@@ -23,7 +24,7 @@ import org.kde.bettercounter.persistence.Interval
 
 class CounterSettingsDialogBuilder(private val context: Context, private val viewModel: ViewModel) {
 
-    private val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+    private val builder = MaterialAlertDialogBuilder(context)
     private val binding: CounterSettingsBinding = CounterSettingsBinding.inflate(LayoutInflater.from(context))
     private val intervalAdapter = IntervalAdapter(context)
     private val colorAdapter = ColorAdapter(context)

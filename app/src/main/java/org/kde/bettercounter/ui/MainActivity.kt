@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.ChartsAdapter
 import org.kde.bettercounter.EntryListViewAdapter
@@ -187,7 +188,7 @@ class MainActivity : AppCompatActivity() {
                 var hasImported = false
 
                 val progressDialogBinding = ProgressDialogBinding.inflate(layoutInflater)
-                val dialog = AlertDialog.Builder(this)
+                val dialog = MaterialAlertDialogBuilder(this)
                     .setView(progressDialogBinding.root)
                     .setCancelable(false)
                     .setOnDismissListener {
@@ -228,7 +229,7 @@ class MainActivity : AppCompatActivity() {
             contentResolver.openOutputStream(uri)?.let { stream ->
 
                 val progressDialogBinding = ProgressDialogBinding.inflate(layoutInflater)
-                val dialog = AlertDialog.Builder(this)
+                val dialog = MaterialAlertDialogBuilder(this)
                     .setView(progressDialogBinding.root)
                     .setCancelable(false)
                     .create()
@@ -284,7 +285,7 @@ class MainActivity : AppCompatActivity() {
                     binding.fab.visibility = View.VISIBLE
                 }
                 .setOnDeleteListener { _, _ ->
-                    AlertDialog.Builder(this)
+                    MaterialAlertDialogBuilder(this)
                         .setTitle(counter.name)
                         .setMessage(R.string.delete_confirmation)
                         .setNeutralButton(R.string.reset) { _, _ ->
