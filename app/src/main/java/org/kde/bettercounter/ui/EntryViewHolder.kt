@@ -1,8 +1,10 @@
 package org.kde.bettercounter.ui
 
+import android.app.Activity
 import android.content.Context
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
@@ -14,7 +16,7 @@ import org.kde.bettercounter.persistence.Tutorial
 import java.util.Calendar
 
 class EntryViewHolder(
-    private val context: Context,
+    private val activity: AppCompatActivity,
     val binding: FragmentEntryBinding,
     private var viewModel: ViewModel,
     private val touchHelper: ItemTouchHelper,
@@ -27,7 +29,7 @@ class EntryViewHolder(
             viewModel.incrementCounter(counter.name)
             if (!viewModel.isTutorialShown(Tutorial.PICKDATE)) {
                 viewModel.setTutorialShown(Tutorial.PICKDATE)
-                SimpleTooltip.Builder(context)
+                SimpleTooltip.Builder(activity)
                     .anchorView(binding.increaseButton)
                     .text(R.string.tutorial_pickdate)
                     .gravity(Gravity.BOTTOM)
@@ -38,7 +40,7 @@ class EntryViewHolder(
             }
         }
         binding.increaseButton.setOnLongClickListener {
-            showDateTimePicker(context, Calendar.getInstance()) { pickedDateTime ->
+            showDateTimePicker(activity, Calendar.getInstance()) { pickedDateTime ->
                 viewModel.incrementCounter(counter.name, pickedDateTime.time)
             }
             true

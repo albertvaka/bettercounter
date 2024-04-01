@@ -18,6 +18,8 @@
         <!-- Overflow menu backgound -->
         <item name="colorSurfaceContainer">@color/colorDarkBackground</item>
 
+        <!-- TimePicker and DatePicker background -->
+        <item name="colorSurfaceContainerHigh">@color/colorLightBackground</item>
 
         <!-- FAB -->
         <item name="colorPrimaryContainer">@color/colorAccent</item>
@@ -25,6 +27,9 @@
 
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+
+        <item name="materialTimePickerTheme">@style/ThemeOverlay.App.MaterialTimePicker</item>
+        <item name="materialCalendarTheme">@style/ThemeOverlay.App.MaterialCalendar</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
     </style>
 
@@ -32,11 +37,42 @@
     <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
         <item name="android:background">@color/colorLightBackground</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/DialogTitle</item>
     </style>
     <style name="MaterialAlertDialog.App" parent="MaterialAlertDialog.Material3">
         <item name="shapeAppearance">@style/ShapeAppearance.App.MediumComponent</item>
         <item name="shapeAppearanceOverlay">@null</item>
     </style>
+
+    <!-- MaterialCalendar (DatePicker) -->
+    <style name="ThemeOverlay.App.MaterialCalendar" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="materialCalendarStyle">@style/MaterialCalendar.App</item>
+        <item name="materialCalendarHeaderTitle">@style/DialogTitle</item>
+
+    </style>
+    <style name="MaterialCalendar.App" parent="Widget.Material3.MaterialCalendar">
+        <item name="shapeAppearance">@style/ShapeAppearance.App.MediumComponent</item>
+        <item name="shapeAppearanceOverlay">@null</item>
+    </style>
+
+    <!-- MaterialTimePicker -->
+    <!-- Note: I inherit from the Material 2 theme (MaterialComponents.TimePicker) instead of the
+         Material 3 one (Material3.MaterialTimePicker) because the AM/PM selector looks nicer. -->
+    <style name="ThemeOverlay.App.MaterialTimePicker" parent="ThemeOverlay.MaterialComponents.TimePicker">
+        <item name="materialTimePickerStyle">@style/MaterialTimePicker.App</item>
+        <item name="materialTimePickerTitleStyle">@style/DialogTitle</item>
+    </style>
+    <style name="MaterialTimePicker.App" parent="Widget.Material3.MaterialTimePicker">
+        <item name="shapeAppearance">@style/ShapeAppearance.App.MediumComponent</item>
+        <item name="shapeAppearanceOverlay">@null</item>
+    </style>
+
+    <!-- Make titles look the same for all dialogs -->
+    <style name="DialogTitle" parent="@style/MaterialAlertDialog.Material3.Title.Text">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+    </style>
+
+    <!-- Reduce corner radius from the Material 3 default to something less pronounced -->
     <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
         <item name="cornerSize">8dp</item>
     </style>

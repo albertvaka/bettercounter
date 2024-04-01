@@ -1,7 +1,7 @@
 package org.kde.bettercounter.ui
 
-import android.content.Context
 import android.view.Gravity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
@@ -19,7 +19,7 @@ import java.util.Date
 import java.util.Locale
 
 class ChartHolder(
-    private val context: Context,
+    private val activity: AppCompatActivity,
     private val binding: FragmentChartBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -36,9 +36,9 @@ class ChartHolder(
             Interval.LIFETIME -> throw IllegalStateException("Interval not valid as a chart display interval")
         }
         val dateString = dateFormat.format(rangeStart.time)
-        binding.chartName.text = context.resources.getQuantityString(R.plurals.chart_title, entries.size, dateString, entries.size)
+        binding.chartName.text = activity.resources.getQuantityString(R.plurals.chart_title, entries.size, dateString, entries.size)
         binding.chartName.setOnClickListener { view ->
-            val popupMenu = PopupMenu(context, view, Gravity.END)
+            val popupMenu = PopupMenu(activity, view, Gravity.END)
             popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener { menuItem ->
                 menuItem.isChecked = true
@@ -62,7 +62,7 @@ class ChartHolder(
             popupMenu.show()
         }
         binding.chartName.setOnLongClickListener {
-            showDatePicker(context, rangeStart, onDateChange)
+            showDatePicker(activity, rangeStart, onDateChange)
             true
         }
 
@@ -70,14 +70,14 @@ class ChartHolder(
         val goalLine = computeGoalLine(counter, interval)
 
         // Chart
-        binding.chart.setDataBucketized(entries, rangeStart, interval, counter.color.toColorForChart(context), goalLine)
+        binding.chart.setDataBucketized(entries, rangeStart, interval, counter.color.toColorForChart(activity), goalLine)
 
         // Stats
         val periodAverage = getPeriodAverageString(counter, entries, rangeStart, rangeEnd)
         val lifetimeAverage = getLifetimeAverageString(counter)
-        binding.chartAverage.text = context.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
+        binding.chartAverage.text = activity.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
         if (binding.chartAverage.lineCount > 1) {
-            binding.chartAverage.text = context.getString(R.string.stats_averages_multiline, periodAverage, lifetimeAverage)
+            binding.chartAverage.text = activity.getString(R.string.stats_averages_multiline, periodAverage, lifetimeAverage)
         }
     }
 
@@ -97,7 +97,7 @@ class ChartHolder(
 
     private fun getLifetimeAverageString(counter: CounterSummary): String {
         if (counter.totalCount == 0) {
-            return context.getString(R.string.stats_average_n_a)
+            return activity.getString(R.string.stats_average_n_a)
         }
 
         val beginRange = counter.leastRecent!!
@@ -111,7 +111,7 @@ class ChartHolder(
 
     private fun getPeriodAverageString(counter: CounterSummary, intervalEntries: List<Entry>, rangeStart: Calendar, rangeEnd: Calendar): String {
         if (intervalEntries.isEmpty()) {
-            return context.getString(R.string.stats_average_n_a)
+            return activity.getString(R.string.stats_average_n_a)
         }
 
         // Hack so to use the end of this interval and not at the beginning of the next,
@@ -135,9 +135,9 @@ class ChartHolder(
         val days = ChronoUnit.DAYS.count(startDate, endDate)
         val avgPerDay = count.toFloat() / days
         return if (avgPerDay > 1) {
-            context.getString(R.string.stats_average_per_day, avgPerDay)
+            activity.getString(R.string.stats_average_per_day, avgPerDay)
         } else {
-            context.getString(R.string.stats_average_every_days, 1 / avgPerDay)
+            activity.getString(R.string.stats_average_every_days, 1 / avgPerDay)
         }
     }
 
@@ -145,9 +145,9 @@ class ChartHolder(
         val hours = ChronoUnit.HOURS.count(startDate, endDate)
         val avgPerHour = count.toFloat() / hours
         return if (avgPerHour > 1) {
-            context.getString(R.string.stats_average_per_hour, avgPerHour)
+            activity.getString(R.string.stats_average_per_hour, avgPerHour)
         } else {
-            context.getString(R.string.stats_average_every_hours, 1 / avgPerHour)
+            activity.getString(R.string.stats_average_every_hours, 1 / avgPerHour)
         }
     }
 }
