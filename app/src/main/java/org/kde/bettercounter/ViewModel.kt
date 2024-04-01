@@ -237,26 +237,19 @@ class ViewModel(application: Application) {
             message.arg2 = done // -1 -> error, 0 -> wip, 1 -> done
             progressHandler?.sendMessage(message)
         }
-
-        val reusedCounterMetadata = CounterMetadata("", Interval.DEFAULT, 0, CounterColor.getDefault(context))
-
         CoroutineScope(Dispatchers.IO).launch {
             stream.use { stream ->
                 // We read everything into memory before we update the DB so we know there are no errors
-                val entriesToImport: MutableList<Entry> = mutableListOf()
                 val namesToImport: MutableList<String> = mutableListOf()
+                val entriesToImport: MutableList<Entry> = mutableListOf()
                 try {
                     stream.bufferedReader().use { reader ->
                         reader.forEachLine { line ->
-                            val nameAndDates = line.splitToSequence(",").iterator()
-                            val name = nameAndDates.next()
-                            namesToImport.add(name)
-                            nameAndDates.forEach { timestamp ->
-                                entriesToImport.add(Entry(name = name, date = Date(timestamp.toLong())))
-                            }
+                            parseImportLine(line, namesToImport, entriesToImport)
                             sendProgress(namesToImport.size, 0)
                         }
                     }
+                    val reusedCounterMetadata = CounterMetadata("", Interval.DEFAULT, 0, CounterColor.getDefault(context))
                     namesToImport.forEach { name ->
                         if (!counterExists(name)) {
                             reusedCounterMetadata.name = name
@@ -270,6 +263,30 @@ class ViewModel(application: Application) {
                     sendProgress(namesToImport.size, -1)
                 }
             }
+        }
+    }
+
+    companion object {
+        fun parseImportLine(line: String, namesToImport: MutableList<String>, entriesToImport: MutableList<Entry>) {
+            val nameAndDates = line.splitToSequence(",").iterator()
+            var name = nameAndDates.next()
+            var nameEnded = false
+            nameAndDates.forEach { timestamp ->
+                // Hack to support counters with commas in their names
+                val timestampLong = if (nameEnded) {
+                    timestamp.toLong()
+                } else {
+                    val maybeTimestamp = timestamp.toLongOrNull()
+                    if (maybeTimestamp == null || maybeTimestamp < 100000000000L) {
+                        name += ",$timestamp"
+                        return@forEach
+                    }
+                    nameEnded = true
+                    maybeTimestamp
+                }
+                entriesToImport.add(Entry(name = name, date = Date(timestampLong)))
+            }
+            namesToImport.add(name)
         }
     }
 
