@@ -15,6 +15,9 @@
         <item name="android:textColorPrimary">@color/colorAccent</item>
         <item name="colorControlNormal">@color/colorAccent</item>
 
+        <!-- Overflow menu backgound -->
+        <item name="colorSurfaceContainer">@color/colorDarkBackground</item>
+
         <!-- Dialog background -->
         <item name="colorBackgroundFloating">@color/colorLightBackground</item>
 
@@ -26,11 +29,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.PopupMenu" parent="Theme.Material3.Dark" >
-        <!-- ActionBar menu background -->
-        <item name="android:background">@color/colorDarkBackground</item>
-    </style>
-
     <style name="Divider">
         <item name="android:background">@color/colorDarkBackground</item>
     </style>
@@ -38,4 +36,5 @@
         <item name="android:layout_width">@dimen/dividerSpacing</item>
         <item name="android:layout_height">match_parent</item>
     </style>
+
 </resources>
