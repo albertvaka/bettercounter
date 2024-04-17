@@ -1,17 +1,12 @@
 package org.kde.bettercounter.ui
 
-import android.app.Activity
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
-import android.content.Context
 import android.text.format.DateFormat
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.util.Calendar
-import java.util.Date
+import java.util.TimeZone
 
 fun showDateTimePicker(activity: AppCompatActivity, initialDateTime: Calendar, callback: (Calendar) -> Unit) {
     val initialHour = initialDateTime.get(Calendar.HOUR_OF_DAY)
@@ -34,12 +29,14 @@ fun showDateTimePicker(activity: AppCompatActivity, initialDateTime: Calendar, c
 }
 
 fun showDatePicker(activity: AppCompatActivity, initialDateTime: Calendar, callback: (Calendar) -> Unit) {
+    val timezone = TimeZone.getDefault()
+    val initialTime = initialDateTime.timeInMillis + timezone.getOffset(initialDateTime.timeInMillis) // MaterialDatePicker needs UTC
     MaterialDatePicker.Builder.datePicker()
-        .setSelection(initialDateTime.timeInMillis)
+        .setSelection(initialTime)
         .build().apply {
             addOnPositiveButtonClickListener {
                 val cal = Calendar.getInstance()
-                cal.timeInMillis = it
+                cal.timeInMillis = it - timezone.getOffset(it) // MaterialDatePicker returns UTC
                 callback(cal)
             }
         }
