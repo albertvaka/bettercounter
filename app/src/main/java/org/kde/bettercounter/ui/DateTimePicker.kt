@@ -5,6 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import org.kde.bettercounter.extensions.toEpochMilli
+import org.kde.bettercounter.extensions.toLocalDateTime
+import org.kde.bettercounter.extensions.toUTCLocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -30,13 +35,15 @@ fun showDateTimePicker(activity: AppCompatActivity, initialDateTime: Calendar, c
 
 fun showDatePicker(activity: AppCompatActivity, initialDateTime: Calendar, callback: (Calendar) -> Unit) {
     val timezone = TimeZone.getDefault()
-    val initialTime = initialDateTime.timeInMillis + timezone.getOffset(initialDateTime.timeInMillis) // MaterialDatePicker needs UTC
+    // MaterialDatePicker needs UTC, see https://stackoverflow.com/questions/63929730/materialdatepicker-returning-wrong-value/71541489#71541489
+    val initialTime = initialDateTime.timeInMillis.toLocalDateTime().atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toEpochMilli()
     MaterialDatePicker.Builder.datePicker()
         .setSelection(initialTime)
         .build().apply {
             addOnPositiveButtonClickListener {
                 val cal = Calendar.getInstance()
-                cal.timeInMillis = it - timezone.getOffset(it) // MaterialDatePicker returns UTC
+                // MaterialDatePicker returns UTC
+                cal.timeInMillis = it.toUTCLocalDateTime().atZone(ZoneId.systemDefault()).toEpochMilli()
                 callback(cal)
             }
         }
