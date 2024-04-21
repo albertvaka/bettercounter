@@ -1,0 +1,27 @@
+4.6.3:
+* Added Turkish translation.
+* Fixed day names in charts.
+
+4.6.2:
+* Fixed date sometimes being offset by one day when using the selector.
+
+4.6.1:
+* Fixed issues when the week doesn't start in Monday.
+
+4.6:
+* UI improvements.
+
+4.5:
+* Allow using the keyboard to enter goal numbers.
+
+4.4:
+* Long tap the chart title to jump to a specific date.
+
+4.1:
+* Format dates with the device's locale.
+
+4.0:
+* Set goals for your counters.
+
+3.1:
+* Click on a chart title to view a different time interval.
