@@ -160,11 +160,12 @@ class BetterChart : BarChart {
 
     class DayOfWeekFormatter : ValueFormatter() {
         private val dayNames = DateFormatSymbols().shortWeekdays
+        private val firstDayOfWeek = Calendar.getInstance().firstDayOfWeek
         override fun getFormattedValue(value: Float): String {
             // dayNames are meant to be indexed with Calendar.SATURDAY,
             // Calendar.MONDAY, etc. so the range is [1,7] with 1 being Sunday.
             // The range of bucket indices is [0,6] with 0 being Monday.
-            return dayNames[((value.toInt() + 1) % 7) + 1]
+            return dayNames[((firstDayOfWeek + value.toInt() - 1) % 7) + 1]
         }
     }
 
