@@ -1,0 +1,11 @@
+Utilisez-le pour ce que vous voulez :
+- Suivre ses habitudes, bonnes ou mauvaises (ex : faire du sport, fumer, boire de l'alcool...).
+- Se souvenir de la dernière fois que l'on a fait quelque chose (par exemple : arroser les plantes, changer les draps...).
+- Compter les vies dans un jeu de magie
+
+Fonctions principales :
+- Créer des compteurs avec des noms et des couleurs différentes
+- Visualiser l'historique de chaque compteur
+- Exporter des données
+- Vos données ne quittent jamais votre appareil (sauf, si elles sont activées, les sauvegardes Google)
+- Une application très simple, qui le restera.
