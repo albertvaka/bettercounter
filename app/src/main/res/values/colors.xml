@@ -8,14 +8,13 @@
 
     <array name="picker_colors">
         <item>@color/colorLightBackground</item>
-        <item>#2062af</item>
-        <item>#8c47fb</item>
-        <item>#CE6767</item>
-        <item>#9086BA</item>
-        <item>#58AEB7</item>
-        <item>#DD3E48</item>
-        <item>#BF89AE</item>
-        <item>#5C88BE</item>
-        <item>#59BC10</item>
+        <item>#1B5496</item>
+        <item>#6232B0</item>
+        <item>#833434</item>
+        <item>#67506F</item>
+        <item>#0A616C</item>
+        <item>#AB1E27</item>
+        <item>#8D1E6A</item>
+        <item>#085816</item>
     </array>
 </resources>
