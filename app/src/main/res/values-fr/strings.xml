@@ -6,7 +6,7 @@
     <string name="decrease">Diminuer</string>
     <string name="increase">Augmenter</string>
     <string name="never">Jamais</string>
-    <string name="add_counter">Ajout d'un compteur</string>
+    <string name="add_counter">Ajout d\'un compteur</string>
     <string name="cancel">Annuler</string>
     <string name="save">Sauvegarder</string>
     <string name="edit_counter">Editer un compteur</string>
@@ -23,7 +23,7 @@
     <string name="time_in_dhm">Dans %1$dd %2$dh %3$dm</string>
     <string name="time_in_hm">Dans %1$dh %2$dm</string>
     <string name="time_in_m">Dans %1$dm</string>
-    <string name="just_now">A l'instant</string>
+    <string name="just_now">A l\'instant</string>
     <string name="stats_averages">Moyenne: %1$s, vie entière: %2$s</string>
     <string name="stats_averages_multiline">Moyenne: %1$s\nVie entière: %2$s</string>
     <string name="stats_average_per_hour">%1$.2f fois par heure</string>
@@ -46,11 +46,11 @@
     </plurals>
     <string name="decreased_entry">Diminution de \"%1$s\"</string>
     <string name="undo">Annuler</string>
-    <string name="import_error">Erreur : le format n'est pas correct</string>
+    <string name="import_error">Erreur : le format n\'est pas correct</string>
     <string name="reset">Réinitialiser les données</string>
     <string name="fake_example_title">Salir a correr</string>
-    <string name="app_widget_description">Ajouter un compteur à l'écran principal</string>
-    <string name="no_counters">Il n'y a pas de compteur</string>
+    <string name="app_widget_description">Ajouter un compteur à l\'écran principal</string>
+    <string name="no_counters">Il n\'y a pas de compteur</string>
     <string name="color_hint">Couleur %1$d</string>
     <string name="display_interval">Intervalle à afficher</string>
     <string name="goal">Objetifs</string>
