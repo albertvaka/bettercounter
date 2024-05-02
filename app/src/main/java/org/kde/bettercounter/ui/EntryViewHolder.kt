@@ -1,13 +1,13 @@
 package org.kde.bettercounter.ui
 
-import android.app.Activity
-import android.content.Context
+
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip.OnDismissListener
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.FragmentEntryBinding
@@ -23,20 +23,26 @@ class EntryViewHolder(
     private val onClickListener: (counter: CounterSummary) -> Unit?,
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    fun showPickDateTutorial(onDismissListener: OnDismissListener? = null) {
+        SimpleTooltip.Builder(activity)
+            .anchorView(binding.increaseButton)
+            .text(R.string.tutorial_pickdate)
+            .gravity(Gravity.BOTTOM)
+            .animated(true)
+            .focusable(true) // modal requires focusable
+            .modal(true)
+            .onDismissListener(onDismissListener)
+            .build()
+            .show()
+    }
+
     fun onBind(counter: CounterSummary) {
         binding.root.setBackgroundColor(counter.color.colorInt)
         binding.increaseButton.setOnClickListener {
             viewModel.incrementCounter(counter.name)
-            if (!viewModel.isTutorialShown(Tutorial.PICKDATE)) {
-                viewModel.setTutorialShown(Tutorial.PICKDATE)
-                SimpleTooltip.Builder(activity)
-                    .anchorView(binding.increaseButton)
-                    .text(R.string.tutorial_pickdate)
-                    .gravity(Gravity.BOTTOM)
-                    .animated(true)
-                    .modal(true)
-                    .build()
-                    .show()
+            if (!viewModel.isTutorialShown(Tutorial.PICK_DATE)) {
+                viewModel.setTutorialShown(Tutorial.PICK_DATE)
+                showPickDateTutorial()
             }
         }
         binding.increaseButton.setOnLongClickListener {

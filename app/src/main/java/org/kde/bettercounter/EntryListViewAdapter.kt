@@ -10,12 +10,14 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip.OnDismissListener
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
 import org.kde.bettercounter.ui.EntryViewHolder
-import java.util.*
+import java.util.Collections
+import java.util.Date
 
 private const val TAG = "EntryListAdapter"
 
@@ -133,15 +135,25 @@ class EntryListViewAdapter(
         super.onViewAttachedToWindow(holder)
         if (counters.size > 1 && !viewModel.isTutorialShown(Tutorial.DRAG)) {
             viewModel.setTutorialShown(Tutorial.DRAG)
-            SimpleTooltip.Builder(activity)
-                .anchorView(holder.binding.countText)
-                .text(R.string.tutorial_drag)
-                .gravity(Gravity.BOTTOM)
-                .animated(true)
-                .modal(true)
-                .build()
-                .show()
+            showDragTutorial(holder)
         }
+    }
+
+    fun showDragTutorial(holder: EntryViewHolder, onDismissListener: OnDismissListener? = null) {
+        SimpleTooltip.Builder(activity)
+            .anchorView(holder.binding.countText)
+            .text(R.string.tutorial_drag)
+            .gravity(Gravity.BOTTOM)
+            .animated(true)
+            .focusable(true) // modal requires focusable
+            .modal(true)
+            .onDismissListener(onDismissListener)
+            .build()
+            .show()
+    }
+
+    fun showPickDateTutorial(holder: EntryViewHolder, onDismissListener: OnDismissListener? = null) {
+        holder.showPickDateTutorial(onDismissListener)
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {

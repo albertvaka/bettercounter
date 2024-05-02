@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.ChartsAdapter
 import org.kde.bettercounter.EntryListViewAdapter
@@ -165,17 +166,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+        when (item.itemId) {
             R.id.export_csv -> {
                 exportFilePicker.launch(CreateFileParams("text/csv", "bettercounter-export.csv"))
-                true
             }
             R.id.import_csv -> {
                 importFilePicker.launch(OpenFileParams("text/*"))
-                true
             }
-            else -> super.onOptionsItemSelected(item)
+            R.id.show_tutorial -> {
+                if (viewModel.getCounterList().isEmpty()) {
+                    Snackbar.make(binding.recycler, getString(R.string.no_counters), Snackbar.LENGTH_LONG).show()
+                } else {
+                    binding.recycler.scrollToPosition(0)
+                    val holder = binding.recycler.findViewHolderForAdapterPosition(0) as EntryViewHolder
+                    entryViewAdapter.showDragTutorial(holder) {
+                        entryViewAdapter.showPickDateTutorial(holder)
+                    }
+                }
+            }
+            else -> return super.onOptionsItemSelected(item)
         }
+        return true
     }
 
     private val importFilePicker: ActivityResultLauncher<OpenFileParams> = registerForActivityResult(

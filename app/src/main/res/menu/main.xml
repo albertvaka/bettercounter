@@ -2,4 +2,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/export_csv" android:title="@string/export_csv" />
     <item android:id="@+id/import_csv" android:title="@string/import_csv" />
+    <item android:id="@+id/show_tutorial" android:title="@string/show_tutorial" />
 </menu>

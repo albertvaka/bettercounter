@@ -36,6 +36,7 @@
     <string name="tutorial_drag">Appuyer longuement et faite glisser pour réorganiser</string>
     <string name="export_csv">Exporter les données</string>
     <string name="import_csv">Importer les données</string>
+    <string name="show_tutorial">Afficher le tutoriel</string>
     <string name="exported_n">%1$d/%2$d Compteurs exportés</string>
     <string name="imported_n"> %1$d Compteurs importés</string>
     <string name="delete_confirmation">Êtes-vous sûr de vouloir supprimer ce compteur ?</string>

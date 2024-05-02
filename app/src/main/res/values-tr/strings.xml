@@ -36,6 +36,7 @@
     <string name="tutorial_drag">Yeniden sıralamak için uzun basın ve sürükleyin</string>
     <string name="export_csv">Verileri dışa aktar</string>
     <string name="import_csv">Verileri içe aktar</string>
+    <string name="show_tutorial">Öğreticiyi göster</string>
     <string name="exported_n">1$d/%2$d sayaç dışa aktarıldı</string>
     <string name="imported_n">%1$d sayaç içe aktarıldı</string>
     <string name="import_error">Hata: geçersiz dosya biçimi</string>
