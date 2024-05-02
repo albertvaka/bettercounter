@@ -55,4 +55,5 @@
     <string name="color_hint">Couleur %1$d</string>
     <string name="display_interval">Intervalle à afficher</string>
     <string name="goal">Objetifs</string>
+    <string name="tutorial_change_graph_interval">Appuyer pour modifier l\'intervalle de temps</string>
 </resources>

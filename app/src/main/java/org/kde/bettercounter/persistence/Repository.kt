@@ -52,6 +52,11 @@ class Repository(
         sharedPref.edit().putStringSet(TUTORIALS_PREFS_KEY, tutorials).apply()
     }
 
+    fun resetTutorialShown(id: Tutorial) {
+        tutorials.remove(id.name)
+        sharedPref.edit().putStringSet(TUTORIALS_PREFS_KEY, tutorials).apply()
+    }
+
     fun isTutorialShown(id: Tutorial): Boolean {
         return tutorials.contains(id.name)
     }

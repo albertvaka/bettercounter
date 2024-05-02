@@ -54,4 +54,5 @@
     <string name="color_hint">Farve %1$d</string>
     <string name="display_interval">Visningsinterval</string>
     <string name="goal">Mål</string>
+    <string name="tutorial_change_graph_interval">Tryk for at ændre tidsintervallet</string>
 </resources>

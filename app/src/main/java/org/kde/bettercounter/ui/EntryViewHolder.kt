@@ -1,12 +1,10 @@
 package org.kde.bettercounter.ui
 
 
-import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip.OnDismissListener
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
@@ -22,19 +20,6 @@ class EntryViewHolder(
     private val touchHelper: ItemTouchHelper,
     private val onClickListener: (counter: CounterSummary) -> Unit?,
 ) : RecyclerView.ViewHolder(binding.root) {
-
-    fun showPickDateTutorial(onDismissListener: OnDismissListener? = null) {
-        SimpleTooltip.Builder(activity)
-            .anchorView(binding.increaseButton)
-            .text(R.string.tutorial_pickdate)
-            .gravity(Gravity.BOTTOM)
-            .animated(true)
-            .focusable(true) // modal requires focusable
-            .modal(true)
-            .onDismissListener(onDismissListener)
-            .build()
-            .show()
-    }
 
     fun onBind(counter: CounterSummary) {
         binding.root.setBackgroundColor(counter.color.colorInt)
@@ -77,4 +62,9 @@ class EntryViewHolder(
             binding.decreaseButton.isEnabled = false
         }
     }
+
+    fun showPickDateTutorial(onDismissListener: OnDismissListener? = null) {
+        Tutorial.PICK_DATE.show(activity, binding.increaseButton, onDismissListener)
+    }
+
 }

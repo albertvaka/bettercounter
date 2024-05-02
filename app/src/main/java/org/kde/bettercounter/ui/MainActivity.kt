@@ -18,8 +18,10 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.ChartsAdapter
 import org.kde.bettercounter.EntryListViewAdapter
@@ -84,6 +86,10 @@ class MainActivity : AppCompatActivity() {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     onBackPressedCloseSheetCallback.isEnabled = true
                     sheetIsExpanding = false
+                    if (!viewModel.isTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)) {
+                        viewModel.setTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
+                        showChangeGraphIntervalTutorial()
+                    }
                 } else if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     onBackPressedCloseSheetCallback.isEnabled = false
                     setFabToCreate()
@@ -165,6 +171,13 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    fun showChangeGraphIntervalTutorial(onDismissListener: SimpleTooltip.OnDismissListener? = null) {
+        val adapter = binding.charts.adapter!!
+        binding.charts.scrollToPosition(adapter.itemCount - 1)
+        val holder = binding.charts.findViewHolderForAdapterPosition(adapter.itemCount - 1) as ChartHolder
+        holder.showChangeGraphIntervalTutorial(onDismissListener)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.export_csv -> {
@@ -180,7 +193,10 @@ class MainActivity : AppCompatActivity() {
                     binding.recycler.scrollToPosition(0)
                     val holder = binding.recycler.findViewHolderForAdapterPosition(0) as EntryViewHolder
                     entryViewAdapter.showDragTutorial(holder) {
-                        entryViewAdapter.showPickDateTutorial(holder)
+                        entryViewAdapter.showPickDateTutorial(holder) {
+                            viewModel.resetTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
+                            sheetBehavior.state = STATE_EXPANDED
+                        }
                     }
                 }
             }

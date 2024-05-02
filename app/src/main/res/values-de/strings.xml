@@ -54,4 +54,5 @@
     <string name="color_hint">Farbe %1$d</string>
     <string name="display_interval">Anzeigezeitraum</string>
     <string name="goal">Ziel</string>
+    <string name="tutorial_change_graph_interval">Tippen Sie, um das Zeitintervall zu ändern</string>
 </resources>

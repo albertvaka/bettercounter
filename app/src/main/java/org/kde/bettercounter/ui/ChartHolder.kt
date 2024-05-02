@@ -4,6 +4,7 @@ import android.view.Gravity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
 import org.kde.bettercounter.extensions.count
@@ -12,6 +13,7 @@ import org.kde.bettercounter.extensions.min
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
+import org.kde.bettercounter.persistence.Tutorial
 import java.text.SimpleDateFormat
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
@@ -79,6 +81,10 @@ class ChartHolder(
         if (binding.chartAverage.lineCount > 1) {
             binding.chartAverage.text = activity.getString(R.string.stats_averages_multiline, periodAverage, lifetimeAverage)
         }
+    }
+
+    fun showChangeGraphIntervalTutorial(onDismissListener: SimpleTooltip.OnDismissListener? = null) {
+        Tutorial.CHANGE_GRAPH_INTERVAL.show(activity, binding.chartName, onDismissListener)
     }
 
     private fun computeGoalLine(counter: CounterSummary, displayInterval: Interval): Float {

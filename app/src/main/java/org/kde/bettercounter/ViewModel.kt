@@ -133,6 +133,10 @@ class ViewModel(application: Application) {
         repo.setTutorialShown(id)
     }
 
+    fun resetTutorialShown(id: Tutorial) {
+        repo.resetTutorialShown(id)
+    }
+
     fun isTutorialShown(id: Tutorial): Boolean {
         return repo.isTutorialShown(id)
     }

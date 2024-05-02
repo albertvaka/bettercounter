@@ -54,4 +54,5 @@
     <string name="color_hint">Renk %1$d</string>
     <string name="display_interval">Görüntülenecek aralık</string>
     <string name="goal">Hedef</string>
+    <string name="tutorial_change_graph_interval">Zaman aralığını değiştirmek için dokunun</string>
 </resources>
