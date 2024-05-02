@@ -11,7 +11,6 @@ import org.kde.bettercounter.extensions.toUTCLocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.Calendar
-import java.util.TimeZone
 
 fun showDateTimePicker(activity: AppCompatActivity, initialDateTime: Calendar, callback: (Calendar) -> Unit) {
     val initialHour = initialDateTime.get(Calendar.HOUR_OF_DAY)
@@ -34,7 +33,6 @@ fun showDateTimePicker(activity: AppCompatActivity, initialDateTime: Calendar, c
 }
 
 fun showDatePicker(activity: AppCompatActivity, initialDateTime: Calendar, callback: (Calendar) -> Unit) {
-    val timezone = TimeZone.getDefault()
     // MaterialDatePicker needs UTC, see https://stackoverflow.com/questions/63929730/materialdatepicker-returning-wrong-value/71541489#71541489
     val initialTime = initialDateTime.timeInMillis.toLocalDateTime().atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toEpochMilli()
     MaterialDatePicker.Builder.datePicker()
