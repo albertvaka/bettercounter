@@ -10,7 +10,7 @@ import org.kde.bettercounter.extensions.truncate
 import java.util.Calendar
 import java.util.Date
 
-const val alwaysShowTutorialsInDebugBuilds = true
+const val alwaysShowTutorialsInDebugBuilds = false
 
 const val COUNTERS_PREFS_KEY = "counters"
 const val COUNTERS_INTERVAL_PREFS_KEY = "interval.%s"

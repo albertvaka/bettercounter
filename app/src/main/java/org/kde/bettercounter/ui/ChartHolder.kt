@@ -120,7 +120,7 @@ class ChartHolder(
             return activity.getString(R.string.stats_average_n_a)
         }
 
-        // Hack so to use the end of this interval and not at the beginning of the next,
+        // Use the end of this interval and not at the beginning of the next,
         // so weeks have 7 days and not 8 because of the rounding up we do later.
         rangeEnd.add(Calendar.MINUTE, -1)
 

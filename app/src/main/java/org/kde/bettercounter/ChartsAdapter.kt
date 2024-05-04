@@ -24,6 +24,7 @@ class ChartsAdapter(
     private val onIntervalChange: (Interval) -> Unit,
     private val onDateChange: ChartsAdapter.(Calendar) -> Unit,
 ) : RecyclerView.Adapter<ChartHolder>() {
+
     private val boundViewHolders = mutableListOf<ChartHolder>()
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)

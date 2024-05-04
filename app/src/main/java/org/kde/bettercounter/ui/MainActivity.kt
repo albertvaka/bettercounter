@@ -10,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +19,6 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: ViewModel
     private lateinit var entryViewAdapter: EntryListViewAdapter
     private lateinit var binding: ActivityMainBinding
-    private lateinit var sheetBehavior: BottomSheetBehavior<View>
+    private lateinit var sheetBehavior: BottomSheetBehavior<LinearLayout>
     private var intervalOverride: Interval? = null
     private var sheetIsExpanding = false
     private var onBackPressedCloseSheetCallback = object : OnBackPressedCallback(false) {
@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity() {
                     entryViewAdapter.showDragTutorial(holder) {
                         entryViewAdapter.showPickDateTutorial(holder) {
                             viewModel.resetTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
-                            sheetBehavior.state = STATE_EXPANDED
+                            sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                         }
                     }
                 }

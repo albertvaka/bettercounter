@@ -270,6 +270,18 @@ class ViewModel(application: Application) {
         }
     }
 
+    fun getEntriesForRangeSortedByDate(name: String, since: Date, until: Date): LiveData<List<Entry>> {
+        val ret = MutableLiveData<List<Entry>>()
+        CoroutineScope(Dispatchers.IO).launch {
+            val entries = repo.getEntriesForRangeSortedByDate(name, since, until)
+            //Log.e(TAG, "Queried ${entries.size} entries")
+            CoroutineScope(Dispatchers.Main).launch {
+                ret.value = entries
+            }
+        }
+        return ret
+    }
+
     companion object {
         fun parseImportLine(line: String, namesToImport: MutableList<String>, entriesToImport: MutableList<Entry>) {
             val nameAndDates = line.splitToSequence(",").iterator()
@@ -294,15 +306,4 @@ class ViewModel(application: Application) {
         }
     }
 
-    fun getEntriesForRangeSortedByDate(name: String, since: Date, until: Date): LiveData<List<Entry>> {
-        val ret = MutableLiveData<List<Entry>>()
-        CoroutineScope(Dispatchers.IO).launch {
-            val entries = repo.getEntriesForRangeSortedByDate(name, since, until)
-            //Log.e(TAG, "Queried ${entries.size} entries")
-            CoroutineScope(Dispatchers.Main).launch {
-                ret.value = entries
-            }
-        }
-        return ret
-    }
 }
