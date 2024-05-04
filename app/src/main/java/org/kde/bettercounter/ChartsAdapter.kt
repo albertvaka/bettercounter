@@ -23,6 +23,7 @@ class ChartsAdapter(
     private val interval: Interval,
     private val onIntervalChange: (Interval) -> Unit,
     private val onDateChange: ChartsAdapter.(Calendar) -> Unit,
+    private val onDataDisplayed: () -> Unit,
 ) : RecyclerView.Adapter<ChartHolder>() {
 
     private val boundViewHolders = mutableListOf<ChartHolder>()
@@ -47,7 +48,8 @@ class ChartsAdapter(
             rangeStart.time,
             rangeEnd.time
         ).observe(activity) { entries ->
-            holder.onBind(counter, entries, interval, rangeStart, rangeEnd, onIntervalChange) { this.onDateChange(it) }
+            holder.display(counter, entries, interval, rangeStart, rangeEnd, onIntervalChange) { this.onDateChange(it) }
+            onDataDisplayed()
         }
     }
 

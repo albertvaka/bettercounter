@@ -33,7 +33,6 @@ import org.kde.bettercounter.boilerplate.OpenFileParams
 import org.kde.bettercounter.boilerplate.OpenFileResultContract
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
-import org.kde.bettercounter.persistence.CounterColor
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
@@ -72,8 +71,6 @@ class MainActivity : AppCompatActivity() {
         sheetIsExpanding = false
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
         var sheetUnfoldedPadding = 0 // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
-        // Hack so the size of the sheet is known from the beginning, since we only compute it once.
-        binding.charts.adapter = ChartsAdapter(this, viewModel, CounterSummary("Empty", Interval.DAY, 0, CounterColor(0), 0, 0, null, null), Interval.DAY, {}, {})
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 sheetUnfoldedPadding = binding.bottomSheet.height + 50
@@ -129,6 +126,11 @@ class MainActivity : AppCompatActivity() {
                     onDateChange = { newDate ->
                         val chartPosition = findPositionForRangeStart(newDate)
                         binding.charts.scrollToPosition(chartPosition)
+                    },
+                    onDataDisplayed = {
+                        // Re-triggers calculating the expanded offset, since the height of the sheet
+                        // contents depend on whether the stats take one or two lines of text
+                        sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                     }
                 )
                 binding.charts.swapAdapter(adapter, true)
