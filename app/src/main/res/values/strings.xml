@@ -12,6 +12,7 @@
     <string name="edit_counter">Edit counter</string>
     <string name="delete">Delete</string>
     <string name="delete_or_reset">Delete/Reset</string>
+    <string name="interval_hour">Hourly</string>
     <string name="interval_day">Daily</string>
     <string name="interval_week">Weekly</string>
     <string name="interval_month">Monthly</string>

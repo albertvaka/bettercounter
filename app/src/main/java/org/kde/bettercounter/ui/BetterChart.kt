@@ -101,6 +101,7 @@ class BetterChart : BarChart {
         }
 
         val (numBuckets, bucketIntervalAsCalendarField) = when (totalInterval) {
+            Interval.HOUR -> 60 to Calendar.MINUTE
             Interval.DAY -> 24 to Calendar.HOUR_OF_DAY
             Interval.WEEK -> 7 to Calendar.DAY_OF_WEEK
             Interval.MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH) to Calendar.DAY_OF_MONTH
@@ -148,7 +149,8 @@ class BetterChart : BarChart {
         yAxis.axisMaximum = maxCount.toFloat()
         xAxis.labelCount = series.size
         xAxis.valueFormatter = when (bucketIntervalAsCalendarField) {
-            Calendar.HOUR_OF_DAY -> HourFormatter()
+            Calendar.MINUTE -> RawFormatter()
+            Calendar.HOUR_OF_DAY -> RawFormatter()
             Calendar.DAY_OF_WEEK -> DayOfWeekFormatter()
             Calendar.DAY_OF_MONTH -> MonthDayFormatter()
             Calendar.MONTH -> MonthFormatter(rangeStart)
@@ -189,7 +191,7 @@ class BetterChart : BarChart {
         }
     }
 
-    class HourFormatter : ValueFormatter() {
+    class RawFormatter : ValueFormatter() {
         override fun getFormattedValue(value: Float): String {
             return (value.toInt()).toString()
         }

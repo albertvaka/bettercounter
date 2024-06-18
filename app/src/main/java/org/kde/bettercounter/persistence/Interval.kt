@@ -5,6 +5,7 @@ import org.kde.bettercounter.R
 import java.time.temporal.ChronoUnit
 
 enum class Interval(val humanReadableResource: Int) {
+    HOUR(R.string.interval_hour),
     DAY(R.string.interval_day),
     WEEK(R.string.interval_week),
     MONTH(R.string.interval_month),
@@ -21,6 +22,7 @@ enum class Interval(val humanReadableResource: Int) {
 
     fun toChronoUnit(): ChronoUnit {
         return when (this) {
+            HOUR -> ChronoUnit.HOURS
             DAY -> ChronoUnit.DAYS
             WEEK -> ChronoUnit.WEEKS
             MONTH -> ChronoUnit.MONTHS

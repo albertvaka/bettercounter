@@ -41,6 +41,7 @@ fun Calendar.copy(): Calendar {
 
 fun Calendar.addInterval(interval: Interval, times: Int) {
     when (interval) {
+        Interval.HOUR -> add(Calendar.HOUR_OF_DAY, 1 * times)
         Interval.DAY -> add(Calendar.DAY_OF_YEAR, 1 * times)
         Interval.WEEK -> add(Calendar.DAY_OF_YEAR, 7 * times)
         Interval.MONTH -> add(Calendar.MONTH, 1 * times)

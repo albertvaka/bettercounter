@@ -32,6 +32,7 @@ class ChartHolder(
     fun display(counter: CounterSummary, entries: List<Entry>, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, onIntervalChange: (Interval) -> Unit, onDateChange: (Calendar) -> Unit) {
         // Chart name
         val dateFormat = when (interval) {
+            Interval.HOUR -> SimpleDateFormat.getDateTimeInstance()
             Interval.DAY, Interval.WEEK -> SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)
             Interval.MONTH -> SimpleDateFormat("LLL yyyy", Locale.getDefault())
             Interval.YEAR -> SimpleDateFormat("yyyy", Locale.getDefault())
@@ -45,6 +46,7 @@ class ChartHolder(
             popupMenu.setOnMenuItemClickListener { menuItem ->
                 menuItem.isChecked = true
                 val newInterval = when (menuItem.itemId) {
+                    R.id.hour -> Interval.HOUR
                     R.id.day -> Interval.DAY
                     R.id.week -> Interval.WEEK
                     R.id.month -> Interval.MONTH
@@ -54,6 +56,7 @@ class ChartHolder(
                 return@setOnMenuItemClickListener true
             }
             val selectedItem = when (interval) {
+                Interval.HOUR -> R.id.hour
                 Interval.DAY -> R.id.day
                 Interval.WEEK -> R.id.week
                 Interval.MONTH -> R.id.month
@@ -132,7 +135,7 @@ class ChartHolder(
         val endDate = min(rangeEnd.time, max(lastEntryDate, now))
 
         return when (counter.interval) {
-            Interval.DAY -> getAverageStringPerHour(intervalEntries.size, startDate, endDate)
+            Interval.DAY, Interval.HOUR -> getAverageStringPerHour(intervalEntries.size, startDate, endDate)
             else -> getAverageStringPerDay(intervalEntries.size, startDate, endDate)
         }
     }

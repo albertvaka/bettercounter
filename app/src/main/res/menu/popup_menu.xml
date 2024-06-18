@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
+        <item android:id="@+id/hour" android:title="@string/interval_hour" />
         <item android:id="@+id/day" android:title="@string/interval_day" />
         <item android:id="@+id/week" android:title="@string/interval_week" />
         <item android:id="@+id/month" android:title="@string/interval_month" />
