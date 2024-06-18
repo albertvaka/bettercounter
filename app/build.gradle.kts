@@ -18,8 +18,8 @@ android {
         applicationId = "org.kde.bettercounter"
         minSdk = 21
         targetSdk = 34
-        versionCode = 40800
-        versionName = "4.8.0"
+        versionCode = 40900
+        versionName = "4.9.0"
 
         javaCompileOptions {
             annotationProcessorOptions {
