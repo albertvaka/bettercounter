@@ -14,6 +14,7 @@ import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +23,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.ChartsAdapter
 import org.kde.bettercounter.EntryListViewAdapter
@@ -36,6 +41,8 @@ import org.kde.bettercounter.databinding.ProgressDialogBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -165,6 +172,23 @@ class MainActivity : AppCompatActivity() {
         // For some reason, when the app is installed via Android Studio, the broadcast that
         // refreshes the widgets after installing doesn't trigger. Do it manually here.
         forceRefreshWidgets(this)
+
+        startRefreshEveryHourBoundary()
+    }
+
+    private fun millisecondsUntilNextHour(): Long {
+        val current = LocalDateTime.now()
+        val nextHour = current.truncatedTo(ChronoUnit.HOURS).plusHours(1)
+        return ChronoUnit.MILLIS.between(current, nextHour)
+    }
+
+    private fun startRefreshEveryHourBoundary() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                delay(millisecondsUntilNextHour())
+                viewModel.refreshAllObservers()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

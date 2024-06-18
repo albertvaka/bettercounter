@@ -282,6 +282,12 @@ class ViewModel(application: Application) {
         return ret
     }
 
+    suspend fun refreshAllObservers() {
+        for ((name, summary) in summaryMap) {
+            summary.postValue(repo.getCounterSummary(name))
+        }
+    }
+
     companion object {
         fun parseImportLine(line: String, namesToImport: MutableList<String>, entriesToImport: MutableList<Entry>) {
             val nameAndDates = line.splitToSequence(",").iterator()
