@@ -26,7 +26,6 @@ class Repository(
 
     private var tutorials: MutableSet<String>
     private var counters: List<String>
-    private var counterCache = HashMap<String, CounterSummary>()
 
     init {
         val countersStr = sharedPref.getString(COUNTERS_PREFS_KEY, "[]")
@@ -90,7 +89,6 @@ class Repository(
             .remove(intervalKey)
             .remove(goalKey)
             .apply()
-        counterCache.remove(name)
     }
 
     fun setCounterMetadata(counter: CounterMetadata) {
@@ -102,7 +100,6 @@ class Repository(
             .putString(intervalKey, counter.interval.toString())
             .putInt(goalKey, counter.goal)
             .apply()
-        counterCache.remove(counter.name)
     }
 
     suspend fun getCounterSummary(name: String): CounterSummary {
@@ -115,28 +112,24 @@ class Repository(
         }
         val intervalEndDate = intervalStartDate.copy().apply { addInterval(interval, 1) }
         val firstLastAndCount = entryDao.getFirstLastAndCount(name)
-        return counterCache.getOrPut(name) {
-            CounterSummary(
-                name = name,
-                color = color,
-                interval = interval,
-                goal = goal,
-                lastIntervalCount = entryDao.getCountInRange(name, intervalStartDate.time, intervalEndDate.time),
-                totalCount = firstLastAndCount.count, // entryDao.getCount(name),
-                leastRecent = firstLastAndCount.first, // entryDao.getLeastRecent(name)?.date,
-                mostRecent = firstLastAndCount.last, // entryDao.getMostRecent(name)?.date,
-            )
-        }
+        return CounterSummary(
+            name = name,
+            color = color,
+            interval = interval,
+            goal = goal,
+            lastIntervalCount = entryDao.getCountInRange(name, intervalStartDate.time, intervalEndDate.time),
+            totalCount = firstLastAndCount.count, // entryDao.getCount(name),
+            leastRecent = firstLastAndCount.first, // entryDao.getLeastRecent(name)?.date,
+            mostRecent = firstLastAndCount.last, // entryDao.getMostRecent(name)?.date,
+        )
     }
 
     suspend fun renameCounter(oldName: String, newName: String) {
         entryDao.renameCounter(oldName, newName)
-        counterCache.remove(oldName)
     }
 
     suspend fun addEntry(name: String, date: Date = Calendar.getInstance().time) {
         entryDao.insert(Entry(name = name, date = date))
-        counterCache.remove(name)
     }
 
     suspend fun removeEntry(name: String): Date? {
@@ -144,13 +137,11 @@ class Repository(
         if (entry != null) {
             entryDao.delete(entry)
         }
-        counterCache.remove(name)
         return entry?.date
     }
 
     suspend fun removeAllEntries(name: String) {
         entryDao.deleteAll(name)
-        counterCache.remove(name)
     }
 
     suspend fun getEntriesForRangeSortedByDate(name: String, since: Date, until: Date): List<Entry> {
@@ -162,6 +153,5 @@ class Repository(
 
     suspend fun bulkAddEntries(entries: List<Entry>) {
         entryDao.bulkInsert(entries)
-        counterCache.clear() // we don't know what changed
     }
 }
