@@ -9,7 +9,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewTreeObserver
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -77,13 +76,7 @@ class MainActivity : AppCompatActivity() {
 
         sheetIsExpanding = false
         val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
-        var sheetUnfoldedPadding = 0 // padding to fit the bottomSheet. We read it once and assume all sheets are going to be the same height
-        binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                sheetUnfoldedPadding = binding.bottomSheet.height + 50
-                binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })
+        var sheetUnfoldedPadding = sheetFoldedPadding // padding to fit the bottomSheet, to be updated later
 
         sheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -103,8 +96,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 if (!sheetIsExpanding) { // only do this when collapsing. when expanding we set the final padding at once so smoothScrollToPosition can do its job
-                    val bottomPadding =
-                        sheetFoldedPadding + ((1.0 + slideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
+                    val bottomPadding = sheetFoldedPadding + ((1.0 + slideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
                     binding.recycler.setPadding(0, 0, 0, bottomPadding)
                 }
             }
@@ -138,6 +130,9 @@ class MainActivity : AppCompatActivity() {
                         // Re-triggers calculating the expanded offset, since the height of the sheet
                         // contents depend on whether the stats take one or two lines of text
                         sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                        sheetUnfoldedPadding = binding.bottomSheet.height + 50
+                        binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
+                        binding.recycler.smoothScrollToPosition(position)
                     }
                 )
                 binding.charts.swapAdapter(adapter, true)
@@ -149,8 +144,6 @@ class MainActivity : AppCompatActivity() {
                     onBackPressedCloseSheetCallback.isEnabled = true
                     sheetIsExpanding = true
                 }
-                binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
-                binding.recycler.smoothScrollToPosition(position)
 
                 setFabToEdit(counter)
 
