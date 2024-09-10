@@ -1,0 +1,27 @@
+4.9.3:
+* Fixed crash.
+
+4.9.2:
+* Fixed graphs covering the counter list.
+
+4.9.1:
+* Fixed numbers not refreshing automatically if app was kept open for long.
+
+4.9:
+* Added hourly intervals.
+
+4.8:
+* You can now show an app tutorial from the top right menu.
+
+4.7:
+* Added Turkish and French translation.
+* Changed counter colors to higher contrast ones.
+
+4.6:
+* UI improvements.
+
+4.5:
+* Allow using the keyboard to enter goal numbers.
+
+4.4:
+* Long tap the chart title to jump to a specific date.
