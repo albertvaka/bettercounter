@@ -124,11 +124,13 @@ class EntryListViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val binding = FragmentEntryBinding.inflate(inflater, parent, false)
-        val holder = EntryViewHolder(activity, binding, viewModel, touchHelper) { counter ->
-            currentSelectedCounterName = counter.name
-            listObserver.onItemSelected(counters.indexOf(counter.name), counter)
-        }
+        val holder = EntryViewHolder(activity, binding, viewModel, touchHelper, ::selectCounter)
         return holder
+    }
+
+    fun selectCounter(counter: CounterSummary) {
+        currentSelectedCounterName = counter.name
+        listObserver.onItemSelected(counters.indexOf(counter.name), counter)
     }
 
     override fun onViewAttachedToWindow(holder: EntryViewHolder) {

@@ -84,7 +84,6 @@ class MainActivity : AppCompatActivity() {
                     onBackPressedCloseSheetCallback.isEnabled = true
                     sheetIsExpanding = false
                     if (!viewModel.isTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)) {
-                        viewModel.setTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
                         showChangeGraphIntervalTutorial()
                     }
                 } else if (newState == BottomSheetBehavior.STATE_HIDDEN) {
@@ -191,10 +190,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showChangeGraphIntervalTutorial(onDismissListener: SimpleTooltip.OnDismissListener? = null) {
-        val adapter = binding.charts.adapter!!
+        val adapter = binding.charts.adapter ?: return
         binding.charts.scrollToPosition(adapter.itemCount - 1)
         val holder = binding.charts.findViewHolderForAdapterPosition(adapter.itemCount - 1) as ChartHolder
         holder.showChangeGraphIntervalTutorial(onDismissListener)
+        viewModel.setTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -214,7 +214,17 @@ class MainActivity : AppCompatActivity() {
                     entryViewAdapter.showDragTutorial(holder) {
                         entryViewAdapter.showPickDateTutorial(holder) {
                             viewModel.resetTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
-                            sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                            if (sheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                                // Re-trigger the tutorial on the selected counter
+                                showChangeGraphIntervalTutorial()
+                            } else {
+                                // Select the first counter
+                                val firstCounterName = viewModel.getCounterList().firstOrNull()
+                                    ?: return@showPickDateTutorial
+                                val counter = viewModel.getCounterSummary(firstCounterName).value
+                                    ?: return@showPickDateTutorial
+                                entryViewAdapter.selectCounter(counter)
+                            }
                         }
                     }
                 }
