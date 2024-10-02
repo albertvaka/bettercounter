@@ -1,5 +1,6 @@
 package org.kde.bettercounter.ui
 
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
@@ -14,6 +15,7 @@ import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
+import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.persistence.CounterSummary
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -24,6 +26,36 @@ private const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"
 private const val TAG = "WidgetProvider"
 
 class WidgetProvider : AppWidgetProvider() {
+
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        scheduleHourlyUpdate(context)
+    }
+
+    override fun onDisabled(context: Context) {
+        super.onDisabled(context)
+        cancelHourlyUpdate(context)
+    }
+
+    private fun scheduleHourlyUpdate(context: Context) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AppWidgetProvider::class.java)
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        alarmManager.setRepeating(
+            AlarmManager.RTC,
+            millisecondsUntilNextHour(),
+            AlarmManager.INTERVAL_HOUR,
+            pendingIntent
+        )
+    }
+
+    private fun cancelHourlyUpdate(context: Context) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, WidgetProvider::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        alarmManager.cancel(pendingIntent)
+    }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         val viewModel = (context.applicationContext as BetterApplication).viewModel

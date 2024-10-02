@@ -1,5 +1,6 @@
 package org.kde.bettercounter.extensions
 
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
@@ -31,4 +32,10 @@ fun ChronoUnit.toCalendarField(): Int {
         ChronoUnit.YEARS -> Calendar.YEAR
         else -> throw UnsupportedOperationException("$this can't be converted to Calendar field")
     }
+}
+
+fun millisecondsUntilNextHour(): Long {
+    val current = LocalDateTime.now()
+    val nextHour = current.truncatedTo(ChronoUnit.HOURS).plusHours(1)
+    return ChronoUnit.MILLIS.between(current, nextHour)
 }

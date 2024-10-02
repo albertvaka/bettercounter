@@ -37,11 +37,10 @@ import org.kde.bettercounter.boilerplate.OpenFileParams
 import org.kde.bettercounter.boilerplate.OpenFileResultContract
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
+import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -166,12 +165,6 @@ class MainActivity : AppCompatActivity() {
         forceRefreshWidgets(this)
 
         startRefreshEveryHourBoundary()
-    }
-
-    private fun millisecondsUntilNextHour(): Long {
-        val current = LocalDateTime.now()
-        val nextHour = current.truncatedTo(ChronoUnit.HOURS).plusHours(1)
-        return ChronoUnit.MILLIS.between(current, nextHour)
     }
 
     private fun startRefreshEveryHourBoundary() {
