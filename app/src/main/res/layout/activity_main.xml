@@ -73,4 +73,12 @@
         app:layout_anchorGravity="top|end"
         app:srcCompat="@drawable/ic_add" />
 
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/snackbar"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_gravity="top"
+        app:layout_anchor="@+id/fab"
+        app:layout_anchorGravity="top" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

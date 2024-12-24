@@ -16,13 +16,14 @@ import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
 import org.kde.bettercounter.ui.EntryViewHolder
+import org.kde.bettercounter.ui.MainActivity
 import java.util.Collections
 import java.util.Date
 
 private const val TAG = "EntryListAdapter"
 
 class EntryListViewAdapter(
-    private var activity: AppCompatActivity,
+    private var activity: MainActivity,
     private var viewModel: ViewModel,
     private var listObserver: EntryListObserver,
 
@@ -110,7 +111,7 @@ class EntryListViewAdapter(
 
             override fun onCounterDecremented(counterName: String, oldEntryDate: Date) {
                 Snackbar.make(
-                    recyclerView!!,
+                    activity.binding.snackbar,
                     activity.getString(R.string.decreased_entry, counterName),
                     Snackbar.LENGTH_LONG
                 )

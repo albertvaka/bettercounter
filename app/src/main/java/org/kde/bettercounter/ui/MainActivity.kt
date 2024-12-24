@@ -1,5 +1,6 @@
 package org.kde.bettercounter.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -37,6 +38,7 @@ import org.kde.bettercounter.boilerplate.OpenFileParams
 import org.kde.bettercounter.boilerplate.OpenFileResultContract
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
+import org.kde.bettercounter.extensions.dptoPx
 import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
@@ -46,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ViewModel
     private lateinit var entryViewAdapter: EntryListViewAdapter
-    private lateinit var binding: ActivityMainBinding
+    internal lateinit var binding: ActivityMainBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<LinearLayout>
     private var intervalOverride: Interval? = null
     private var sheetIsExpanding = false
@@ -128,9 +130,9 @@ class MainActivity : AppCompatActivity() {
                         // Re-triggers calculating the expanded offset, since the height of the sheet
                         // contents depend on whether the stats take one or two lines of text
                         sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                        sheetUnfoldedPadding = binding.bottomSheet.height + 50
-                        binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
+                        sheetUnfoldedPadding = binding.bottomSheet.height + 100.dptoPx(this@MainActivity)
                         binding.recycler.smoothScrollToPosition(position)
+                        binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
                     }
                 )
                 binding.charts.swapAdapter(adapter, true)
