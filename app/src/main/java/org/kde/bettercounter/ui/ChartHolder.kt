@@ -105,16 +105,16 @@ class ChartHolder(
     }
 
     private fun getLifetimeAverageString(counter: CounterSummary): String {
-        if (counter.totalCount == 0) {
+        if (counter.totalCount <= 1) {
             return activity.getString(R.string.stats_average_n_a)
         }
 
         val beginRange = counter.leastRecent!!
-        val endRange = counter.latestBetweenNowAndMostRecentEntry()
+        val endRange = counter.mostRecent ?: Calendar.getInstance().time
 
         return when (counter.interval) {
-            Interval.DAY -> getAverageStringPerHour(counter.totalCount, beginRange, endRange)
-            else -> getAverageStringPerDay(counter.totalCount, beginRange, endRange)
+            Interval.DAY -> getAverageStringPerHour(counter.totalCount - 1, beginRange, endRange)
+            else -> getAverageStringPerDay(counter.totalCount - 1, beginRange, endRange)
         }
     }
 
@@ -132,11 +132,18 @@ class ChartHolder(
         val now = Calendar.getInstance().time
 
         val startDate = max(rangeStart.time, min(firstEntryDate, now))
-        val endDate = min(rangeEnd.time, max(lastEntryDate, now))
+        val isPeriodComplete = rangeEnd.time < now // true if we are looking at historical data
+
+        val endDate = if (isPeriodComplete) { rangeEnd.time } else { lastEntryDate }
+        val numCounts = if (isPeriodComplete) { intervalEntries.size } else { intervalEntries.size - 1 }
+
+        if (numCounts == 0) {
+            return activity.getString(R.string.stats_average_n_a)
+        }
 
         return when (counter.interval) {
-            Interval.DAY, Interval.HOUR -> getAverageStringPerHour(intervalEntries.size, startDate, endDate)
-            else -> getAverageStringPerDay(intervalEntries.size, startDate, endDate)
+            Interval.DAY, Interval.HOUR -> getAverageStringPerHour(numCounts, startDate, endDate)
+            else -> getAverageStringPerDay(numCounts, startDate, endDate)
         }
     }
 
