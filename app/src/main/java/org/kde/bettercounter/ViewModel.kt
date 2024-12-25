@@ -2,8 +2,6 @@ package org.kde.bettercounter
 
 import android.app.Application
 import android.content.Context
-import android.os.Handler
-import android.os.Message
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
@@ -207,19 +205,12 @@ class ViewModel(application: Application) {
         repo.setCounterList(list)
     }
 
-    fun exportAll(stream: OutputStream, progressHandler: Handler?) {
-        fun sendProgress(progress: Int) {
-            val message = Message()
-            message.arg1 = progress
-            message.arg2 = repo.getCounterList().size
-            progressHandler?.sendMessage(message)
-        }
-
+    fun exportAll(stream: OutputStream, progressCallback: (progress: Int) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             stream.use {
                 it.bufferedWriter().use { writer ->
                     for ((i, name) in repo.getCounterList().withIndex()) {
-                        sendProgress(i)
+                        progressCallback(i)
                         val entries = repo.getAllEntriesSortedByDate(name)
                         writer.write(name)
                         for (entry in entries) {
@@ -228,29 +219,29 @@ class ViewModel(application: Application) {
                         }
                         writer.write("\n")
                     }
-                    sendProgress(repo.getCounterList().size)
+                    progressCallback(repo.getCounterList().size)
                 }
             }
         }
     }
 
-    fun importAll(context: Context, stream: InputStream, progressHandler: Handler?) {
-        fun sendProgress(progress: Int, done: Int) {
-            val message = Message()
-            message.arg1 = progress
-            message.arg2 = done // -1 -> error, 0 -> wip, 1 -> done
-            progressHandler?.sendMessage(message)
-        }
+    fun importAll(
+        context: Context,
+        stream: InputStream,
+        progressCallback: (progress: Int, status: Int) -> Unit // status: -1 -> error, 0 -> wip, 1 -> done
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
             stream.use { stream ->
                 // We read everything into memory before we update the DB so we know there are no errors
                 val namesToImport: MutableList<String> = mutableListOf()
                 val entriesToImport: MutableList<Entry> = mutableListOf()
+                // Disable all tutorials, they can cause problems when we update all the flows at once
+                Tutorial.entries.forEach { tutorial -> setTutorialShown(tutorial) }
                 try {
                     stream.bufferedReader().use { reader ->
                         reader.forEachLine { line ->
                             parseImportLine(line, namesToImport, entriesToImport)
-                            sendProgress(namesToImport.size, 0)
+                            progressCallback(namesToImport.size, 0)
                         }
                     }
                     val reusedCounterMetadata = CounterMetadata("", Interval.DEFAULT, 0, CounterColor.getDefault(context))
@@ -261,10 +252,13 @@ class ViewModel(application: Application) {
                         }
                     }
                     repo.bulkAddEntries(entriesToImport)
-                    sendProgress(namesToImport.size, 1)
+                    summaryMap.forEach { (name, flow) ->
+                        flow.postValue(repo.getCounterSummary(name))
+                    }
+                    progressCallback(namesToImport.size, 1)
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    sendProgress(namesToImport.size, -1)
+                    progressCallback(namesToImport.size, -1)
                 }
             }
         }

@@ -1,11 +1,7 @@
 package org.kde.bettercounter.ui
 
-import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -43,6 +39,7 @@ import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
@@ -233,41 +230,32 @@ class MainActivity : AppCompatActivity() {
         OpenFileResultContract()
     ) { uri: Uri? ->
         if (uri != null) {
-            contentResolver.openInputStream(uri)?.let { stream ->
+            try {
+                contentResolver.openInputStream(uri)?.let { stream ->
+                    val progressDialogBinding = ProgressDialogBinding.inflate(layoutInflater)
+                    val dialog = MaterialAlertDialogBuilder(this)
+                        .setView(progressDialogBinding.root)
+                        .setCancelable(false)
+                        .create()
+                    dialog.show()
 
-                var hasImported = false
-
-                val progressDialogBinding = ProgressDialogBinding.inflate(layoutInflater)
-                val dialog = MaterialAlertDialogBuilder(this)
-                    .setView(progressDialogBinding.root)
-                    .setCancelable(false)
-                    .setOnDismissListener {
-                        if (hasImported) {
-                            // restart app
-                            val intent = Intent(this, MainActivity::class.java)
-                            this.startActivity(intent)
-                            finishAffinity()
+                    viewModel.importAll(this, stream) { progress, status ->
+                        runOnUiThread {
+                            if (status == -1) {
+                                progressDialogBinding.text.text = getString(R.string.import_error)
+                                dialog.setCancelable(true)
+                            } else {
+                                progressDialogBinding.text.text =
+                                    getString(R.string.imported_n, progress)
+                                if (status == 1) { // we are done
+                                    dialog.setCancelable(true)
+                                }
+                            }
                         }
                     }
-                    .create()
-                dialog.show()
-
-                val progressHandler = Handler(Looper.getMainLooper()) {
-                    if (it.arg2 == -1) {
-                        progressDialogBinding.text.text = getString(R.string.import_error)
-                        dialog.setCancelable(true)
-                    } else {
-                        progressDialogBinding.text.text = getString(R.string.imported_n, it.arg1)
-                        if (it.arg2 == 1) { // we are done
-                            dialog.setCancelable(true)
-                            hasImported = true
-                            // Hide all tutorials
-                            Tutorial.entries.forEach { tuto -> viewModel.setTutorialShown(tuto) }
-                        }
-                    }
-                    true
                 }
-                viewModel.importAll(this, stream, progressHandler)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
@@ -285,15 +273,16 @@ class MainActivity : AppCompatActivity() {
                     .create()
                 dialog.show()
 
-                val progressHandler = Handler(Looper.getMainLooper()) {
-                    progressDialogBinding.text.text =
-                        getString(R.string.exported_n, it.arg1, it.arg2)
-                    if (it.arg1 == it.arg2) {
-                        dialog.setCancelable(true)
+                val total = viewModel.getCounterList().size
+                viewModel.exportAll(stream) { progress ->
+                    runOnUiThread {
+                        progressDialogBinding.text.text =
+                            getString(R.string.exported_n, progress, total)
+                        if (progress == total) {
+                            dialog.setCancelable(true)
+                        }
                     }
-                    true
                 }
-                viewModel.exportAll(stream, progressHandler)
             }
         }
     }
