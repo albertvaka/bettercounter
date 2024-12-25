@@ -129,21 +129,24 @@ class ChartHolder(
 
         val firstEntryDate = counter.leastRecent!!
         val lastEntryDate = counter.mostRecent!!
-        val now = Calendar.getInstance().time
 
-        val startDate = max(rangeStart.time, min(firstEntryDate, now))
-        val isPeriodComplete = rangeEnd.time < now // true if we are looking at historical data
+        val startDate = max(rangeStart.time, firstEntryDate)
+        val endDate = min(rangeEnd.time, lastEntryDate)
 
-        val endDate = if (isPeriodComplete) { rangeEnd.time } else { lastEntryDate }
-        val numCounts = if (isPeriodComplete) { intervalEntries.size } else { intervalEntries.size - 1 }
+        val isFromRangeLimit = endDate == rangeEnd.time || startDate == rangeStart.time
+        val numEntries = if (isFromRangeLimit) {
+            intervalEntries.size
+        } else {
+            intervalEntries.size - 1
+        }
 
-        if (numCounts == 0) {
+        if (numEntries == 0) {
             return activity.getString(R.string.stats_average_n_a)
         }
 
         return when (counter.interval) {
-            Interval.DAY, Interval.HOUR -> getAverageStringPerHour(numCounts, startDate, endDate)
-            else -> getAverageStringPerDay(numCounts, startDate, endDate)
+            Interval.DAY, Interval.HOUR -> getAverageStringPerHour(numEntries, startDate, endDate)
+            else -> getAverageStringPerDay(numEntries, startDate, endDate)
         }
     }
 
