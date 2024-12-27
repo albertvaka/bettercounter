@@ -8,12 +8,12 @@ class DragAndSwipeTouchHelper(private val mAdapter: ListGesturesCallback) :
 
     private var isDragging: Boolean = false
 
-    override fun isLongPressDragEnabled(): Boolean { return false } // we start drag manually
-    override fun isItemViewSwipeEnabled(): Boolean { return true }
+    override fun isLongPressDragEnabled(): Boolean = false // we start drag manually
+    override fun isItemViewSwipeEnabled(): Boolean = true
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder
+        viewHolder: RecyclerView.ViewHolder,
     ): Int {
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
         val swipeFlags = 0
@@ -42,7 +42,7 @@ class DragAndSwipeTouchHelper(private val mAdapter: ListGesturesCallback) :
 
     override fun onSelectedChanged(
         viewHolder: RecyclerView.ViewHolder?,
-        actionState: Int
+        actionState: Int,
     ) {
         if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
             isDragging = true

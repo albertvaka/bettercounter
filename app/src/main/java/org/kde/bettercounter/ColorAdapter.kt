@@ -52,6 +52,7 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
         init {
             colorButton.setOnClickListener(this)
         }
+
         override fun onClick(v: View) {
             selectedPosition = layoutPosition
         }
@@ -86,7 +87,5 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
         holder.colorButton.background = background
     }
 
-    override fun getItemCount(): Int {
-        return colors.size
-    }
+    override fun getItemCount(): Int = colors.size
 }

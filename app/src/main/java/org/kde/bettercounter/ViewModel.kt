@@ -228,7 +228,7 @@ class ViewModel(application: Application) {
     fun importAll(
         context: Context,
         stream: InputStream,
-        progressCallback: (progress: Int, status: Int) -> Unit // status: -1 -> error, 0 -> wip, 1 -> done
+        progressCallback: (progress: Int, status: Int) -> Unit, // status: -1 -> error, 0 -> wip, 1 -> done
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             stream.use { stream ->

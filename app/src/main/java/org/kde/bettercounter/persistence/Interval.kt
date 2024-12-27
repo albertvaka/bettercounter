@@ -10,7 +10,8 @@ enum class Interval(val humanReadableResource: Int) {
     WEEK(R.string.interval_week),
     MONTH(R.string.interval_month),
     YEAR(R.string.interval_year),
-    LIFETIME(R.string.interval_lifetime);
+    LIFETIME(R.string.interval_lifetime),
+    ;
 
     companion object {
         val DEFAULT = LIFETIME
@@ -20,8 +21,8 @@ enum class Interval(val humanReadableResource: Int) {
         }
     }
 
-    fun toChronoUnit(): ChronoUnit {
-        return when (this) {
+    fun toChronoUnit(): ChronoUnit =
+        when (this) {
             HOUR -> ChronoUnit.HOURS
             DAY -> ChronoUnit.DAYS
             WEEK -> ChronoUnit.WEEKS
@@ -29,15 +30,11 @@ enum class Interval(val humanReadableResource: Int) {
             YEAR -> ChronoUnit.YEARS
             LIFETIME -> throw UnsupportedOperationException("$this can't be converted to ChronoUnit")
         }
-    }
 
-    fun toHumanReadableResourceId(): Int {
-        return humanReadableResource
-    }
+    fun toHumanReadableResourceId(): Int = humanReadableResource
 
     fun toChartDisplayableInterval(): Interval {
         // When displaying in a chart, LIFETIME counters will still display year by year
         return if (this == LIFETIME) YEAR else this
     }
 }
-

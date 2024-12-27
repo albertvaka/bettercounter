@@ -9,7 +9,8 @@ import org.kde.bettercounter.R
 enum class Tutorial {
     DRAG,
     PICK_DATE,
-    CHANGE_GRAPH_INTERVAL;
+    CHANGE_GRAPH_INTERVAL,
+    ;
 
     private fun getText() = when(this) {
         DRAG -> R.string.tutorial_drag

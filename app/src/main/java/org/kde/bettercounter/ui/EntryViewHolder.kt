@@ -1,6 +1,5 @@
 package org.kde.bettercounter.ui
 
-
 import android.view.HapticFeedbackConstants
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -43,7 +42,7 @@ class EntryViewHolder(
             @Suppress("DEPRECATION")
             binding.draggableArea.performHapticFeedback(
                 HapticFeedbackConstants.LONG_PRESS,
-                HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+                HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING,
             )
             true
         }

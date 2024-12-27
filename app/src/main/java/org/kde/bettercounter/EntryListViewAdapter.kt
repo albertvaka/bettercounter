@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -35,7 +34,10 @@ class EntryListViewAdapter(
     }
 
     var currentSelectedCounterName: String? = null
-    fun clearItemSelected() { currentSelectedCounterName = null }
+
+    fun clearItemSelected() {
+        currentSelectedCounterName = null
+    }
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)
     private var counters: MutableList<String> = mutableListOf()

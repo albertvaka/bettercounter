@@ -28,7 +28,7 @@ class BetterChart : BarChart {
     constructor(ctx: Context, attrs: AttributeSet?) : super(ctx, attrs)
     constructor(ctx: Context, attrs: AttributeSet?, defStyle: Int) : super(ctx, attrs, defStyle)
 
-    private val yAxis: YAxis get() { return axisLeft } // alias
+    private val yAxis: YAxis get() = axisLeft // alias
 
     private lateinit var mDataSet: BarDataSet
     private lateinit var mBarData: BarData

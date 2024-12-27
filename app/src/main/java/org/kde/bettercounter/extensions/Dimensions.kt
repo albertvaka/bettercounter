@@ -1,9 +1,8 @@
-package org.kde.bettercounter.extensions;
+package org.kde.bettercounter.extensions
 
-import android.content.Context;
+import android.content.Context
 
-public fun Int.dptoPx(context: Context): Int {
+fun Int.dpToPx(context: Context): Int {
     val density = context.resources.displayMetrics.density
     return (this * density).toInt()
 }
-

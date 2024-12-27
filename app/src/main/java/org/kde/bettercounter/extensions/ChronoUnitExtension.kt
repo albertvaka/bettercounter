@@ -23,8 +23,8 @@ fun ChronoUnit.between(from: Calendar, to: Calendar): Long {
     return between(fromZonedDateTime, toZonedDateTime)
 }
 
-fun ChronoUnit.toCalendarField(): Int {
-    return when (this) {
+fun ChronoUnit.toCalendarField(): Int =
+    when (this) {
         ChronoUnit.HOURS -> Calendar.HOUR
         ChronoUnit.DAYS -> Calendar.DAY_OF_WEEK
         ChronoUnit.WEEKS -> Calendar.WEEK_OF_YEAR
@@ -32,7 +32,6 @@ fun ChronoUnit.toCalendarField(): Int {
         ChronoUnit.YEARS -> Calendar.YEAR
         else -> throw UnsupportedOperationException("$this can't be converted to Calendar field")
     }
-}
 
 fun millisecondsUntilNextHour(): Long {
     val current = LocalDateTime.now()

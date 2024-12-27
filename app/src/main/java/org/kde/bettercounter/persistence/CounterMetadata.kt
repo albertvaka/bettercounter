@@ -6,4 +6,3 @@ data class CounterMetadata(
     var goal: Int,
     var color: CounterColor,
 )
-

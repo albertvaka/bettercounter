@@ -2,13 +2,10 @@ package org.kde.bettercounter.extensions
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.persistence.Entry
-import java.time.temporal.ChronoUnit
-import java.util.Date
 
 class ImportTest {
 

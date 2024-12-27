@@ -34,7 +34,7 @@ import org.kde.bettercounter.boilerplate.OpenFileParams
 import org.kde.bettercounter.boilerplate.OpenFileResultContract
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
-import org.kde.bettercounter.extensions.dptoPx
+import org.kde.bettercounter.extensions.dpToPx
 import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                         // Re-triggers calculating the expanded offset, since the height of the sheet
                         // contents depend on whether the stats take one or two lines of text
                         sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                        sheetUnfoldedPadding = binding.bottomSheet.height + 100.dptoPx(this@MainActivity)
+                        sheetUnfoldedPadding = binding.bottomSheet.height + 100.dpToPx(this@MainActivity)
                         binding.recycler.smoothScrollToPosition(position)
                         binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
                     }

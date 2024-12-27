@@ -70,7 +70,7 @@ class ChartsAdapter(
             val endCal = endRange.toCalendar()
             endCal.truncate(interval)
             val count = interval.toChronoUnit().between(endCal, cal).toInt()
-            return count.coerceIn(0, numCharts-1)
+            return count.coerceIn(0, numCharts - 1)
         }
         return 0
     }

@@ -26,18 +26,14 @@ fun Calendar.truncate(field: Int) {
     throw UnsupportedOperationException("truncate by $field not implemented")
 }
 
-fun Calendar.truncate(field: Interval) {
-    return truncate(field.toChronoUnit().toCalendarField())
-}
+fun Calendar.truncate(field: Interval) = truncate(field.toChronoUnit().toCalendarField())
 
 fun Calendar.debugToSimpleDateString(): String {
     val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.US)
     return dateFormat.format(time)
 }
 
-fun Calendar.copy(): Calendar {
-    return clone() as Calendar
-}
+fun Calendar.copy(): Calendar = clone() as Calendar
 
 fun Calendar.addInterval(interval: Interval, times: Int) {
     when (interval) {

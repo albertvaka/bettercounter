@@ -8,7 +8,7 @@ import androidx.activity.result.contract.ActivityResultContract
 
 data class CreateFileParams(
     val fileMimeType: String,
-    val suggestedFileName: String
+    val suggestedFileName: String,
 )
 
 class CreateFileResultContract : ActivityResultContract<CreateFileParams, Uri?>() {

@@ -21,7 +21,7 @@ const val TUTORIALS_PREFS_KEY = "tutorials"
 class Repository(
     private val context: Context,
     private val entryDao: EntryDao,
-    private val sharedPref: SharedPreferences
+    private val sharedPref: SharedPreferences,
 ) {
 
     private var tutorials: MutableSet<String>
@@ -36,9 +36,7 @@ class Repository(
         }
     }
 
-    fun getCounterList(): List<String> {
-        return counters
-    }
+    fun getCounterList(): List<String> = counters
 
     fun setCounterList(list: List<String>) {
         val jsonStr = Converters.stringListToString(list)
