@@ -6,10 +6,14 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -39,7 +43,6 @@ import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
-import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var entryViewAdapter: EntryListViewAdapter
     internal lateinit var binding: ActivityMainBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<LinearLayout>
+    private var extraBottomPaddingForNavigationInset = 0
     private var intervalOverride: Interval? = null
     private var sheetIsExpanding = false
     private var onBackPressedCloseSheetCallback = object : OnBackPressedCallback(false) {
@@ -64,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+        setAndroid15insets()
 
         viewModel = (application as BetterApplication).viewModel
 
@@ -73,7 +78,8 @@ class MainActivity : AppCompatActivity() {
         sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         sheetIsExpanding = false
-        val sheetFoldedPadding = binding.recycler.paddingBottom // padding so the fab is in view
+        val extraBottomPaddingForSnackbar = 100.dpToPx(this)
+        val sheetFoldedPadding = binding.recycler.paddingBottom - extraBottomPaddingForSnackbar - extraBottomPaddingForNavigationInset // padding so the fab is in view
         var sheetUnfoldedPadding = sheetFoldedPadding // padding to fit the bottomSheet, to be updated later
 
         sheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
@@ -91,9 +97,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            override fun onSlide(bottomSheet: View, negativeSlideOffset: Float) {
                 if (!sheetIsExpanding) { // only do this when collapsing. when expanding we set the final padding at once so smoothScrollToPosition can do its job
-                    val bottomPadding = sheetFoldedPadding + ((1.0 + slideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
+                    val sheetPadding = sheetFoldedPadding + ((1.0 + negativeSlideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
+                    val navigationPadding = extraBottomPaddingForNavigationInset - ((1.0 + negativeSlideOffset) * extraBottomPaddingForNavigationInset).toInt()
+                    val bottomPadding = sheetPadding + extraBottomPaddingForSnackbar + navigationPadding
                     binding.recycler.setPadding(0, 0, 0, bottomPadding)
                 }
             }
@@ -127,9 +135,10 @@ class MainActivity : AppCompatActivity() {
                         // Re-triggers calculating the expanded offset, since the height of the sheet
                         // contents depend on whether the stats take one or two lines of text
                         sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                        sheetUnfoldedPadding = binding.bottomSheet.height + 100.dpToPx(this@MainActivity)
+                        sheetUnfoldedPadding = binding.bottomSheet.height
                         binding.recycler.smoothScrollToPosition(position)
-                        binding.recycler.setPadding(0, 0, 0, sheetUnfoldedPadding)
+                        val bottomPadding = sheetUnfoldedPadding + extraBottomPaddingForSnackbar
+                        binding.recycler.setPadding(0, 0, 0, bottomPadding)
                     }
                 )
                 binding.charts.swapAdapter(adapter, true)
@@ -344,6 +353,45 @@ class MainActivity : AppCompatActivity() {
                         .show()
                 }
                 .show()
+        }
+    }
+
+    private fun setAndroid15insets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appBarLayout) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+            v.setPadding(insets.left, insets.top, insets.right, 0)
+            WindowInsetsCompat.CONSUMED
+        }
+        val (originalFabLeftMargin, originalFabBottomMargin, originalFabRightMargin) =
+            with (binding.fab.layoutParams as ViewGroup.MarginLayoutParams) {
+                Triple(leftMargin, rightMargin, bottomMargin)
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fab) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin =  originalFabLeftMargin + insets.left
+                bottomMargin = originalFabBottomMargin + insets.bottom
+                rightMargin = originalFabRightMargin + insets.right
+            }
+            if (extraBottomPaddingForNavigationInset == 0) {
+                extraBottomPaddingForNavigationInset = insets.bottom
+                binding.recycler.setPadding(0, 0, 0, extraBottomPaddingForNavigationInset + binding.recycler.paddingBottom)
+            }
+            WindowInsetsCompat.CONSUMED
+        }
+        val originalChartsBottomPadding = binding.charts.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(binding.charts) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = originalChartsBottomPadding + insets.bottom
+            }
+            WindowInsetsCompat.CONSUMED
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.snackbar) { v, _ ->
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = 0
+            }
+            WindowInsetsCompat.CONSUMED
         }
     }
 }

@@ -9,6 +9,7 @@
     tools:context=".ui.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -27,7 +28,7 @@
         android:layout_height="match_parent"
         app:layoutManager="LinearLayoutManager"
         android:clipToPadding="false"
-        android:paddingBottom="100dp"
+        android:paddingBottom="150dp"
         tools:listitem="@layout/fragment_entry" />
 
     <LinearLayout
