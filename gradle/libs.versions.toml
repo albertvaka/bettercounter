@@ -1,5 +1,5 @@
 [versions]
-gradle = "8.7.3"
+gradle = "8.8.0"
 kotlin = "2.1.0"
 ksp = "2.1.0-1.0.29"
 coreKtx = "1.15.0"
