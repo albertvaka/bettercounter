@@ -11,6 +11,7 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.renderer.XAxisRenderer
 import com.github.mikephil.charting.utils.Utils
 import org.kde.bettercounter.R
 import org.kde.bettercounter.extensions.copy
@@ -38,6 +39,13 @@ class BetterChart : BarChart {
         setDrawBarShadow(false)
         setDrawGridBackground(false)
         setDrawValueAboveBar(true)
+        setXAxisRenderer(object : XAxisRenderer(mViewPortHandler, mXAxis, mLeftAxisTransformer) {
+            override fun computeSize() {
+                super.computeSize()
+                // Hack so that labels are not cut on the bottom
+                mXAxis.mLabelRotatedHeight += Utils.convertDpToPixel(5.0f).toInt()
+            }
+        })
 
         val accentColor = ContextCompat.getColor(context, R.color.colorAccent)
 
@@ -49,9 +57,10 @@ class BetterChart : BarChart {
         // Axis
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
+        xAxis.textSize = 13.0f
         xAxis.textColor = accentColor
-        xAxis.granularity = 1f
-        xAxis.isGranularityEnabled = true
+        xAxis.isGranularityEnabled = true // granularity defined in setDataBucketized
+        yAxis.textSize = 13.0f
         yAxis.textColor = accentColor
         yAxis.granularity = 1f
         yAxis.isGranularityEnabled = true
@@ -62,6 +71,7 @@ class BetterChart : BarChart {
 
         mDataSet = BarDataSet(listOf(), "")
         mDataSet.color = accentColor
+        mDataSet.valueTextSize = 12.0f
         mDataSet.valueTextColor = accentColor
         mDataSet.valueFormatter = object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
@@ -107,6 +117,12 @@ class BetterChart : BarChart {
             Interval.MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH) to Calendar.DAY_OF_MONTH
             Interval.YEAR -> 12 to Calendar.MONTH
             Interval.LIFETIME -> 0 to 0.also { assert(false) } // Not a valid display interval
+        }
+
+        xAxis.granularity = when (totalInterval) {
+            Interval.HOUR -> 3.0f
+            Interval.MONTH -> 2.0f
+            else -> 1f
         }
 
         val cal = rangeStart.copy()
