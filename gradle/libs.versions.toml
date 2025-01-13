@@ -10,7 +10,7 @@ material = "1.12.0"
 room = "2.6.1"
 androidDesugarJdkLibs = "2.1.4"
 simpleTooltip = "1.1.0"
-mpAndroidChart = "v3.1.0"
+mpAndroidChart = "3.1.0.25"
 junit = "4.13.2"
 
 [libraries]
@@ -27,7 +27,7 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 android-desugarJdkLibs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 douglasjunior-android-simple-tooltip = { module = "com.github.douglasjunior:android-simple-tooltip", version.ref = "simpleTooltip" }
-philJay-mpAndroidChart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpAndroidChart" }
+appdevnext-mpAndroidChart = { module = "com.github.AppDevNext:AndroidChart", version.ref = "mpAndroidChart" }
 junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]

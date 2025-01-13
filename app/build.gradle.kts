@@ -65,7 +65,7 @@ android {
 
 dependencies {
     implementation(libs.douglasjunior.android.simple.tooltip)
-    implementation(libs.philJay.mpAndroidChart)
+    implementation(libs.appdevnext.mpAndroidChart)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.recyclerview)
     implementation(libs.material)
+
     coreLibraryDesugaring(libs.android.desugarJdkLibs) // Chrono.UNITS for Android < 26
     testImplementation(libs.junit)
 }

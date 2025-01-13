@@ -4,15 +4,18 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.IValueFormatter
 import com.github.mikephil.charting.renderer.XAxisRenderer
 import com.github.mikephil.charting.utils.Utils
+import com.github.mikephil.charting.utils.ViewPortHandler
 import org.kde.bettercounter.R
 import org.kde.bettercounter.extensions.copy
 import org.kde.bettercounter.persistence.Entry
@@ -43,7 +46,7 @@ class BetterChart : BarChart {
             override fun computeSize() {
                 super.computeSize()
                 // Hack so that labels are not cut on the bottom
-                mXAxis.mLabelRotatedHeight += Utils.convertDpToPixel(5.0f).toInt()
+                mXAxis.mLabelHeight += Utils.convertDpToPixel(5.0f).toInt()
             }
         })
 
@@ -73,8 +76,13 @@ class BetterChart : BarChart {
         mDataSet.color = accentColor
         mDataSet.valueTextSize = 12.0f
         mDataSet.valueTextColor = accentColor
-        mDataSet.valueFormatter = object : ValueFormatter() {
-            override fun getFormattedValue(value: Float): String {
+        mDataSet.valueFormatter = object : IValueFormatter {
+            override fun getFormattedValue(
+                value: Float,
+                entry: com.github.mikephil.charting.data.Entry?,
+                dataSetIndex: Int,
+                viewPortHandler: ViewPortHandler?
+            ): String? {
                 val integer = value.toInt()
                 if (integer == 0) {
                     return ""
@@ -90,7 +98,7 @@ class BetterChart : BarChart {
     }
 
     private fun setBarEntries(series: List<BarEntry>) {
-        mDataSet.values = series
+        mDataSet.entries = series
         mBarData.notifyDataChanged()
         data = mBarData
         invalidate()
@@ -176,10 +184,13 @@ class BetterChart : BarChart {
         setBarEntries(series)
     }
 
-    class DayOfWeekFormatter : ValueFormatter() {
+    class DayOfWeekFormatter : IAxisValueFormatter {
         private val dayNames = DateFormatSymbols().shortWeekdays
         private val firstDayOfWeek = Calendar.getInstance().firstDayOfWeek
-        override fun getFormattedValue(value: Float): String {
+        override fun getFormattedValue(
+            value: Float,
+            axis: AxisBase?
+        ): String? {
             // dayNames are meant to be indexed with Calendar.SATURDAY,
             // Calendar.MONDAY, etc. so the range is [1,7] with 1 being Sunday.
             // The range of bucket indices is [0,6] with 0 being Monday.
@@ -187,13 +198,16 @@ class BetterChart : BarChart {
         }
     }
 
-    class MonthFormatter(private var startDate: Calendar) : ValueFormatter() {
+    class MonthFormatter(private var startDate: Calendar) : IAxisValueFormatter {
         // We can't use DateFormatSymbols like for week days, because when
         // the user language uses different month name forms for formatting
         // and stand-alone usages, then DateFormatSymbols returns names in
         // the formatting form, but we want the stand-alone form.
         private val monthNamesFormatter = SimpleDateFormat("LLL", Locale.getDefault())
-        override fun getFormattedValue(value: Float): String {
+        override fun getFormattedValue(
+            value: Float,
+            axis: AxisBase?
+        ): String? {
             val cal = startDate.copy()
             cal.add(Calendar.MONTH, value.toInt())
             monthNamesFormatter.timeZone = cal.timeZone
@@ -201,14 +215,20 @@ class BetterChart : BarChart {
         }
     }
 
-    class MonthDayFormatter : ValueFormatter() {
-        override fun getFormattedValue(value: Float): String {
+    class MonthDayFormatter : IAxisValueFormatter {
+        override fun getFormattedValue(
+            value: Float,
+            axis: AxisBase?
+        ): String? {
             return (value.toInt() + 1).toString()
         }
     }
 
-    class RawFormatter : ValueFormatter() {
-        override fun getFormattedValue(value: Float): String {
+    class RawFormatter : IAxisValueFormatter {
+        override fun getFormattedValue(
+            value: Float,
+            axis: AxisBase?
+        ): String? {
             return (value.toInt()).toString()
         }
     }
