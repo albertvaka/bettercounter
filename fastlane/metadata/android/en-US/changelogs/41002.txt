@@ -1,0 +1,16 @@
+4.10.2:
+* Increase font size in charts
+
+4.10.1:
+* Fixed app showing behind the title bar in Android 15
+
+4.10:
+* Calculate average until last entry, not inclusive (unless showing historical data).
+* Made undo notification not cover the charts
+* Restarting the app is no longer needed after importing data.
+
+4.9:
+* Added hourly intervals.
+
+4.8:
+* You can now show an app tutorial from the top right menu.
