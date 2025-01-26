@@ -9,6 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.CounterColor
@@ -41,6 +43,8 @@ class ViewModel(application: Application) {
     private val summaryMap = HashMap<String, MutableLiveData<CounterSummary>>()
 
     private var initialized = false
+
+    private val mutex = Mutex()
 
     init {
         val db = AppDatabase.getInstance(application)
@@ -115,13 +119,15 @@ class ViewModel(application: Application) {
         }
     }
 
-    fun decrementCounter(name: String) {
+    fun decrementCounter(name: String, mode: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
-            val oldEntryDate = repo.removeEntry(name)
-            summaryMap[name]?.postValue(repo.getCounterSummary(name))
-            if (oldEntryDate != null) {
-                for (observer in counterObservers) {
-                    observer.onCounterDecremented(name, oldEntryDate)
+            mutex.withLock {
+                val oldEntryDate = repo.removeEntry(name)
+                summaryMap[name]?.postValue(repo.getCounterSummary(name))
+                if (oldEntryDate != null && mode) {
+                    for (observer in counterObservers) {
+                        observer.onCounterDecremented(name, oldEntryDate)
+                    }
                 }
             }
         }
@@ -191,18 +197,20 @@ class ViewModel(application: Application) {
 
     fun deleteCounter(name: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            repo.removeAllEntries(name)
-            withContext(Dispatchers.Main) {
-                for (observer in counterObservers) {
-                    observer.onCounterRemoved(name)
+            mutex.withLock {
+                repo.removeAllEntries(name)
+                withContext(Dispatchers.Main) {
+                    for (observer in counterObservers) {
+                        observer.onCounterRemoved(name)
+                    }
                 }
+                summaryMap.remove(name)
+                repo.deleteCounterMetadata(name)
+                val list = repo.getCounterList().toMutableList()
+                list.remove(name)
+                repo.setCounterList(list)
             }
         }
-        summaryMap.remove(name)
-        repo.deleteCounterMetadata(name)
-        val list = repo.getCounterList().toMutableList()
-        list.remove(name)
-        repo.setCounterList(list)
     }
 
     fun exportAll(stream: OutputStream, progressCallback: (progress: Int) -> Unit) {

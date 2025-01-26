@@ -56,4 +56,8 @@
     <string name="display_interval">Intervalo a mostrar</string>
     <string name="goal">Objetivo</string>
     <string name="tutorial_change_graph_interval">Pulsar para cambiar el intervalo de tiempo</string>
+    <string name="accept">Aceptar</string>
+    <string name="titleDialogConfirmation">¿Borrar entradas?</string>
+    <string name="confirmation_message">¿Estás seguro de que quieres eliminar %1$d entradas?\n\nEsta acción podría tomar un momento.</string>
+    <string name="yes">Sí</string>
 </resources>

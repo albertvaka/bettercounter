@@ -1,6 +1,7 @@
 package org.kde.bettercounter.ui
 
 import android.view.HapticFeedbackConstants
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -8,6 +9,7 @@ import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip.OnDismissListe
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.FragmentEntryBinding
+import org.kde.bettercounter.databinding.FragmentEntryLongPressBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
 import java.util.Calendar
@@ -31,11 +33,15 @@ class EntryViewHolder(
         }
         binding.increaseButton.setOnLongClickListener {
             showDateTimePicker(activity, Calendar.getInstance()) { pickedDateTime ->
-                viewModel.incrementCounter(counter.name, pickedDateTime.time)
+                dialog(counter, true, pickedDateTime)
             }
             true
         }
-        binding.decreaseButton.setOnClickListener { viewModel.decrementCounter(counter.name) }
+        binding.decreaseButton.setOnClickListener { viewModel.decrementCounter(counter.name, true) }
+        binding.decreaseButton.setOnLongClickListener {
+            dialog(counter, false)
+            true
+        }
         binding.draggableArea.setOnClickListener { onClickListener(counter) }
         binding.draggableArea.setOnLongClickListener {
             touchHelper.startDrag(this@EntryViewHolder)
@@ -64,6 +70,59 @@ class EntryViewHolder(
 
     fun showPickDateTutorial(onDismissListener: OnDismissListener? = null) {
         Tutorial.PICK_DATE.show(activity, binding.increaseButton, onDismissListener)
+    }
+
+    private fun dialog(counter: CounterSummary, mode: Boolean, pickedDateTime: Calendar = Calendar.getInstance()){
+        val builder = AlertDialog.Builder(activity)
+        val dialogBinding = FragmentEntryLongPressBinding.inflate(activity.layoutInflater)
+
+        builder.setView(dialogBinding.root)
+        dialogBinding.tietQuantity.requestFocus()
+
+        builder.setPositiveButton(R.string.accept) { _, _ ->
+            val tiet = dialogBinding.tietQuantity
+
+            if (!tiet.text.isNullOrEmpty()){
+                val quantity: Int = tiet.text.toString().toInt()
+                if (quantity != 0){
+                    if (mode) {
+                        for (i in 0..<quantity) {
+                            viewModel.incrementCounter(counter.name, pickedDateTime.time)
+                        }
+                    } else{
+                        val builderConfirmation = AlertDialog.Builder(activity)
+
+                        builderConfirmation.setTitle(R.string.titleDialogConfirmation)
+                        builderConfirmation.setMessage(
+                            activity.getString(R.string.confirmation_message, quantity)
+                        )
+                        builderConfirmation.setNegativeButton(R.string.cancel, null)
+
+                        builderConfirmation.setCancelable(false)
+
+                        builderConfirmation.setPositiveButton(R.string.yes) { _, _ ->
+                            for (i in 0..<quantity){
+                                viewModel.decrementCounter(counter.name, false)
+                            }
+                        }
+
+                        val dialogConfirmation = builderConfirmation.create()
+
+                        dialogConfirmation.show()
+                    }
+
+                }
+            }else{
+                if (mode) viewModel.incrementCounter(counter.name, pickedDateTime.time)
+                else viewModel.decrementCounter(counter.name, true)
+            }
+        }
+
+        builder.setNegativeButton(R.string.cancel) { _, _ ->
+            // Toast.makeText(activity, "Canceled.", Toast.LENGTH_SHORT).show()
+        }
+
+        builder.create().show()
     }
 
 }

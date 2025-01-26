@@ -56,4 +56,9 @@
     <string name="color_hint">Color %1$d</string>
     <string name="display_interval">Interval to display</string>
     <string name="goal">Goal</string>
+    <string name="accept">Accept</string>
+    <string name="titleDialogConfirmation">Delete entries?</string>
+    <string name="confirmation_message">Are you sure you want to delete %1$d entries?\n\n
+        This action may take a moment.</string>
+    <string name="yes">Yes</string>
 </resources>
