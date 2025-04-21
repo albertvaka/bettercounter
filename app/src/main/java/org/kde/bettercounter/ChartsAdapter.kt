@@ -42,7 +42,6 @@ class ChartsAdapter(
         val rangeStart = findRangeStartForPosition(position)
         val rangeEnd = rangeStart.copy().apply { addInterval(interval, 1) }
         boundViewHolders.add(holder)
-        // TODO: This launches a coroutine. If one is already running, we should first cancel it.
         viewModel.getEntriesForRangeSortedByDate(
             counter.name,
             rangeStart.time,

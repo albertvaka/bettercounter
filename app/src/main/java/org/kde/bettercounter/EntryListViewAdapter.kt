@@ -46,10 +46,7 @@ class EntryListViewAdapter(
 
     private val touchHelper = ItemTouchHelper(DragAndSwipeTouchHelper(this))
 
-    private var recyclerView: RecyclerView? = null
-
     override fun onAttachedToRecyclerView(view: RecyclerView) {
-        recyclerView = view
         touchHelper.attachToRecyclerView(view)
         super.onAttachedToRecyclerView(view)
     }

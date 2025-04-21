@@ -2,6 +2,7 @@ package org.kde.bettercounter.persistence
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.boilerplate.Converters
 import org.kde.bettercounter.extensions.addInterval
@@ -40,18 +41,18 @@ class Repository(
 
     fun setCounterList(list: List<String>) {
         val jsonStr = Converters.stringListToString(list)
-        sharedPref.edit().putString(COUNTERS_PREFS_KEY, jsonStr).apply()
+        sharedPref.edit { putString(COUNTERS_PREFS_KEY, jsonStr) }
         counters = list
     }
 
     fun setTutorialShown(id: Tutorial) {
         tutorials.add(id.name)
-        sharedPref.edit().putStringSet(TUTORIALS_PREFS_KEY, tutorials).apply()
+        sharedPref.edit { putStringSet(TUTORIALS_PREFS_KEY, tutorials) }
     }
 
     fun resetTutorialShown(id: Tutorial) {
         tutorials.remove(id.name)
-        sharedPref.edit().putStringSet(TUTORIALS_PREFS_KEY, tutorials).apply()
+        sharedPref.edit { putStringSet(TUTORIALS_PREFS_KEY, tutorials) }
     }
 
     fun isTutorialShown(id: Tutorial): Boolean {
@@ -82,22 +83,22 @@ class Repository(
         val colorKey = COUNTERS_COLOR_PREFS_KEY.format(name)
         val intervalKey = COUNTERS_INTERVAL_PREFS_KEY.format(name)
         val goalKey = COUNTERS_GOAL_PREFS_KEY.format(name)
-        sharedPref.edit()
-            .remove(colorKey)
-            .remove(intervalKey)
-            .remove(goalKey)
-            .apply()
+        sharedPref.edit {
+            remove(colorKey)
+            remove(intervalKey)
+            remove(goalKey)
+        }
     }
 
     fun setCounterMetadata(counter: CounterMetadata) {
         val colorKey = COUNTERS_COLOR_PREFS_KEY.format(counter.name)
         val intervalKey = COUNTERS_INTERVAL_PREFS_KEY.format(counter.name)
         val goalKey = COUNTERS_GOAL_PREFS_KEY.format(counter.name)
-        sharedPref.edit()
-            .putInt(colorKey, counter.color.colorInt)
-            .putString(intervalKey, counter.interval.toString())
-            .putInt(goalKey, counter.goal)
-            .apply()
+        sharedPref.edit {
+            putInt(colorKey, counter.color.colorInt)
+            putString(intervalKey, counter.interval.toString())
+            putInt(goalKey, counter.goal)
+        }
     }
 
     suspend fun getCounterSummary(name: String): CounterSummary {
@@ -109,16 +110,15 @@ class Repository(
             else -> Calendar.getInstance().apply { truncate(interval) }
         }
         val intervalEndDate = intervalStartDate.copy().apply { addInterval(interval, 1) }
-        val firstLastAndCount = entryDao.getFirstLastAndCount(name)
         return CounterSummary(
             name = name,
             color = color,
             interval = interval,
             goal = goal,
             lastIntervalCount = entryDao.getCountInRange(name, intervalStartDate.time, intervalEndDate.time),
-            totalCount = firstLastAndCount.count, // entryDao.getCount(name),
-            leastRecent = firstLastAndCount.first, // entryDao.getLeastRecent(name)?.date,
-            mostRecent = firstLastAndCount.last, // entryDao.getMostRecent(name)?.date,
+            totalCount = entryDao.getCount(name),
+            leastRecent = entryDao.getFirstDate(name),
+            mostRecent = entryDao.getLastDate(name),
         )
     }
 

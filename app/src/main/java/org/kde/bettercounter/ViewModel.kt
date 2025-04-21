@@ -266,6 +266,7 @@ class ViewModel(application: Application) {
 
     fun getEntriesForRangeSortedByDate(name: String, since: Date, until: Date): LiveData<List<Entry>> {
         val ret = MutableLiveData<List<Entry>>()
+        // TODO: Maybe we should cancel the existing coroutine if already running?
         CoroutineScope(Dispatchers.IO).launch {
             val entries = repo.getEntriesForRangeSortedByDate(name, since, until)
             //Log.e(TAG, "Queried ${entries.size} entries")

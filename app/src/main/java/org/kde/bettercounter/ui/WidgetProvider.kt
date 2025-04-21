@@ -40,7 +40,7 @@ class WidgetProvider : AppWidgetProvider() {
     private fun scheduleHourlyUpdate(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AppWidgetProvider::class.java)
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
         val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         alarmManager.setRepeating(
             AlarmManager.RTC,
