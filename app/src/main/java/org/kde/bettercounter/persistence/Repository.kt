@@ -18,6 +18,9 @@ const val COUNTERS_INTERVAL_PREFS_KEY = "interval.%s"
 const val COUNTERS_COLOR_PREFS_KEY = "color.%s"
 const val COUNTERS_GOAL_PREFS_KEY = "goal.%s"
 const val TUTORIALS_PREFS_KEY = "tutorials"
+const val AUTO_EXPORT_ENABLED_KEY = "auto_export_enabled"
+const val AVERAGE_CALCULATION_MODE_KEY = "average_calculation_mode"
+const val AUTO_EXPORT_FILE_URI_KEY = "auto_export_file_uri"
 
 class Repository(
     private val context: Context,
@@ -151,5 +154,30 @@ class Repository(
 
     suspend fun bulkAddEntries(entries: List<Entry>) {
         entryDao.bulkInsert(entries)
+    }
+
+    fun isAutoExportOnSaveEnabled(): Boolean {
+        return sharedPref.getBoolean(AUTO_EXPORT_ENABLED_KEY, false)
+    }
+    
+    fun setAutoExportOnSave(enabled: Boolean) {
+        sharedPref.edit { putBoolean(AUTO_EXPORT_ENABLED_KEY, enabled) }
+    }
+    
+    fun getAutoExportFileUri(): String? {
+        return sharedPref.getString(AUTO_EXPORT_FILE_URI_KEY, null)
+    }
+    
+    fun setAutoExportFileUri(uriString: String) {
+        sharedPref.edit { putString(AUTO_EXPORT_FILE_URI_KEY, uriString) }
+    }
+    
+    fun getAverageCalculationMode(): AverageMode {
+        val ordinal = sharedPref.getInt(AVERAGE_CALCULATION_MODE_KEY, AverageMode.FIRST_TO_LAST.ordinal)
+        return AverageMode.entries[ordinal]
+    }
+    
+    fun setAverageCalculationMode(mode: AverageMode) {
+        sharedPref.edit { putInt(AVERAGE_CALCULATION_MODE_KEY, mode.ordinal) }
     }
 }

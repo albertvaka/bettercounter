@@ -56,4 +56,14 @@
     <string name="color_hint">Color %1$d</string>
     <string name="display_interval">Interval to display</string>
     <string name="goal">Goal</string>
+    <string name="settings">Settings</string>
+    <string name="export_settings">Auto-export</string>
+    <string name="auto_export">Auto-export when a counter changes</string>
+    <string name="current_export_file">Counters will be exported automatically to %1$s</string>
+    <string name="export_disabled">You can always export the counters manually from the main screen\'s context menu.</string>
+    <string name="change_button">Change</string>
+    <string name="export_error">Export failed</string>
+    <string name="average_calculation_settings">Average Calculation</string>
+    <string name="average_mode_first_to_last">Average between first entry and last entry</string>
+    <string name="average_mode_first_to_now">Average between first entry and now</string>
 </resources>

@@ -1,5 +1,6 @@
 package org.kde.bettercounter.ui
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -205,6 +206,9 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.import_csv -> {
                 importFilePicker.launch(OpenFileParams("text/*"))
+            }
+            R.id.settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
             }
             R.id.show_tutorial -> {
                 if (viewModel.getCounterList().isEmpty()) {

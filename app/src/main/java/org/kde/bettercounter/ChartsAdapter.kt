@@ -35,7 +35,7 @@ class ChartsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartHolder {
         val binding = FragmentChartBinding.inflate(inflater, parent, false)
-        return ChartHolder(activity, binding)
+        return ChartHolder(activity, viewModel, binding)
     }
 
     override fun onBindViewHolder(holder: ChartHolder, position: Int) {

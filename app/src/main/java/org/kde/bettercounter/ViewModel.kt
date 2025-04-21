@@ -3,14 +3,18 @@ package org.kde.bettercounter
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.MainThread
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kde.bettercounter.boilerplate.AppDatabase
+import org.kde.bettercounter.persistence.AverageMode
 import org.kde.bettercounter.persistence.CounterColor
 import org.kde.bettercounter.persistence.CounterMetadata
 import org.kde.bettercounter.persistence.CounterSummary
@@ -22,11 +26,10 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.Calendar
 import java.util.Date
-import kotlin.collections.set
 
 private const val TAG = "ViewModel"
 
-class ViewModel(application: Application) {
+class ViewModel(val application: Application) {
 
     interface CounterObserver {
         fun onInitialCountersLoaded()
@@ -41,6 +44,7 @@ class ViewModel(application: Application) {
     private val summaryMap = HashMap<String, MutableLiveData<CounterSummary>>()
 
     private var initialized = false
+    private var autoExportJob : Job? = null
 
     init {
         val db = AppDatabase.getInstance(application)
@@ -102,6 +106,7 @@ class ViewModel(application: Application) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.addEntry(name, date)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            autoExportIfEnabled()
         }
     }
 
@@ -112,6 +117,7 @@ class ViewModel(application: Application) {
             CoroutineScope(Dispatchers.Main).launch {
                 callback()
             }
+            autoExportIfEnabled()
         }
     }
 
@@ -124,6 +130,7 @@ class ViewModel(application: Application) {
                     observer.onCounterDecremented(name, oldEntryDate)
                 }
             }
+            autoExportIfEnabled()
         }
     }
 
@@ -142,6 +149,9 @@ class ViewModel(application: Application) {
     fun editCounterSameName(counterMetadata: CounterMetadata) {
         val name = counterMetadata.name
         repo.setCounterMetadata(counterMetadata)
+
+        // no need to auto-export here, since metadata doesn't get exported as of today
+
         CoroutineScope(Dispatchers.IO).launch {
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
         }
@@ -169,6 +179,7 @@ class ViewModel(application: Application) {
                     observer.onCounterRenamed(oldName, newName)
                 }
             }
+            autoExportIfEnabled()
         }
     }
 
@@ -186,6 +197,7 @@ class ViewModel(application: Application) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.removeAllEntries(name)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            autoExportIfEnabled()
         }
     }
 
@@ -203,6 +215,7 @@ class ViewModel(application: Application) {
         val list = repo.getCounterList().toMutableList()
         list.remove(name)
         repo.setCounterList(list)
+        autoExportIfEnabled()
     }
 
     fun exportAll(stream: OutputStream, progressCallback: (progress: Int) -> Unit) {
@@ -281,6 +294,48 @@ class ViewModel(application: Application) {
         for ((name, summary) in summaryMap) {
             summary.postValue(repo.getCounterSummary(name))
         }
+    }
+
+    fun autoExportIfEnabled() {
+        if (!repo.isAutoExportOnSaveEnabled()) {
+            return
+        }
+        autoExportJob?.cancel() // Ensure we don't have two exports running in parallel
+        autoExportJob = CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val uri = getAutoExportFileUri()!!.toUri()
+                application.contentResolver.openOutputStream(uri, "wt")?.let { stream ->
+                    exportAll(stream) { }
+                }
+            } catch (_: Exception) {
+                setAutoExportOnSave(false)
+                Toast.makeText(application, R.string.export_error, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun isAutoExportOnSaveEnabled(): Boolean {
+        return repo.isAutoExportOnSaveEnabled()
+    }
+
+    fun setAutoExportOnSave(enabled: Boolean) {
+        repo.setAutoExportOnSave(enabled)
+    }
+
+    fun getAutoExportFileUri(): String? {
+        return repo.getAutoExportFileUri()
+    }
+
+    fun setAutoExportFileUri(uriString: String) {
+        repo.setAutoExportFileUri(uriString)
+    }
+
+    fun getAverageCalculationMode(): AverageMode {
+        return repo.getAverageCalculationMode()
+    }
+
+    fun setAverageCalculationMode(mode: AverageMode) {
+        repo.setAverageCalculationMode(mode)
     }
 
     companion object {

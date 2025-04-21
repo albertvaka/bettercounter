@@ -6,10 +6,12 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.R
+import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.FragmentChartBinding
 import org.kde.bettercounter.extensions.count
 import org.kde.bettercounter.extensions.max
 import org.kde.bettercounter.extensions.min
+import org.kde.bettercounter.persistence.AverageMode
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
@@ -22,6 +24,7 @@ import java.util.Locale
 
 class ChartHolder(
     private val activity: AppCompatActivity,
+    private val viewModel: ViewModel,
     private val binding: FragmentChartBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -109,12 +112,22 @@ class ChartHolder(
             return activity.getString(R.string.stats_average_n_a)
         }
 
-        val beginRange = counter.leastRecent!!
-        val endRange = counter.mostRecent ?: Calendar.getInstance().time
+        val averageMode = viewModel.getAverageCalculationMode()
+
+
+        val startDate = counter.leastRecent!!
+        val endDate = when (averageMode) {
+            AverageMode.FIRST_TO_NOW ->  counter.latestBetweenNowAndMostRecentEntry()
+            AverageMode.FIRST_TO_LAST -> counter.mostRecent ?: Date()
+        }
+        val numEntries = when (averageMode) {
+            AverageMode.FIRST_TO_NOW -> counter.totalCount
+            AverageMode.FIRST_TO_LAST -> counter.totalCount - 1
+        }
 
         return when (counter.interval) {
-            Interval.DAY -> getAverageStringPerHour(counter.totalCount - 1, beginRange, endRange)
-            else -> getAverageStringPerDay(counter.totalCount - 1, beginRange, endRange)
+            Interval.DAY -> getAverageStringPerHour(numEntries, startDate, endDate)
+            else -> getAverageStringPerDay(numEntries, startDate, endDate)
         }
     }
 
@@ -123,21 +136,34 @@ class ChartHolder(
             return activity.getString(R.string.stats_average_n_a)
         }
 
+        val averageMode = viewModel.getAverageCalculationMode()
+
         // Use the end of this interval and not at the beginning of the next,
         // so weeks have 7 days and not 8 because of the rounding up we do later.
         rangeEnd.add(Calendar.MINUTE, -1)
 
-        val firstEntryDate = counter.leastRecent!!
-        val lastEntryDate = counter.mostRecent!!
+        val firstEntryDate = when (averageMode) {
+            AverageMode.FIRST_TO_NOW -> min(counter.leastRecent!!, Date())
+            AverageMode.FIRST_TO_LAST -> counter.leastRecent!!
+        }
+        val lastEntryDate = when (averageMode) {
+            AverageMode.FIRST_TO_NOW -> max(counter.mostRecent!!, Date())
+            AverageMode.FIRST_TO_LAST -> counter.mostRecent!!
+        }
 
         val startDate = max(rangeStart.time, firstEntryDate)
         val endDate = min(rangeEnd.time, lastEntryDate)
 
-        val isFromRangeLimit = endDate == rangeEnd.time || startDate == rangeStart.time
-        val numEntries = if (isFromRangeLimit) {
-            intervalEntries.size
-        } else {
-            intervalEntries.size - 1
+        val numEntries = when (averageMode) {
+            AverageMode.FIRST_TO_NOW -> intervalEntries.size
+            AverageMode.FIRST_TO_LAST -> {
+                val isFromRangeLimit = endDate == rangeEnd.time || startDate == rangeStart.time
+                if (isFromRangeLimit) {
+                    intervalEntries.size
+                } else {
+                    intervalEntries.size - 1
+                }
+            }
         }
 
         if (numEntries == 0) {

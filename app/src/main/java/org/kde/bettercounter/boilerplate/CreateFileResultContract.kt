@@ -18,6 +18,8 @@ class CreateFileResultContract : ActivityResultContract<CreateFileParams, Uri?>(
             addCategory(Intent.CATEGORY_OPENABLE)
             setTypeAndNormalize(input.fileMimeType)
             putExtra(Intent.EXTRA_TITLE, input.suggestedFileName)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
         }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Uri? = when (resultCode) {
