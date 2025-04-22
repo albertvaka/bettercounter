@@ -103,6 +103,8 @@ class Repository(
         }
     }
 
+    suspend fun getLeastRecentEntry(name:String): Date? = entryDao.getFirstDate(name)
+
     suspend fun getCounterSummary(name: String): CounterSummary {
         val interval = getCounterInterval(name)
         val color = getCounterColor(name)

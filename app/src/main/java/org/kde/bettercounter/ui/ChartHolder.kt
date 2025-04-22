@@ -32,7 +32,7 @@ class ChartHolder(
         binding.chart.setup()
     }
 
-    fun display(counter: CounterSummary, entries: List<Entry>, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, onIntervalChange: (Interval) -> Unit, onDateChange: (Calendar) -> Unit) {
+    fun display(counter: CounterSummary, entries: List<Entry>, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, maxCount: Int, onIntervalChange: (Interval) -> Unit, onDateChange: (Calendar) -> Unit) {
         // Chart name
         val dateFormat = when (interval) {
             Interval.HOUR -> SimpleDateFormat.getDateTimeInstance()
@@ -78,7 +78,7 @@ class ChartHolder(
         val goalLine = computeGoalLine(counter, interval)
 
         // Chart
-        binding.chart.setDataBucketized(entries, rangeStart, interval, counter.color.toColorForChart(activity), goalLine)
+        binding.chart.setDataBucketized(entries, rangeStart, interval, counter.color.toColorForChart(activity), goalLine, maxCount)
 
         // Stats
         val periodAverage = getPeriodAverageString(counter, entries, rangeStart, rangeEnd)

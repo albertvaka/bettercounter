@@ -110,6 +110,7 @@ class BetterChart : BarChart {
         totalInterval: Interval,
         color: Int,
         goalLine: Float,
+        maxCount: Int,
     ) {
         mDataSet.color = color
 
@@ -145,7 +146,6 @@ class BetterChart : BarChart {
             "Entry on ${intervalEntries.first().date} is not before ${endCal.time}}"
         }
 
-        var maxCount = 0
         var entriesIndex = 0
         val series: MutableList<BarEntry> = mutableListOf()
         for (bucket in 0 until numBuckets) {
@@ -154,9 +154,6 @@ class BetterChart : BarChart {
             while (entriesIndex < intervalEntries.size && intervalEntries[entriesIndex].date.time < cal.timeInMillis) {
                 bucketCount++
                 entriesIndex++
-            }
-            if (bucketCount > maxCount) {
-                maxCount = bucketCount
             }
             // Log.e("Bucket", "$bucket (ends ${cal.debugToSimpleDateString()}) -> $bucketCount")
             series.add(BarEntry(bucket.toFloat(), bucketCount.toFloat()))

@@ -32,6 +32,8 @@ class ChartsAdapter(
     private var numCharts: Int = countNumCharts(counter)
     override fun getItemCount(): Int = numCharts
 
+    private val maxCountLiveData = viewModel.getMaxCountForInterval(counter.name, interval)
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartHolder {
         val binding = FragmentChartBinding.inflate(inflater, parent, false)
         return ChartHolder(activity, viewModel, binding)
@@ -41,13 +43,24 @@ class ChartsAdapter(
         val rangeStart = findRangeStartForPosition(position)
         val rangeEnd = rangeStart.plusInterval(interval, 1)
         boundViewHolders.add(holder)
-        viewModel.getEntriesForRangeSortedByDate(
+        val entriesLiveData = viewModel.getEntriesForRangeSortedByDate(
             counter.name,
             rangeStart.time,
             rangeEnd.time
-        ).observe(activity) { entries ->
-            holder.display(counter, entries, interval, rangeStart, rangeEnd, onIntervalChange) { this.onDateChange(it) }
-            onDataDisplayed()
+        )
+        maxCountLiveData.observe(activity) { maxCount ->
+            entriesLiveData.observe(activity) { entries ->
+                holder.display(
+                    counter,
+                    entries,
+                    interval,
+                    rangeStart,
+                    rangeEnd,
+                    maxCount,
+                    onIntervalChange
+                ) { this.onDateChange(it) }
+                onDataDisplayed()
+            }
         }
     }
 

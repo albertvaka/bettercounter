@@ -14,6 +14,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kde.bettercounter.boilerplate.AppDatabase
+import org.kde.bettercounter.extensions.toCalendar
+import org.kde.bettercounter.extensions.truncated
 import org.kde.bettercounter.persistence.AverageMode
 import org.kde.bettercounter.persistence.CounterColor
 import org.kde.bettercounter.persistence.CounterMetadata
@@ -285,6 +287,34 @@ class ViewModel(val application: Application) {
             //Log.e(TAG, "Queried ${entries.size} entries")
             CoroutineScope(Dispatchers.Main).launch {
                 ret.value = entries
+            }
+        }
+        return ret
+    }
+
+    fun getMaxCountForInterval(name: String, interval: Interval) : LiveData<Int> {
+        val ret = MutableLiveData<Int>()
+        // TODO: Maybe we should cancel the existing coroutine if already running?
+        CoroutineScope(Dispatchers.IO).launch {
+            val counterBegin = repo.getLeastRecentEntry(name)?.toCalendar() ?: Calendar.getInstance()
+            val cal = counterBegin.truncated(interval)
+            val entries = repo.getAllEntriesSortedByDate(name)
+            val bucketIntervalAsCalendarField = interval.asCalendarField()
+            var maxCount = 0
+            var entriesIndex = 0
+            while (entriesIndex < entries.size) {
+                cal.add(bucketIntervalAsCalendarField, 1) // Calendar is now at the end of the current bucket
+                var bucketCount = 0
+                while (entriesIndex < entries.size && entries[entriesIndex].date.time < cal.timeInMillis) {
+                    bucketCount++
+                    entriesIndex++
+                }
+                if (bucketCount > maxCount) {
+                    maxCount = bucketCount
+                }
+            }
+            CoroutineScope(Dispatchers.Main).launch {
+                ret.value = maxCount
             }
         }
         return ret
