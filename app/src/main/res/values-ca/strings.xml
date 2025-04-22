@@ -12,6 +12,7 @@
     <string name="edit_counter">Edita el comptador</string>
     <string name="delete">Esborra</string>
     <string name="delete_or_reset">Esborra/Reinicia</string>
+    <string name="interval_hour">Horari</string>
     <string name="interval_day">Diari</string>
     <string name="interval_week">Setmanal</string>
     <string name="interval_month">Mensual</string>
@@ -56,4 +57,15 @@
     <string name="display_interval">Interval a mostrar</string>
     <string name="goal">Objectiu</string>
     <string name="tutorial_change_graph_interval">Premeu per canviar l\'interval de temps</string>
+    <string name="settings">Preferències</string>
+    <string name="export_settings">Exportació automàtica</string>
+    <string name="auto_export">Exporta automàticament quan canviï un comptador</string>
+    <string name="current_export_file">Els comptadors s\'exportaran automàticament a %1$s</string>
+    <string name="export_disabled">Sempre podeu exportar els comptadors manualment des del menú contextual de la pantalla principal.</string>
+    <string name="change_button">Canvia</string>
+    <string name="export_error">Error en exportar</string>
+    <string name="average_calculation_settings">Càlcul de la mitjana</string>
+    <string name="average_mode_first_to_last">Mitjana entre la primera i l\'última entrada</string>
+    <string name="average_mode_first_to_now">Mitjana entre la primera entrada i ara</string>
+    <string name="search">Filtra</string>
 </resources>

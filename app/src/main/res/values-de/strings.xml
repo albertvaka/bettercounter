@@ -12,6 +12,7 @@
     <string name="edit_counter">Zähler bearbeiten</string>
     <string name="delete">Löschen</string>
     <string name="delete_or_reset">Löschen/Zurücksetzen</string>
+    <string name="interval_hour">Stunde</string>
     <string name="interval_day">Tag</string>
     <string name="interval_week">Woche</string>
     <string name="interval_month">Monat</string>
@@ -55,4 +56,15 @@
     <string name="display_interval">Anzeigezeitraum</string>
     <string name="goal">Ziel</string>
     <string name="tutorial_change_graph_interval">Tippen Sie, um das Zeitintervall zu ändern</string>
+    <string name="settings">Einstellungen</string>
+    <string name="export_settings">Automatischer Export</string>
+    <string name="auto_export">Automatisch exportieren, wenn sich ein Zähler ändert</string>
+    <string name="current_export_file">Zähler werden automatisch nach %1$s exportiert</string>
+    <string name="export_disabled">Sie können die Zähler jederzeit manuell über das Kontextmenü des Hauptbildschirms exportieren.</string>
+    <string name="change_button">Ändern</string>
+    <string name="export_error">Export fehlgeschlagen</string>
+    <string name="average_calculation_settings">Durchschnittsberechnung</string>
+    <string name="average_mode_first_to_last">Durchschnitt zwischen erstem und letztem Eintrag</string>
+    <string name="average_mode_first_to_now">Durchschnitt zwischen erstem Eintrag und jetzt</string>
+    <string name="search">Filter</string>
 </resources>

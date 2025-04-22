@@ -11,6 +11,7 @@
     <string name="save">保存</string>
     <string name="edit_counter">编辑计数器</string>
     <string name="delete">删除</string>
+    <string name="interval_hour">按小时统计</string>
     <string name="interval_day">按天统计</string>
     <string name="interval_week">按周统计</string>
     <string name="interval_month">按月统计</string>
@@ -54,4 +55,15 @@
     <string name="delete_or_reset">删除/重置</string>
     <string name="goal">目标次数</string>
     <string name="tutorial_change_graph_interval">点击可更改时间间隔</string>
+    <string name="settings">设置</string>
+    <string name="export_settings">自动导出</string>
+    <string name="auto_export">计数器变更时自动导出</string>
+    <string name="current_export_file">计数器将自动导出到 %1$s</string>
+    <string name="export_disabled">您随时可以从主屏幕的上下文菜单手动导出计数器。</string>
+    <string name="change_button">更改</string>
+    <string name="export_error">导出失败</string>
+    <string name="average_calculation_settings">平均值计算</string>
+    <string name="average_mode_first_to_last">从第一次到最后一次的平均值</string>
+    <string name="average_mode_first_to_now">从第一次到现在的平均值</string>
+    <string name="search">筛选</string>
 </resources>

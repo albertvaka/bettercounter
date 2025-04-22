@@ -12,6 +12,7 @@
     <string name="edit_counter">Editar el contador</string>
     <string name="delete">Eliminar</string>
     <string name="delete_or_reset">Eliminar/Reiniciar</string>
+    <string name="interval_hour">Horario</string>
     <string name="interval_day">Diario</string>
     <string name="interval_week">Semanal</string>
     <string name="interval_month">Mensual</string>
@@ -56,4 +57,15 @@
     <string name="display_interval">Intervalo a mostrar</string>
     <string name="goal">Objetivo</string>
     <string name="tutorial_change_graph_interval">Pulsar para cambiar el intervalo de tiempo</string>
+    <string name="settings">Ajustes</string>
+    <string name="export_settings">Exportación automática</string>
+    <string name="auto_export">Exportar automáticamente cuando cambie un contador</string>
+    <string name="current_export_file">Los contadores se exportarán automáticamente a %1$s</string>
+    <string name="export_disabled">Siempre puedes exportar los contadores manualmente desde el menú contextual de la pantalla principal.</string>
+    <string name="change_button">Cambiar</string>
+    <string name="export_error">Error al exportar</string>
+    <string name="average_calculation_settings">Cálculo de la media</string>
+    <string name="average_mode_first_to_last">Media entre la primera y la última entrada</string>
+    <string name="average_mode_first_to_now">Media entre la primera entrada y ahora</string>
+    <string name="search">Filtrar</string>
 </resources>

@@ -12,6 +12,7 @@
     <string name="edit_counter">Редактировать счетчик</string>
     <string name="delete">Удалить</string>
     <string name="delete_or_reset">Удалить/сбросить</string>
+    <string name="interval_hour">Ежечасно</string>
     <string name="interval_day">Ежедневно</string>
     <string name="interval_week">Еженедельно</string>
     <string name="interval_month">Ежемесячно</string>
@@ -56,4 +57,15 @@
     <string name="display_interval">интервал для отображения</string>
     <string name="goal">Цель</string>
     <string name="tutorial_change_graph_interval">Нажмите, чтобы изменить временной интервал</string>
+    <string name="settings">Настройки</string>
+    <string name="export_settings">Автоматический экспорт</string>
+    <string name="auto_export">Автоматически экспортировать при изменении счетчика</string>
+    <string name="current_export_file">Счетчики будут автоматически экспортированы в %1$s</string>
+    <string name="export_disabled">Вы всегда можете экспортировать счетчики вручную из контекстного меню главного экрана.</string>
+    <string name="change_button">Изменить</string>
+    <string name="export_error">Ошибка экспорта</string>
+    <string name="average_calculation_settings">Расчет среднего значения</string>
+    <string name="average_mode_first_to_last">Среднее между первой и последней записью</string>
+    <string name="average_mode_first_to_now">Среднее между первой записью и настоящим временем</string>
+    <string name="search">Фильтр</string>
 </resources>

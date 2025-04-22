@@ -12,6 +12,7 @@
     <string name="edit_counter">Sayacı düzenle</string>
     <string name="delete">Sil</string>
     <string name="delete_or_reset">Sil/Sıfırla</string>
+    <string name="interval_hour">Saatlik</string>
     <string name="interval_day">Günlük</string>
     <string name="interval_week">Haftalık</string>
     <string name="interval_month">Aylık</string>
@@ -55,4 +56,15 @@
     <string name="display_interval">Görüntülenecek aralık</string>
     <string name="goal">Hedef</string>
     <string name="tutorial_change_graph_interval">Zaman aralığını değiştirmek için dokunun</string>
+    <string name="settings">Ayarlar</string>
+    <string name="export_settings">Otomatik dışa aktarma</string>
+    <string name="auto_export">Bir sayaç değiştiğinde otomatik olarak dışa aktar</string>
+    <string name="current_export_file">Sayaçlar otomatik olarak %1$s konumuna dışa aktarılacak</string>
+    <string name="export_disabled">Sayaçları her zaman ana ekran bağlam menüsünden manuel olarak dışa aktarabilirsiniz.</string>
+    <string name="change_button">Değiştir</string>
+    <string name="export_error">Dışa aktarma başarısız</string>
+    <string name="average_calculation_settings">Ortalama hesaplama</string>
+    <string name="average_mode_first_to_last">İlk ve son kayıt arasındaki ortalama</string>
+    <string name="average_mode_first_to_now">İlk kayıt ile şimdi arasındaki ortalama</string>
+    <string name="search">Filtrele</string>
 </resources>
