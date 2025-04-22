@@ -1,0 +1,4 @@
+5.0:
+- Add a filter/search
+- Add settings to configure average calculation and auto-export
+- Keep Y axis the same for all charts
