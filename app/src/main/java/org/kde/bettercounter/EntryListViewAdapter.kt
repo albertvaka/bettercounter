@@ -31,6 +31,7 @@ class EntryListViewAdapter(
         fun onItemSelected(position: Int, counter: CounterSummary)
         fun onSelectedItemUpdated(position: Int, counter: CounterSummary)
         fun onItemAdded(position: Int)
+        fun cancelFilter()
     }
 
     var currentSelectedCounterName: String? = null
@@ -41,8 +42,10 @@ class EntryListViewAdapter(
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)
     private var counters: MutableList<String> = mutableListOf()
+    private var filteredCounters: MutableList<String> = mutableListOf()
+    private var filterQuery: String = ""
 
-    override fun getItemCount(): Int = counters.size
+    override fun getItemCount(): Int = filteredCounters.size
 
     private val touchHelper = ItemTouchHelper(DragAndSwipeTouchHelper(this))
 
@@ -56,9 +59,12 @@ class EntryListViewAdapter(
 
             fun observeNewCounter(counterName: String) {
                 viewModel.getCounterSummary(counterName).observe(activity) {
-                    notifyItemChanged(counters.indexOf(it.name), Unit)
-                    if (currentSelectedCounterName == it.name) {
-                        listObserver.onSelectedItemUpdated(counters.indexOf(it.name), it)
+                    val position = filteredCounters.indexOf(it.name)
+                    if (position >= 0) {
+                        notifyItemChanged(position, Unit)
+                        if (currentSelectedCounterName == it.name) {
+                            listObserver.onSelectedItemUpdated(position, it)
+                        }
                     }
                 }
             }
@@ -67,6 +73,7 @@ class EntryListViewAdapter(
             override fun onInitialCountersLoaded() {
                 activity.runOnUiThread {
                     counters = viewModel.getCounterList().toMutableList()
+                    filteredCounters = counters.toMutableList()
                     notifyDataSetChanged()
                     for (counterName in counters) {
                         observeNewCounter(counterName)
@@ -76,7 +83,9 @@ class EntryListViewAdapter(
 
             override fun onCounterAdded(counterName: String) {
                 activity.runOnUiThread {
+                    cancelFilter()
                     counters.add(counterName)
+                    filteredCounters.add(counterName)
                     val position = counters.size - 1
                     notifyItemInserted(position)
                     observeNewCounter(counterName)
@@ -85,8 +94,10 @@ class EntryListViewAdapter(
             }
 
             override fun onCounterRemoved(counterName: String) {
+                cancelFilter()
                 val position = counters.indexOf(counterName)
                 counters.removeAt(position)
+                filteredCounters.removeAt(position)
                 if (currentSelectedCounterName == counterName) {
                     currentSelectedCounterName = null
                 }
@@ -96,16 +107,19 @@ class EntryListViewAdapter(
             }
 
             override fun onCounterRenamed(oldName: String, newName: String) {
+                cancelFilter()
                 val position = counters.indexOf(oldName)
                 counters[position] = newName
-                if (currentSelectedCounterName == oldName) {
-                    currentSelectedCounterName = newName
-                    listObserver.onSelectedItemUpdated(position, viewModel.getCounterSummary(newName).value!!)
-                }
+                filteredCounters[position] = newName
                 activity.runOnUiThread {
                     // passing a second parameter disables the disappear+appear animation
                     notifyItemChanged(position, Unit)
                 }
+                if (currentSelectedCounterName == oldName) {
+                    currentSelectedCounterName = newName
+                    listObserver.onSelectedItemUpdated(position, viewModel.getCounterSummary(newName).value!!)
+                }
+
             }
 
             override fun onCounterDecremented(counterName: String, oldEntryDate: Date) {
@@ -122,9 +136,34 @@ class EntryListViewAdapter(
         })
     }
 
+    private fun cancelFilter() {
+        if (filterQuery != "") {
+            filterQuery = ""
+            filteredCounters = counters.toMutableList()
+            notifyDataSetChanged()
+        }
+        listObserver.cancelFilter()
+    }
+
+    fun applyFilter(query: String) {
+        if (query == filterQuery) {
+            return
+        }
+        filterQuery = query
+        if (filterQuery.isBlank()) {
+            filteredCounters = counters.toMutableList()
+        } else {
+            val lowerCaseQuery = query.trim().lowercase()
+            filteredCounters = counters.asSequence().filter {
+                it.lowercase().contains(lowerCaseQuery)
+            }.toMutableList()
+        }
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val binding = FragmentEntryBinding.inflate(inflater, parent, false)
-        val holder = EntryViewHolder(activity, binding, viewModel, touchHelper, ::selectCounter)
+        val holder = EntryViewHolder(activity, binding, viewModel, touchHelper, ::selectCounter, ::canDrag)
         return holder
     }
 
@@ -159,7 +198,8 @@ class EntryListViewAdapter(
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
-        val counter = viewModel.getCounterSummary(counters[position]).value
+        val counterName = filteredCounters[position]
+        val counter = viewModel.getCounterSummary(counterName).value
         if (counter != null) {
             holder.onBind(counter)
         } else {
@@ -171,10 +211,12 @@ class EntryListViewAdapter(
         if (fromPosition < toPosition) {
             for (i in fromPosition until toPosition) {
                 Collections.swap(counters, i, i + 1)
+                Collections.swap(filteredCounters, i, i + 1)
             }
         } else {
             for (i in fromPosition downTo toPosition + 1) {
                 Collections.swap(counters, i, i - 1)
+                Collections.swap(filteredCounters, i, i - 1)
             }
         }
         notifyItemMoved(fromPosition, toPosition)
@@ -186,6 +228,12 @@ class EntryListViewAdapter(
     }
 
     override fun onDragEnd(viewHolder: RecyclerView.ViewHolder?) {
+        assert(counters == filteredCounters) // do not save if the lists are out of sync
         viewModel.saveCounterOrder(counters)
     }
+
+    fun canDrag(): Boolean {
+        return filterQuery.isEmpty()
+    }
+
 }

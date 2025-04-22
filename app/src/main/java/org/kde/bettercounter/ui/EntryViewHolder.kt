@@ -18,6 +18,7 @@ class EntryViewHolder(
     private var viewModel: ViewModel,
     private val touchHelper: ItemTouchHelper,
     private val onClickListener: (counter: CounterSummary) -> Unit?,
+    private val canDrag: () -> Boolean
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun onBind(counter: CounterSummary) {
@@ -38,6 +39,7 @@ class EntryViewHolder(
         binding.decreaseButton.setOnClickListener { viewModel.decrementCounter(counter.name) }
         binding.draggableArea.setOnClickListener { onClickListener(counter) }
         binding.draggableArea.setOnLongClickListener {
+            if (!canDrag()) return@setOnLongClickListener false
             touchHelper.startDrag(this@EntryViewHolder)
             @Suppress("DEPRECATION")
             binding.draggableArea.performHapticFeedback(

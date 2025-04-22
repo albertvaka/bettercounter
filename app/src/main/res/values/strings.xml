@@ -66,4 +66,5 @@
     <string name="average_calculation_settings">Average Calculation</string>
     <string name="average_mode_first_to_last">Average between first entry and last entry</string>
     <string name="average_mode_first_to_now">Average between first entry and now</string>
+    <string name="search">Filter</string>
 </resources>

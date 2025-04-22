@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
@@ -37,6 +37,8 @@ import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.boilerplate.OpenFileParams
 import org.kde.bettercounter.boilerplate.OpenFileResultContract
+import org.kde.bettercounter.boilerplate.hideKeyboard
+import org.kde.bettercounter.boilerplate.isKeyboardVisible
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
 import org.kde.bettercounter.extensions.dpToPx
@@ -51,15 +53,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var entryViewAdapter: EntryListViewAdapter
     internal lateinit var binding: ActivityMainBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var searchMenuItem: MenuItem
     private var extraBottomPaddingForNavigationInset = 0
     private var intervalOverride: Interval? = null
     private var sheetIsExpanding = false
     private var onBackPressedCloseSheetCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             if (sheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                this.isEnabled = false
-                sheetIsExpanding = false
+                hideBottomSheet()
             }
         }
     }
@@ -117,6 +118,11 @@ class MainActivity : AppCompatActivity() {
         // Counter list
         // ------------
         entryViewAdapter = EntryListViewAdapter(this, viewModel, object : EntryListViewAdapter.EntryListObserver {
+            override fun cancelFilter() {
+                val searchView = searchMenuItem.actionView as SearchView
+                searchView.setQuery("", false)
+                searchMenuItem.collapseActionView()
+            }
             override fun onItemAdded(position: Int) {
                 binding.recycler.smoothScrollToPosition(position)
             }
@@ -133,29 +139,38 @@ class MainActivity : AppCompatActivity() {
                         binding.charts.scrollToPosition(chartPosition)
                     },
                     onDataDisplayed = {
-                        // Re-triggers calculating the expanded offset, since the height of the sheet
-                        // contents depend on whether the stats take one or two lines of text
-                        sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                        sheetUnfoldedPadding = binding.bottomSheet.height
-                        binding.recycler.smoothScrollToPosition(position)
-                        val bottomPadding = sheetUnfoldedPadding + extraBottomPaddingForSnackbar
-                        binding.recycler.setPadding(0, 0, 0, bottomPadding)
+                        lifecycleScope.launch {
+                            // Never show both the keyboard and the bottom sheet at the same time
+                            // This could happen when we come form renaming a counter, or from the filter.
+                            if (isKeyboardVisible(binding.root)) {
+                                hideKeyboard(binding.root)
+                                // HACK so the keyboard has time to hide before the panel expands.
+                                delay(100)
+                            }
+                            // We need to clear the focus so it triggers the onQueryTextFocusChangeListener  the next time it's clicked
+                            (searchMenuItem.actionView as SearchView).clearFocus()
+
+                            if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                                onBackPressedCloseSheetCallback.isEnabled = true
+                                sheetIsExpanding = true
+                            }
+                            // Set the state unconditionally because it re-triggers calculating the expanded offset.
+                            // Needed because the height of the sheet contents depend on whether the stats take one or two lines of text.
+                            sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+                            sheetUnfoldedPadding = binding.bottomSheet.height
+                            binding.recycler.smoothScrollToPosition(position)
+                            val bottomPadding = sheetUnfoldedPadding + extraBottomPaddingForSnackbar
+                            binding.recycler.setPadding(0, 0, 0, bottomPadding)
+                        }
                     }
                 )
                 binding.charts.swapAdapter(adapter, true)
                 binding.charts.scrollToPosition(adapter.itemCount - 1) // Select the latest chart
             }
             override fun onItemSelected(position: Int, counter: CounterSummary) {
-                if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                    sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    onBackPressedCloseSheetCallback.isEnabled = true
-                    sheetIsExpanding = true
-                }
-
                 setFabToEdit(counter)
-
                 intervalOverride = null
-
                 onSelectedItemUpdated(position, counter)
             }
         })
@@ -186,8 +201,41 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.main, menu)
+        menuInflater.inflate(R.menu.main, menu)
+
+        searchMenuItem = menu.findItem(R.id.action_search)
+        val searchView = searchMenuItem.actionView as SearchView
+
+        searchView.setOnQueryTextFocusChangeListener { _, focus ->
+            if (focus) {
+                hideBottomSheet()
+            } else if (searchView.query.isNullOrEmpty()) {
+                searchMenuItem.collapseActionView()
+            }
+        }
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                searchView.clearFocus() // to hide the cursor since the keyboard is no longer open
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                entryViewAdapter.applyFilter(newText.orEmpty())
+                return true
+            }
+        })
+
+        searchMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                entryViewAdapter.applyFilter("") // Clear filter when search is closed
+                return true
+            }
+        })
+
         return true
     }
 
@@ -342,15 +390,11 @@ class MainActivity : AppCompatActivity() {
                         .setMessage(R.string.delete_confirmation)
                         .setNeutralButton(R.string.reset) { _, _ ->
                             viewModel.resetCounter(counter.name)
-                            sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                            onBackPressedCloseSheetCallback.isEnabled = false
-                            sheetIsExpanding = false
+                            hideBottomSheet()
                         }
                         .setPositiveButton(R.string.delete) { _, _ ->
                             viewModel.deleteCounter(counter.name)
-                            sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                            onBackPressedCloseSheetCallback.isEnabled = false
-                            sheetIsExpanding = false
+                            hideBottomSheet()
                             removeWidgets(this, counter.name)
                         }
                         .setNegativeButton(R.string.cancel, null)
@@ -358,6 +402,12 @@ class MainActivity : AppCompatActivity() {
                 }
                 .show()
         }
+    }
+
+    private fun hideBottomSheet() {
+        sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        onBackPressedCloseSheetCallback.isEnabled = false
+        sheetIsExpanding = false
     }
 
     private fun setAndroid15insets() {
