@@ -5,9 +5,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.boilerplate.Converters
-import org.kde.bettercounter.extensions.addInterval
-import org.kde.bettercounter.extensions.copy
-import org.kde.bettercounter.extensions.truncate
+import org.kde.bettercounter.extensions.plusInterval
+import org.kde.bettercounter.extensions.truncated
 import java.util.Calendar
 import java.util.Date
 
@@ -110,9 +109,9 @@ class Repository(
         val goal = getCounterGoal(name)
         val intervalStartDate = when (interval) {
             Interval.LIFETIME -> Calendar.getInstance().apply { set(Calendar.YEAR, 1990) }
-            else -> Calendar.getInstance().apply { truncate(interval) }
+            else -> Calendar.getInstance().truncated(interval)
         }
-        val intervalEndDate = intervalStartDate.copy().apply { addInterval(interval, 1) }
+        val intervalEndDate = intervalStartDate.plusInterval(interval, 1)
         return CounterSummary(
             name = name,
             color = color,
@@ -148,6 +147,7 @@ class Repository(
     suspend fun getEntriesForRangeSortedByDate(name: String, since: Date, until: Date): List<Entry> {
         return entryDao.getAllEntriesInRangeSortedByDate(name, since, until)
     }
+
     suspend fun getAllEntriesSortedByDate(name: String): List<Entry> {
         return entryDao.getAllEntriesSortedByDate(name)
     }

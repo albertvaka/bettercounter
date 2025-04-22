@@ -9,8 +9,8 @@ import java.util.Date
 // Rounds up to the nearest integer. Both dates included. Eg: returns 2 weeks from Monday at 00:00 to next Monday at 00:00
 fun ChronoUnit.count(fromDate: Date, toDate: Date): Int {
     val calendarField = toCalendarField()
-    val truncatedFrom = fromDate.toCalendar().apply { truncate(calendarField) }
-    val truncatedTo = toDate.toCalendar().apply { truncate(calendarField) }
+    val truncatedFrom = fromDate.toCalendar().truncated(calendarField)
+    val truncatedTo = toDate.toCalendar().truncated(calendarField)
     return between(truncatedFrom, truncatedTo).toInt() + 1
 }
 

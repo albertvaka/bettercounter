@@ -118,13 +118,14 @@ class BetterChart : BarChart {
             return
         }
 
-        val (numBuckets, bucketIntervalAsCalendarField) = when (totalInterval) {
-            Interval.HOUR -> 60 to Calendar.MINUTE
-            Interval.DAY -> 24 to Calendar.HOUR_OF_DAY
-            Interval.WEEK -> 7 to Calendar.DAY_OF_WEEK
-            Interval.MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH) to Calendar.DAY_OF_MONTH
-            Interval.YEAR -> 12 to Calendar.MONTH
-            Interval.LIFETIME -> 0 to 0.also { assert(false) } // Not a valid display interval
+        val bucketIntervalAsCalendarField = totalInterval.asCalendarField()
+        val numBuckets = when (totalInterval) {
+            Interval.HOUR -> 60
+            Interval.DAY -> 24
+            Interval.WEEK -> 7
+            Interval.MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH)
+            Interval.YEAR -> 12
+            else -> 0.also { assert(false) }
         }
 
         xAxis.granularity = when (totalInterval) {

@@ -5,12 +5,11 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.databinding.FragmentChartBinding
-import org.kde.bettercounter.extensions.addInterval
 import org.kde.bettercounter.extensions.between
-import org.kde.bettercounter.extensions.copy
 import org.kde.bettercounter.extensions.count
+import org.kde.bettercounter.extensions.plusInterval
 import org.kde.bettercounter.extensions.toCalendar
-import org.kde.bettercounter.extensions.truncate
+import org.kde.bettercounter.extensions.truncated
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.ui.ChartHolder
@@ -40,7 +39,7 @@ class ChartsAdapter(
 
     override fun onBindViewHolder(holder: ChartHolder, position: Int) {
         val rangeStart = findRangeStartForPosition(position)
-        val rangeEnd = rangeStart.copy().apply { addInterval(interval, 1) }
+        val rangeEnd = rangeStart.plusInterval(interval, 1)
         boundViewHolders.add(holder)
         viewModel.getEntriesForRangeSortedByDate(
             counter.name,
@@ -53,21 +52,15 @@ class ChartsAdapter(
     }
 
     private fun findRangeStartForPosition(position: Int): Calendar {
-        val cal = Calendar.getInstance()
-        val endRange = counter.leastRecent
-        if (endRange != null) {
-            cal.time = endRange
-        }
-        cal.truncate(interval)
-        cal.addInterval(interval, position)
-        return cal
+        val counterBegin = counter.leastRecent?.toCalendar() ?: Calendar.getInstance()
+        val firstInterval = counterBegin.truncated(interval)
+        return firstInterval.plusInterval(interval, position)
     }
 
     fun findPositionForRangeStart(cal: Calendar): Int {
         val endRange = counter.leastRecent
         if (endRange != null) {
-            val endCal = endRange.toCalendar()
-            endCal.truncate(interval)
+            val endCal = endRange.toCalendar().truncated(interval)
             val count = interval.toChronoUnit().between(endCal, cal).toInt()
             return count.coerceIn(0, numCharts - 1)
         }

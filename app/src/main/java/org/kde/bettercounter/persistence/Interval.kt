@@ -3,6 +3,7 @@ package org.kde.bettercounter.persistence
 import android.content.Context
 import org.kde.bettercounter.R
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
 
 enum class Interval(val humanReadableResource: Int) {
     HOUR(R.string.interval_hour),
@@ -19,6 +20,15 @@ enum class Interval(val humanReadableResource: Int) {
         fun humanReadableValues(context: Context): List<String> {
             return entries.map { context.getString(it.humanReadableResource) }
         }
+    }
+
+    fun asCalendarField(): Int = when (this) {
+        HOUR -> Calendar.MINUTE
+        DAY -> Calendar.HOUR_OF_DAY
+        WEEK -> Calendar.DAY_OF_WEEK
+        MONTH -> Calendar.DAY_OF_MONTH
+        YEAR -> Calendar.MONTH
+        LIFETIME -> Calendar.MONTH // Not really, but :shrug:
     }
 
     fun toChronoUnit(): ChronoUnit =
