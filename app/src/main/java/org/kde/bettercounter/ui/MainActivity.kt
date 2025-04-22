@@ -46,6 +46,7 @@ import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
+import kotlin.math.max
 
 class MainActivity : AppCompatActivity() {
 
@@ -99,12 +100,20 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onSlide(bottomSheet: View, negativeSlideOffset: Float) {
-                if (!sheetIsExpanding) { // only do this when collapsing. when expanding we set the final padding at once so smoothScrollToPosition can do its job
-                    val sheetPadding = sheetFoldedPadding + ((1.0 + negativeSlideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
-                    val navigationPadding = extraBottomPaddingForNavigationInset - ((1.0 + negativeSlideOffset) * extraBottomPaddingForNavigationInset).toInt()
+            override fun onSlide(bottomSheet: View, buggySlideOffset: Float) {
+                // Only do this when collapsing. When expanding we set the final padding at once so
+                // `smoothScrollToPosition` can do its job.
+                if (!sheetIsExpanding) {
+                    // According to the docs, `slideOffset` is in the range [0, 1] when the sheet
+                    // is expanding and [-1, 0] when it is collapsing. Here it's always negative.
+                    // The `max` fixes a bug in the BottomSheet where the numbers becomes smaller
+                    // than -1 if the sheet is collapsing at the same time the keyboard is expanding.
+                    val slideOffset = max(-1f, buggySlideOffset)
+                    val sheetPadding = sheetFoldedPadding + ((1.0 + slideOffset) * (sheetUnfoldedPadding - sheetFoldedPadding)).toInt()
+                    val navigationPadding = extraBottomPaddingForNavigationInset - ((1.0 + slideOffset) * extraBottomPaddingForNavigationInset).toInt()
                     val bottomPadding = sheetPadding + extraBottomPaddingForSnackbar + navigationPadding
                     binding.recycler.setPadding(0, 0, 0, bottomPadding)
+
                 }
             }
         })
