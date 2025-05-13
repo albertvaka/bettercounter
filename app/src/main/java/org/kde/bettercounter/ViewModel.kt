@@ -57,14 +57,10 @@ class ViewModel(val application: Application) {
             summaryMap[name] = MutableLiveData()
         }
         CoroutineScope(Dispatchers.IO).launch {
-            val counters = mutableListOf<CounterSummary>()
             for (name in initialCounters) {
-                counters.add(repo.getCounterSummary(name))
+                summaryMap[name]?.postValue(repo.getCounterSummary(name))
             }
             withContext(Dispatchers.Main) {
-                for (counter in counters) {
-                    summaryMap[counter.name]!!.value = counter
-                }
                 synchronized(this) {
                     for (observer in counterObservers) {
                         observer.onInitialCountersLoaded()
