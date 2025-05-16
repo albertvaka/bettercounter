@@ -195,7 +195,9 @@ class MainActivity : AppCompatActivity() {
 
         // For some reason, when the app is installed via Android Studio, the broadcast that
         // refreshes the widgets after installing doesn't trigger. Do it manually here.
-        forceRefreshWidgets(this)
+        WidgetProvider.forceRefreshWidgets(this)
+
+        WidgetProvider.scheduleHourlyUpdate(this)
 
         startRefreshEveryHourBoundary()
     }
@@ -404,7 +406,7 @@ class MainActivity : AppCompatActivity() {
                         .setPositiveButton(R.string.delete) { _, _ ->
                             viewModel.deleteCounter(counter.name)
                             hideBottomSheet()
-                            removeWidgets(this, counter.name)
+                            WidgetProvider.removeWidgets(this, counter.name)
                         }
                         .setNegativeButton(R.string.cancel, null)
                         .show()
