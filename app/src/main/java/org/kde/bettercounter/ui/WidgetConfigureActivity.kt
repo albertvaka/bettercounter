@@ -53,7 +53,7 @@ class WidgetConfigureActivity : AppCompatActivity() {
             saveWidgetCounterNamePref(this, appWidgetId, counterName)
 
             val appWidgetManager = AppWidgetManager.getInstance(this)
-            updateAppWidget(this, viewModel, appWidgetManager, appWidgetId)
+            WidgetProvider.updateAppWidget(this, viewModel, appWidgetManager, appWidgetId)
 
             val resultValue = Intent()
             resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
