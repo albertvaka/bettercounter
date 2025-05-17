@@ -10,32 +10,18 @@ import android.content.Intent
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.Observer
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
-import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.persistence.CounterSummary
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.concurrent.TimeUnit
 
 class WidgetProvider : AppWidgetProvider() {
 
-    override fun onEnabled(context: Context) {
-        super.onEnabled(context)
-        scheduleHourlyUpdate(context)
-    }
-
-    override fun onDisabled(context: Context) {
-        super.onDisabled(context)
-        cancelHourlyUpdate(context)
-    }
-
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        Log.d(TAG, "onUpdate")
         val viewModel = (context.applicationContext as BetterApplication).viewModel
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, viewModel, appWidgetManager, appWidgetId)
@@ -63,43 +49,14 @@ class WidgetProvider : AppWidgetProvider() {
             }
             val counterName = loadWidgetCounterNamePref(context, appWidgetId)
             val viewModel = (context.applicationContext as BetterApplication).viewModel
-            viewModel.incrementCounterWithCallback(counterName) {
-                if (!viewModel.getCounterSummary(counterName).hasObservers()) {
-                    // The app was terminated and we got unsubscribed
-                    Log.d(TAG, "CounterSummary has no observers")
-                    updateAppWidget(context, viewModel, AppWidgetManager.getInstance(context), appWidgetId)
-                }
-            }
+            viewModel.incrementCounter(counterName)
         }
     }
 
     companion object {
         private const val TAG = "WidgetProvider"
-        private const val WORK_NAME = "widget_update_work"
         private const val ACTION_COUNT = "org.kde.bettercounter.WidgetProvider.COUNT"
         private const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"
-
-        fun scheduleHourlyUpdate(context: Context) {
-            if (getAllWidgetIds(context).isEmpty()) {
-                Log.d(TAG, "Not scheduling hourly update because there are no widgets")
-                return
-            }
-            Log.d(TAG, "Scheduling hourly update")
-            val workRequest = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(1, TimeUnit.HOURS)
-                .setInitialDelay(millisecondsUntilNextHour(), TimeUnit.MILLISECONDS)
-                .build()
-
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                WORK_NAME,
-                ExistingPeriodicWorkPolicy.UPDATE,
-                workRequest
-            )
-        }
-
-        private fun cancelHourlyUpdate(context: Context) {
-            Log.d(TAG, "Cancelling hourly update")
-            WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
-        }
 
         private fun getAllWidgetIds(context: Context): IntArray {
             return AppWidgetManager.getInstance(context).getAppWidgetIds(
@@ -120,6 +77,10 @@ class WidgetProvider : AppWidgetProvider() {
             }
         }
 
+        /**
+         * Do not call more than once in the lifetime of the app! Calling this triggers onUpdate, which calls updateAppWidget
+         * which sets a forever observer on the counter. Calling this more than once creates redundant observers.
+         */
         fun forceRefreshWidgets(context: Context) {
             Log.d(TAG, "forceRefreshWidgets called")
             val intent = Intent(context, WidgetProvider::class.java)

@@ -108,17 +108,6 @@ class ViewModel(val application: Application) {
         }
     }
 
-    fun incrementCounterWithCallback(name: String, date: Date = Calendar.getInstance().time, callback: () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            repo.addEntry(name, date)
-            summaryMap[name]?.postValue(repo.getCounterSummary(name))
-            CoroutineScope(Dispatchers.Main).launch {
-                callback()
-            }
-            autoExportIfEnabled()
-        }
-    }
-
     fun decrementCounter(name: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val oldEntryDate = repo.removeEntry(name)
@@ -318,7 +307,11 @@ class ViewModel(val application: Application) {
 
     suspend fun refreshAllObservers() {
         for ((name, summary) in summaryMap) {
-            summary.postValue(repo.getCounterSummary(name))
+            if (summary.hasObservers()) {
+                summary.postValue(repo.getCounterSummary(name))
+            } else {
+                Log.d(TAG, "Not refreshing $name because it has no observers")
+            }
         }
     }
 
