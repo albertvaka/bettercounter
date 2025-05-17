@@ -1,6 +1,5 @@
 package org.kde.bettercounter.ui
 
-import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
@@ -11,6 +10,9 @@ import android.content.Intent
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.Observer
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
@@ -19,6 +21,7 @@ import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.persistence.CounterSummary
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.concurrent.TimeUnit
 
 class WidgetProvider : AppWidgetProvider() {
 
@@ -72,30 +75,31 @@ class WidgetProvider : AppWidgetProvider() {
 
     companion object {
         private const val TAG = "WidgetProvider"
-
+        private const val WORK_NAME = "widget_update_work"
         private const val ACTION_COUNT = "org.kde.bettercounter.WidgetProvider.COUNT"
         private const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"
 
         fun scheduleHourlyUpdate(context: Context) {
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val intent = Intent(context, WidgetProvider::class.java)
-            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-            alarmManager.setInexactRepeating(
-                AlarmManager.RTC,
-                System.currentTimeMillis() + millisecondsUntilNextHour(),
-                AlarmManager.INTERVAL_HOUR,
-                pendingIntent
+            if (getAllWidgetIds(context).isEmpty()) {
+                Log.d(TAG, "Not scheduling hourly update because there are no widgets")
+                return
+            }
+            Log.d(TAG, "Scheduling hourly update")
+            val workRequest = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(1, TimeUnit.HOURS)
+                .setInitialDelay(millisecondsUntilNextHour(), TimeUnit.MILLISECONDS)
+                .build()
+
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                WORK_NAME,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                workRequest
             )
         }
 
         private fun cancelHourlyUpdate(context: Context) {
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val intent = Intent(context, WidgetProvider::class.java)
-            val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-            alarmManager.cancel(pendingIntent)
+            Log.d(TAG, "Cancelling hourly update")
+            WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
         }
-
 
         private fun getAllWidgetIds(context: Context): IntArray {
             return AppWidgetManager.getInstance(context).getAppWidgetIds(
