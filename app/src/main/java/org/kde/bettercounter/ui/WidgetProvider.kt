@@ -81,7 +81,7 @@ class WidgetProvider : AppWidgetProvider() {
          * Do not call more than once in the lifetime of the app! Calling this triggers onUpdate, which calls updateAppWidget
          * which sets a forever observer on the counter. Calling this more than once creates redundant observers.
          */
-        fun forceRefreshWidgets(context: Context) {
+        fun startObservingCounters(context: Context) {
             Log.d(TAG, "forceRefreshWidgets called")
             val intent = Intent(context, WidgetProvider::class.java)
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
@@ -141,11 +141,13 @@ class WidgetProvider : AppWidgetProvider() {
                     Log.d(TAG, "onChanged")
                     if (!existsWidgetCounterNamePref(context, appWidgetId)) {
                         // Prevent leaking the observer once the widget has been deleted by deleting it here
+                        Log.d(TAG, "Counter doesn't exist anymore, removing observer")
                         viewModel.getCounterSummary(value.name).removeObserver(this)
                         return
                     }
                     if (prevCounterName != value.name) {
                         // Counter is being renamed, replace the name stored in the sharedpref
+                        Log.d(TAG, "Counter renamed, updated widget preference")
                         saveWidgetCounterNamePref(context, appWidgetId, value.name)
                         prevCounterName = value.name
                     }

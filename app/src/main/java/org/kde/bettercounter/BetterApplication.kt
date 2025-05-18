@@ -1,8 +1,12 @@
 package org.kde.bettercounter
 
 import android.app.Application
+import android.content.Intent
+import android.content.IntentFilter
 import android.util.Log
+import org.kde.bettercounter.boilerplate.BootReceiver
 import org.kde.bettercounter.ui.WidgetProvider
+
 
 class BetterApplication : Application() {
 
@@ -12,7 +16,7 @@ class BetterApplication : Application() {
         super.onCreate()
         Log.e("BetterApplication", "onCreate")
         viewModel = ViewModel(this)
-        WidgetProvider.forceRefreshWidgets(this)
-        HourlyUpdateWorker.scheduleHourlyUpdate(this)
+        WidgetProvider.startObservingCounters(this)
+        BootReceiver.scheduleHourlyUpdate(this)
     }
 }

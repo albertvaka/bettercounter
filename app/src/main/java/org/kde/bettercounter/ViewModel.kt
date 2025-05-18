@@ -73,7 +73,7 @@ class ViewModel(val application: Application) {
 
     @MainThread
     fun observeCounterChange(observer: CounterObserver) {
-        Log.d(TAG, "observeCounterChange SIZE" + counterObservers.size)
+        Log.d(TAG, "observeCounterChange size=${counterObservers.size}")
         synchronized(this) {
             counterObservers.add(observer)
             if (initialized) {
@@ -298,19 +298,22 @@ class ViewModel(val application: Application) {
                     maxCount = bucketCount
                 }
             }
-            CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.Main) {
                 ret.value = maxCount
             }
         }
         return ret
     }
 
-    suspend fun refreshAllObservers() {
-        for ((name, summary) in summaryMap) {
-            if (summary.hasObservers()) {
-                summary.postValue(repo.getCounterSummary(name))
-            } else {
-                Log.d(TAG, "Not refreshing $name because it has no observers")
+    fun refreshAllObservers() {
+        Log.d(TAG, "refreshAllObservers called")
+        CoroutineScope(Dispatchers.IO).launch {
+            for ((name, summary) in summaryMap) {
+                if (summary.hasObservers()) {
+                    summary.postValue(repo.getCounterSummary(name))
+                } else {
+                    Log.d(TAG, "Not refreshing $name because it has no observers")
+                }
             }
         }
     }
