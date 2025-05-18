@@ -22,10 +22,10 @@ class WidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Log.d(TAG, "onUpdate")
+        // The counters should already be observing changes in the ViewModel, since we do that on app start,
+        // so we just need to refresh the LiveDatas from the ViewModel here.
         val viewModel = (context.applicationContext as BetterApplication).viewModel
-        for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, viewModel, appWidgetManager, appWidgetId)
-        }
+        viewModel.refreshAllObservers()
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
@@ -50,12 +50,19 @@ class WidgetProvider : AppWidgetProvider() {
             val counterName = loadWidgetCounterNamePref(context, appWidgetId)
             val viewModel = (context.applicationContext as BetterApplication).viewModel
             viewModel.incrementCounter(counterName)
+        } else if (intent.action == ACTION_START_OBSERVING) {
+            val viewModel = (context.applicationContext as BetterApplication).viewModel
+            val appWidgetIds = getAllWidgetIds(context)
+            for (appWidgetId in appWidgetIds) {
+                updateAppWidget(context, viewModel, AppWidgetManager.getInstance(context), appWidgetId)
+            }
         }
     }
 
     companion object {
         private const val TAG = "WidgetProvider"
         private const val ACTION_COUNT = "org.kde.bettercounter.WidgetProvider.COUNT"
+        private const val ACTION_START_OBSERVING = "org.kde.bettercounter.WidgetProvider.ACTION_START_OBSERVING"
         private const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"
 
         private fun getAllWidgetIds(context: Context): IntArray {
@@ -65,9 +72,9 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         fun removeWidgets(context: Context, counterName: String) {
-            val ids = getAllWidgetIds(context)
+            val appWidgetIds = getAllWidgetIds(context)
             val host = AppWidgetHost(context, 0)
-            for (appWidgetId in ids) {
+            for (appWidgetId in appWidgetIds) {
                 if (counterName == loadWidgetCounterNamePref(context, appWidgetId)) {
                     Log.d(TAG, "Deleting widget")
                     // In Android 5 deleteAppWidgetId doesn't remove the widget but in Android 13 it does.
@@ -77,15 +84,10 @@ class WidgetProvider : AppWidgetProvider() {
             }
         }
 
-        /**
-         * Do not call more than once in the lifetime of the app! Calling this triggers onUpdate, which calls updateAppWidget
-         * which sets a forever observer on the counter. Calling this more than once creates redundant observers.
-         */
         fun startObservingCounters(context: Context) {
-            Log.d(TAG, "forceRefreshWidgets called")
+            Log.d(TAG, "startObservingCounters called")
             val intent = Intent(context, WidgetProvider::class.java)
-            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, getAllWidgetIds(context))
+            intent.action = ACTION_START_OBSERVING
             context.sendBroadcast(intent)
         }
 

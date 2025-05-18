@@ -75,7 +75,6 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.recyclerview)
     implementation(libs.material)
-    implementation(libs.androidx.work.runtime.ktx)
 
     coreLibraryDesugaring(libs.android.desugarJdkLibs) // Chrono.UNITS for Android < 26
     testImplementation(libs.junit)
