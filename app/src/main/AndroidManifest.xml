@@ -17,7 +17,6 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="org.kde.bettercounter.WidgetProvider.COUNT" />
-                <action android:name="org.kde.bettercounter.WidgetProvider.ACTION_START_OBSERVING" />
             </intent-filter>
 
             <meta-data

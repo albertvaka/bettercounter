@@ -24,6 +24,7 @@ import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Repository
 import org.kde.bettercounter.persistence.Tutorial
+import org.kde.bettercounter.ui.WidgetProvider
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Calendar
@@ -68,6 +69,7 @@ class ViewModel(val application: Application) {
                     initialized = true
                 }
             }
+            WidgetProvider.triggerRefresh(application)
         }
     }
 
@@ -104,6 +106,7 @@ class ViewModel(val application: Application) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.addEntry(name, date)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            WidgetProvider.triggerRefresh(application)
             autoExportIfEnabled()
         }
     }
@@ -117,6 +120,7 @@ class ViewModel(val application: Application) {
                     observer.onCounterDecremented(name, oldEntryDate)
                 }
             }
+            WidgetProvider.triggerRefresh(application)
             autoExportIfEnabled()
         }
     }
@@ -161,6 +165,7 @@ class ViewModel(val application: Application) {
             }
             summaryMap[newName] = counter
             counter.postValue(repo.getCounterSummary(newName))
+            WidgetProvider.triggerRename(application, oldName, newName)
             withContext(Dispatchers.Main) {
                 for (observer in counterObservers) {
                     observer.onCounterRenamed(oldName, newName)
@@ -305,15 +310,13 @@ class ViewModel(val application: Application) {
         return ret
     }
 
-    fun refreshAllObservers() {
+    suspend fun refreshAllObservers() {
         Log.d(TAG, "refreshAllObservers called")
-        CoroutineScope(Dispatchers.IO).launch {
-            for ((name, summary) in summaryMap) {
-                if (summary.hasObservers()) {
-                    summary.postValue(repo.getCounterSummary(name))
-                } else {
-                    Log.d(TAG, "Not refreshing $name because it has no observers")
-                }
+        for ((name, summary) in summaryMap) {
+            if (summary.hasObservers()) {
+                summary.postValue(repo.getCounterSummary(name))
+            } else {
+                Log.d(TAG, "Not refreshing $name because it has no observers")
             }
         }
     }

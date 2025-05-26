@@ -9,12 +9,10 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.RemoteViews
-import androidx.lifecycle.Observer
 import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
-import org.kde.bettercounter.persistence.CounterSummary
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -22,10 +20,10 @@ class WidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Log.d(TAG, "onUpdate")
-        // The counters should already be observing changes in the ViewModel, since we do that on app start,
-        // so we just need to refresh the LiveDatas from the ViewModel here.
         val viewModel = (context.applicationContext as BetterApplication).viewModel
-        viewModel.refreshAllObservers()
+        for (appWidgetId in appWidgetIds) {
+            updateAppWidget(context, viewModel, AppWidgetManager.getInstance(context), appWidgetId)
+        }
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
@@ -50,25 +48,35 @@ class WidgetProvider : AppWidgetProvider() {
             val counterName = loadWidgetCounterNamePref(context, appWidgetId)
             val viewModel = (context.applicationContext as BetterApplication).viewModel
             viewModel.incrementCounter(counterName)
-        } else if (intent.action == ACTION_START_OBSERVING) {
-            val viewModel = (context.applicationContext as BetterApplication).viewModel
-            val appWidgetIds = getAllWidgetIds(context)
-            for (appWidgetId in appWidgetIds) {
-                updateAppWidget(context, viewModel, AppWidgetManager.getInstance(context), appWidgetId)
-            }
         }
     }
 
     companion object {
         private const val TAG = "WidgetProvider"
         private const val ACTION_COUNT = "org.kde.bettercounter.WidgetProvider.COUNT"
-        private const val ACTION_START_OBSERVING = "org.kde.bettercounter.WidgetProvider.ACTION_START_OBSERVING"
         private const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"
 
         private fun getAllWidgetIds(context: Context): IntArray {
             return AppWidgetManager.getInstance(context).getAppWidgetIds(
                 ComponentName(context, WidgetProvider::class.java)
             )
+        }
+
+        fun triggerRefresh(context: Context) {
+            Log.d(TAG, "triggerRefresh called")
+            val intent = Intent(context, WidgetProvider::class.java)
+            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, getAllWidgetIds(context))
+            context.sendBroadcast(intent)
+        }
+
+        fun triggerRename(context: Context, counterName: String, prevCounterName: String) {
+            val appWidgetIds = getAllWidgetIds(context)
+            for (appWidgetId in appWidgetIds) {
+                if (prevCounterName == loadWidgetCounterNamePref(context, appWidgetId)) {
+                    saveWidgetCounterNamePref(context, appWidgetId, counterName)
+                }
+            }
         }
 
         fun removeWidgets(context: Context, counterName: String) {
@@ -82,13 +90,6 @@ class WidgetProvider : AppWidgetProvider() {
                     deleteWidgetCounterNamePref(context, appWidgetId)
                 }
             }
-        }
-
-        fun startObservingCounters(context: Context) {
-            Log.d(TAG, "startObservingCounters called")
-            val intent = Intent(context, WidgetProvider::class.java)
-            intent.action = ACTION_START_OBSERVING
-            context.sendBroadcast(intent)
         }
 
         internal fun updateAppWidget(
@@ -113,6 +114,8 @@ class WidgetProvider : AppWidgetProvider() {
 
             val views = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.widget)
 
+            views.setTextViewText(R.id.widgetName, counterName)
+
             val openAppIntent = Intent(context, MainActivity::class.java)
             val openAppPendingIntent = PendingIntent.getActivity(context, 0, openAppIntent, PendingIntent.FLAG_IMMUTABLE)
             views.setOnClickPendingIntent(R.id.widgetName, openAppPendingIntent)
@@ -127,6 +130,12 @@ class WidgetProvider : AppWidgetProvider() {
                 return
             }
 
+            val counter = viewModel.getCounterSummary(counterName).value
+            if (counter == null) {
+                views.setTextViewText(R.id.widgetCounter, "...")
+                return
+            }
+
             val countIntent = Intent(context, WidgetProvider::class.java)
             countIntent.action = ACTION_COUNT
             countIntent.putExtra(EXTRA_WIDGET_ID, appWidgetId)
@@ -136,45 +145,24 @@ class WidgetProvider : AppWidgetProvider() {
             val countPendingIntent = PendingIntent.getBroadcast(context, appWidgetId, countIntent, PendingIntent.FLAG_IMMUTABLE)
             views.setOnClickPendingIntent(R.id.widgetBackground, countPendingIntent)
 
-            var prevCounterName = counterName
-            // observeForever means it's not attached to any lifecycle so we need to call removeObserver manually
-            viewModel.getCounterSummary(counterName).observeForever(object : Observer<CounterSummary> {
-                override fun onChanged(value: CounterSummary) {
-                    Log.d(TAG, "onChanged")
-                    if (!existsWidgetCounterNamePref(context, appWidgetId)) {
-                        // Prevent leaking the observer once the widget has been deleted by deleting it here
-                        Log.d(TAG, "Counter doesn't exist anymore, removing observer")
-                        viewModel.getCounterSummary(value.name).removeObserver(this)
-                        return
-                    }
-                    if (prevCounterName != value.name) {
-                        // Counter is being renamed, replace the name stored in the sharedpref
-                        Log.d(TAG, "Counter renamed, updated widget preference")
-                        saveWidgetCounterNamePref(context, appWidgetId, value.name)
-                        prevCounterName = value.name
-                    }
-
-                    views.setInt(R.id.widgetBackground, "setBackgroundColor", value.color.colorInt)
-                    views.setTextViewText(R.id.widgetName, value.name)
-                    views.setTextViewText(R.id.widgetCounter, value.getFormattedCount())
-                    val date = value.mostRecent
-                    if (date != null) {
-                        val now = Date()
-                        val diffInMillis = now.time - date.time
-                        val isRecent = diffInMillis < (12 * 60 * 60 * 1000L) // 12 hours
-                        val dateFormat = if (isRecent) {
-                            SimpleDateFormat.getTimeInstance()
-                        } else {
-                            SimpleDateFormat.getDateInstance()
-                        }
-                        val formattedDate = dateFormat.format(date)
-                        views.setTextViewText(R.id.widgetTime, formattedDate)
-                    } else {
-                        views.setTextViewText(R.id.widgetTime, context.getString(R.string.never))
-                    }
-                    appWidgetManager.updateAppWidget(appWidgetId, views)
+            views.setInt(R.id.widgetBackground, "setBackgroundColor", counter.color.colorInt)
+            views.setTextViewText(R.id.widgetCounter, counter.getFormattedCount())
+            val date = counter.mostRecent
+            if (date != null) {
+                val now = Date()
+                val diffInMillis = now.time - date.time
+                val isRecent = diffInMillis < (12 * 60 * 60 * 1000L) // 12 hours
+                val dateFormat = if (isRecent) {
+                    SimpleDateFormat.getTimeInstance()
+                } else {
+                    SimpleDateFormat.getDateInstance()
                 }
-            })
+                val formattedDate = dateFormat.format(date)
+                views.setTextViewText(R.id.widgetTime, formattedDate)
+            } else {
+                views.setTextViewText(R.id.widgetTime, context.getString(R.string.never))
+            }
+            appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     }
 }
