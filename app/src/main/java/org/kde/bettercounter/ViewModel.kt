@@ -69,7 +69,7 @@ class ViewModel(val application: Application) {
                     initialized = true
                 }
             }
-            WidgetProvider.triggerRefresh(application)
+            WidgetProvider.refreshWidgets(application)
         }
     }
 
@@ -106,7 +106,7 @@ class ViewModel(val application: Application) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.addEntry(name, date)
             summaryMap[name]?.postValue(repo.getCounterSummary(name))
-            WidgetProvider.triggerRefresh(application)
+            WidgetProvider.refreshWidgets(application)
             autoExportIfEnabled()
         }
     }
@@ -120,7 +120,7 @@ class ViewModel(val application: Application) {
                     observer.onCounterDecremented(name, oldEntryDate)
                 }
             }
-            WidgetProvider.triggerRefresh(application)
+            WidgetProvider.refreshWidgets(application)
             autoExportIfEnabled()
         }
     }
@@ -165,7 +165,7 @@ class ViewModel(val application: Application) {
             }
             summaryMap[newName] = counter
             counter.postValue(repo.getCounterSummary(newName))
-            WidgetProvider.triggerRename(application, oldName, newName)
+            WidgetProvider.renameCounter(application, oldName, newName)
             withContext(Dispatchers.Main) {
                 for (observer in counterObservers) {
                     observer.onCounterRenamed(oldName, newName)

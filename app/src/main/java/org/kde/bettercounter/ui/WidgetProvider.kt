@@ -1,5 +1,6 @@
 package org.kde.bettercounter.ui
 
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
@@ -13,10 +14,16 @@ import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
 import org.kde.bettercounter.ViewModel
+import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import java.text.SimpleDateFormat
 import java.util.Date
 
 class WidgetProvider : AppWidgetProvider() {
+
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        scheduleHourlyUpdate(context)
+    }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Log.d(TAG, "onUpdate")
@@ -35,7 +42,8 @@ class WidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         Log.d(TAG, "onReceive " + intent.action)
-        if (intent.action == ACTION_COUNT) {
+        when (intent.action) {
+        ACTION_COUNT -> {
             val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
             if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
                 Log.e(TAG, "No widget id extra set")
@@ -49,12 +57,37 @@ class WidgetProvider : AppWidgetProvider() {
             val viewModel = (context.applicationContext as BetterApplication).viewModel
             viewModel.incrementCounter(counterName)
         }
+        Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
+            scheduleHourlyUpdate(context)
+        }
+        ACTION_HOURLY_UPDATE -> {
+            refreshWidgets(context)
+            scheduleHourlyUpdate(context) // Schedule next update, we don't use repeating alarms for precision
+        }
+    }
+
     }
 
     companion object {
         private const val TAG = "WidgetProvider"
         private const val ACTION_COUNT = "org.kde.bettercounter.WidgetProvider.COUNT"
+        private const val ACTION_HOURLY_UPDATE = "org.kde.bettercounter.WidgetProvider.HOURLY_UPDATE"
         private const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"
+
+        fun scheduleHourlyUpdate(context: Context) {
+            val widgetIds = getAllWidgetIds(context)
+            if (widgetIds.isEmpty()) return
+            Log.d(TAG, "Scheduling next hourly update")
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(context, WidgetProvider::class.java)
+            intent.action = ACTION_HOURLY_UPDATE
+            val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            alarmManager.set(
+                AlarmManager.RTC,
+                System.currentTimeMillis() + millisecondsUntilNextHour(),
+                pendingIntent
+            )
+        }
 
         private fun getAllWidgetIds(context: Context): IntArray {
             return AppWidgetManager.getInstance(context).getAppWidgetIds(
@@ -62,32 +95,34 @@ class WidgetProvider : AppWidgetProvider() {
             )
         }
 
-        fun triggerRefresh(context: Context) {
-            Log.d(TAG, "triggerRefresh called")
+        fun refreshWidgets(context: Context) {
+            val widgetIds = getAllWidgetIds(context)
+            if (widgetIds.isEmpty()) return
+            Log.d(TAG, "refreshing widgets")
             val intent = Intent(context, WidgetProvider::class.java)
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, getAllWidgetIds(context))
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
             context.sendBroadcast(intent)
         }
 
-        fun triggerRename(context: Context, counterName: String, prevCounterName: String) {
-            val appWidgetIds = getAllWidgetIds(context)
-            for (appWidgetId in appWidgetIds) {
-                if (prevCounterName == loadWidgetCounterNamePref(context, appWidgetId)) {
-                    saveWidgetCounterNamePref(context, appWidgetId, counterName)
+        fun renameCounter(context: Context, counterName: String, prevCounterName: String) {
+            val widgetIds = getAllWidgetIds(context)
+            for (widgetId in widgetIds) {
+                if (prevCounterName == loadWidgetCounterNamePref(context, widgetId)) {
+                    saveWidgetCounterNamePref(context, widgetId, counterName)
                 }
             }
         }
 
         fun removeWidgets(context: Context, counterName: String) {
-            val appWidgetIds = getAllWidgetIds(context)
+            val widgetIds = getAllWidgetIds(context)
             val host = AppWidgetHost(context, 0)
-            for (appWidgetId in appWidgetIds) {
-                if (counterName == loadWidgetCounterNamePref(context, appWidgetId)) {
+            for (widgetId in widgetIds) {
+                if (counterName == loadWidgetCounterNamePref(context, widgetId)) {
                     Log.d(TAG, "Deleting widget")
                     // In Android 5 deleteAppWidgetId doesn't remove the widget but in Android 13 it does.
-                    host.deleteAppWidgetId(appWidgetId)
-                    deleteWidgetCounterNamePref(context, appWidgetId)
+                    host.deleteAppWidgetId(widgetId)
+                    deleteWidgetCounterNamePref(context, widgetId)
                 }
             }
         }
