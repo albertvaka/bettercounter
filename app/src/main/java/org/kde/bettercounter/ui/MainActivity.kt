@@ -24,9 +24,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.ChartsAdapter
@@ -42,7 +40,6 @@ import org.kde.bettercounter.boilerplate.isKeyboardVisible
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
 import org.kde.bettercounter.extensions.dpToPx
-import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
@@ -192,17 +189,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.charts.isNestedScrollingEnabled = false
         PagerSnapHelper().attachToRecyclerView(binding.charts) // Scroll one by one
-
-        startRefreshEveryHourBoundary()
-    }
-
-    private fun startRefreshEveryHourBoundary() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                delay(millisecondsUntilNextHour())
-                viewModel.refreshAllObservers()
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -11,9 +11,12 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kde.bettercounter.boilerplate.AppDatabase
+import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.extensions.toCalendar
 import org.kde.bettercounter.extensions.truncated
 import org.kde.bettercounter.persistence.AverageMode
@@ -70,6 +73,11 @@ class ViewModel(val application: Application) {
                 }
             }
             WidgetProvider.refreshWidgets(application)
+            // Start updating counters every hour
+            while (isActive) {
+                delay(millisecondsUntilNextHour())
+                refreshAllObservers()
+            }
         }
     }
 
@@ -310,10 +318,11 @@ class ViewModel(val application: Application) {
         return ret
     }
 
-    suspend fun refreshAllObservers() {
+    private suspend fun refreshAllObservers() {
         Log.d(TAG, "refreshAllObservers called")
+        val widgetCounterNames = WidgetProvider.getAllWidgetCounterNames(application)
         for ((name, summary) in summaryMap) {
-            if (summary.hasObservers()) {
+            if (summary.hasObservers() || name in widgetCounterNames) {
                 summary.postValue(repo.getCounterSummary(name))
             } else {
                 Log.d(TAG, "Not refreshing $name because it has no observers")

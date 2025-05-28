@@ -95,6 +95,10 @@ class WidgetProvider : AppWidgetProvider() {
             )
         }
 
+        fun getAllWidgetCounterNames(context: Context): List<String> {
+            return getAllWidgetIds(context).map { loadWidgetCounterNamePref(context, it) }
+        }
+
         fun refreshWidgets(context: Context) {
             val widgetIds = getAllWidgetIds(context)
             if (widgetIds.isEmpty()) return
