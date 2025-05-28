@@ -189,6 +189,9 @@ class MainActivity : AppCompatActivity() {
 
         binding.charts.isNestedScrollingEnabled = false
         PagerSnapHelper().attachToRecyclerView(binding.charts) // Scroll one by one
+
+        // Just in case it's not scheduled
+        WidgetProvider.scheduleHourlyUpdate(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
