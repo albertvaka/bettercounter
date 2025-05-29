@@ -14,6 +14,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.extensions.millisecondsUntilNextHour
@@ -49,6 +51,7 @@ class ViewModel(val application: Application) {
     private val counterObservers = HashSet<CounterObserver>()
     private val summaryMap = HashMap<String, MutableLiveData<CounterSummary>>()
 
+    private val mutex = Mutex()
     private var initialized = false
     private var autoExportJob : Job? = null
 
@@ -61,8 +64,10 @@ class ViewModel(val application: Application) {
             summaryMap[name] = MutableLiveData()
         }
         CoroutineScope(Dispatchers.IO).launch {
-            for (name in initialCounters) {
-                summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            mutex.withLock {
+                for (name in initialCounters) {
+                    summaryMap[name]?.postValue(repo.getCounterSummary(name))
+                }
             }
             withContext(Dispatchers.Main) {
                 synchronized(this) {
@@ -70,9 +75,9 @@ class ViewModel(val application: Application) {
                         observer.onInitialCountersLoaded()
                     }
                     initialized = true
+                    WidgetProvider.refreshWidgets(application)
                 }
             }
-            WidgetProvider.refreshWidgets(application)
             // Start updating counters every hour
             while (isActive) {
                 delay(millisecondsUntilNextHour())
@@ -113,7 +118,9 @@ class ViewModel(val application: Application) {
     fun incrementCounter(name: String, date: Date = Calendar.getInstance().time) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.addEntry(name, date)
-            summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            mutex.withLock {
+                summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            }
             WidgetProvider.refreshWidgets(application)
             autoExportIfEnabled()
         }
@@ -122,7 +129,9 @@ class ViewModel(val application: Application) {
     fun decrementCounter(name: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val oldEntryDate = repo.removeEntry(name)
-            summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            mutex.withLock {
+                summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            }
             if (oldEntryDate != null) {
                 for (observer in counterObservers) {
                     observer.onCounterDecremented(name, oldEntryDate)
@@ -152,7 +161,9 @@ class ViewModel(val application: Application) {
         // no need to auto-export here, since metadata doesn't get exported as of today
 
         CoroutineScope(Dispatchers.IO).launch {
-            summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            mutex.withLock {
+                summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            }
         }
     }
 
@@ -172,7 +183,9 @@ class ViewModel(val application: Application) {
                 return@launch
             }
             summaryMap[newName] = counter
-            counter.postValue(repo.getCounterSummary(newName))
+            mutex.withLock {
+                counter.postValue(repo.getCounterSummary(newName))
+            }
             WidgetProvider.renameCounter(application, oldName, newName)
             withContext(Dispatchers.Main) {
                 for (observer in counterObservers) {
@@ -196,7 +209,9 @@ class ViewModel(val application: Application) {
     fun resetCounter(name: String) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.removeAllEntries(name)
-            summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            mutex.withLock {
+                summaryMap[name]?.postValue(repo.getCounterSummary(name))
+            }
             autoExportIfEnabled()
         }
     }
@@ -265,8 +280,10 @@ class ViewModel(val application: Application) {
                         }
                     }
                     repo.bulkAddEntries(entriesToImport)
-                    summaryMap.forEach { (name, flow) ->
-                        flow.postValue(repo.getCounterSummary(name))
+                    mutex.withLock {
+                        summaryMap.forEach { (name, flow) ->
+                            flow.postValue(repo.getCounterSummary(name))
+                        }
                     }
                     progressCallback(namesToImport.size, 1)
                 } catch (e: Exception) {
@@ -321,11 +338,13 @@ class ViewModel(val application: Application) {
     private suspend fun refreshAllObservers() {
         Log.d(TAG, "refreshAllObservers called")
         val widgetCounterNames = WidgetProvider.getAllWidgetCounterNames(application)
-        for ((name, summary) in summaryMap) {
-            if (summary.hasObservers() || name in widgetCounterNames) {
-                summary.postValue(repo.getCounterSummary(name))
-            } else {
-                Log.d(TAG, "Not refreshing $name because it has no observers")
+        mutex.withLock {
+            for ((name, summary) in summaryMap) {
+                if (summary.hasObservers() || name in widgetCounterNames) {
+                    summary.postValue(repo.getCounterSummary(name))
+                } else {
+                    Log.d(TAG, "Not refreshing $name because it has no observers")
+                }
             }
         }
     }
