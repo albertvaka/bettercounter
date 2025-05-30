@@ -4,8 +4,8 @@ import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.persistence.Entry
+import org.kde.bettercounter.ui.main.MainActivityViewModel
 
 class ImportTest {
 
@@ -16,7 +16,7 @@ class ImportTest {
         val namesToImport: MutableList<String> = mutableListOf()
         val entriesToImport: MutableList<Entry> = mutableListOf()
         val line = "hola,$testTimestamp,$testTimestamp,42"
-        ViewModel.parseImportLine(line, namesToImport, entriesToImport)
+        MainActivityViewModel.parseImportLine(line, namesToImport, entriesToImport)
         assertArrayEquals(namesToImport.toTypedArray(), arrayOf("hola"))
         assertEquals(entriesToImport.size, 3)
         assertEquals(entriesToImport.firstOrNull()?.date?.time, testTimestamp)
@@ -28,7 +28,7 @@ class ImportTest {
         val namesToImport: MutableList<String> = mutableListOf()
         val entriesToImport: MutableList<Entry> = mutableListOf()
         val line = "0,$testTimestamp"
-        ViewModel.parseImportLine(line, namesToImport, entriesToImport)
+        MainActivityViewModel.parseImportLine(line, namesToImport, entriesToImport)
         assertArrayEquals(namesToImport.toTypedArray(), arrayOf("0"))
         assertEquals(entriesToImport.firstOrNull()?.date?.time, testTimestamp)
     }
@@ -38,7 +38,7 @@ class ImportTest {
         val namesToImport: MutableList<String> = mutableListOf()
         val entriesToImport: MutableList<Entry> = mutableListOf()
         val line = "0,0,$testTimestamp"
-        ViewModel.parseImportLine(line, namesToImport, entriesToImport)
+        MainActivityViewModel.parseImportLine(line, namesToImport, entriesToImport)
         assertArrayEquals(namesToImport.toTypedArray(), arrayOf("0,0"))
         assertEquals(entriesToImport.firstOrNull()?.date?.time, testTimestamp)
     }
@@ -48,7 +48,7 @@ class ImportTest {
         val namesToImport: MutableList<String> = mutableListOf()
         val entriesToImport: MutableList<Entry> = mutableListOf()
         val line = "hola"
-        ViewModel.parseImportLine(line, namesToImport, entriesToImport)
+        MainActivityViewModel.parseImportLine(line, namesToImport, entriesToImport)
         assertArrayEquals(namesToImport.toTypedArray(), arrayOf("hola"))
         assertTrue(entriesToImport.isEmpty())
     }
@@ -58,7 +58,7 @@ class ImportTest {
         val namesToImport: MutableList<String> = mutableListOf()
         val entriesToImport: MutableList<Entry> = mutableListOf()
         val line = "hola,$testTimestamp,hola"
-        ViewModel.parseImportLine(line, namesToImport, entriesToImport)
+        MainActivityViewModel.parseImportLine(line, namesToImport, entriesToImport)
     }
 
 }

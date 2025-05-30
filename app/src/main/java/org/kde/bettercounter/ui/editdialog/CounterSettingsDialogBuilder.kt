@@ -1,10 +1,10 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.editdialog
 
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager.LayoutParams
+import android.view.WindowManager
 import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
@@ -12,17 +12,15 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
-import org.kde.bettercounter.ColorAdapter
-import org.kde.bettercounter.IntervalAdapter
 import org.kde.bettercounter.R
-import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.CounterSettingsBinding
 import org.kde.bettercounter.persistence.CounterColor
 import org.kde.bettercounter.persistence.CounterMetadata
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
+import org.kde.bettercounter.ui.main.MainActivityViewModel
 
-class CounterSettingsDialogBuilder(private val context: Context, private val viewModel: ViewModel) {
+class CounterSettingsDialogBuilder(private val context: Context, private val viewModel: MainActivityViewModel) {
 
     private val builder = MaterialAlertDialogBuilder(context)
     private val binding: CounterSettingsBinding = CounterSettingsBinding.inflate(LayoutInflater.from(context))
@@ -165,7 +163,7 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
         }
         if (binding.nameEdit.text.isNullOrEmpty()) {
             binding.nameEdit.requestFocus()
-            dialog.window?.setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         }
         return dialog
     }

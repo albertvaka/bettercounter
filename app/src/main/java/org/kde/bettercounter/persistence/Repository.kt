@@ -1,16 +1,15 @@
 package org.kde.bettercounter.persistence
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import org.kde.bettercounter.BuildConfig
+import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.boilerplate.Converters
 import org.kde.bettercounter.extensions.plusInterval
 import org.kde.bettercounter.extensions.truncated
 import java.util.Calendar
 import java.util.Date
-
-const val alwaysShowTutorialsInDebugBuilds = false
 
 const val COUNTERS_PREFS_KEY = "counters"
 const val COUNTERS_INTERVAL_PREFS_KEY = "interval.%s"
@@ -22,48 +21,31 @@ const val AVERAGE_CALCULATION_MODE_KEY = "average_calculation_mode"
 const val AUTO_EXPORT_FILE_URI_KEY = "auto_export_file_uri"
 
 class Repository(
-    private val context: Context,
+    private val application: Application,
     private val entryDao: EntryDao,
-    private val sharedPref: SharedPreferences,
+    private val sharedPref: SharedPreferences
 ) {
-
-    private var tutorials: MutableSet<String>
-    private var counters: List<String>
-
-    init {
-        val countersStr = sharedPref.getString(COUNTERS_PREFS_KEY, "[]")
-        counters = Converters.stringToStringList(countersStr)
-        tutorials = sharedPref.getStringSet(TUTORIALS_PREFS_KEY, setOf())!!.toMutableSet()
-        if (BuildConfig.DEBUG && alwaysShowTutorialsInDebugBuilds) {
-            tutorials = mutableSetOf()
+    companion object {
+        fun create(application: Application): Repository {
+            val db = AppDatabase.getInstance(application)
+            val prefs : SharedPreferences = application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+            return Repository(application, db.entryDao(), prefs)
         }
     }
 
-    fun getCounterList(): List<String> = counters
+    fun getCounterList(): List<String> {
+        val countersStr = sharedPref.getString(COUNTERS_PREFS_KEY, "[]")
+        return Converters.stringToStringList(countersStr)
+    }
 
     fun setCounterList(list: List<String>) {
         val jsonStr = Converters.stringListToString(list)
         sharedPref.edit { putString(COUNTERS_PREFS_KEY, jsonStr) }
-        counters = list
-    }
-
-    fun setTutorialShown(id: Tutorial) {
-        tutorials.add(id.name)
-        sharedPref.edit { putStringSet(TUTORIALS_PREFS_KEY, tutorials) }
-    }
-
-    fun resetTutorialShown(id: Tutorial) {
-        tutorials.remove(id.name)
-        sharedPref.edit { putStringSet(TUTORIALS_PREFS_KEY, tutorials) }
-    }
-
-    fun isTutorialShown(id: Tutorial): Boolean {
-        return tutorials.contains(id.name)
     }
 
     private fun getCounterColor(name: String): CounterColor {
         val key = COUNTERS_COLOR_PREFS_KEY.format(name)
-        return CounterColor(sharedPref.getInt(key, CounterColor.getDefault(context).colorInt))
+        return CounterColor(sharedPref.getInt(key, CounterColor.getDefault(application).colorInt))
     }
 
     private fun getCounterInterval(name: String): Interval {
@@ -127,7 +109,7 @@ class Repository(
     }
 
     suspend fun renameCounter(oldName: String, newName: String) {
-        entryDao.renameCounter(oldName, newName)
+        entryDao.renameAllEntries(oldName, newName)
     }
 
     suspend fun addEntry(name: String, date: Date = Calendar.getInstance().time) {
@@ -156,6 +138,14 @@ class Repository(
 
     suspend fun bulkAddEntries(entries: List<Entry>) {
         entryDao.bulkInsert(entries)
+    }
+
+    fun getTutorialsShown() : Set<String> {
+        return sharedPref.getStringSet(TUTORIALS_PREFS_KEY, setOf())!!
+    }
+
+    fun setTutorialsShown(tutorials: Set<String>) {
+        sharedPref.edit { putStringSet(TUTORIALS_PREFS_KEY, tutorials) }
     }
 
     fun isAutoExportOnSaveEnabled(): Boolean {

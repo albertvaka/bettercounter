@@ -14,7 +14,7 @@
         android:enableOnBackInvokedCallback="true">
 
         <receiver
-            android:name=".ui.WidgetProvider"
+            android:name=".ui.widget.WidgetProvider"
             android:exported="false" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -30,7 +30,7 @@
         </receiver>
 
         <activity
-            android:name=".ui.WidgetConfigureActivity"
+            android:name=".ui.widget.WidgetConfigureActivity"
             android:exported="false" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -38,7 +38,7 @@
         </activity>
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:launchMode="singleTop"
             android:exported="true" >
             <intent-filter>
@@ -48,9 +48,9 @@
         </activity>
         
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name=".ui.settings.SettingsActivity"
             android:exported="false"
-            android:parentActivityName=".ui.MainActivity" />
+            android:parentActivityName=".ui.main.MainActivity" />
     </application>
 
 </manifest>

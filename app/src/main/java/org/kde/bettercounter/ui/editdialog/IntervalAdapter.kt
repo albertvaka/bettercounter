@@ -1,4 +1,4 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui.editdialog
 
 import android.content.Context
 import android.widget.ArrayAdapter

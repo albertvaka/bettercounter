@@ -1,9 +1,14 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui.chart
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import org.kde.bettercounter.databinding.FragmentChartBinding
 import org.kde.bettercounter.extensions.between
 import org.kde.bettercounter.extensions.count
@@ -12,18 +17,20 @@ import org.kde.bettercounter.extensions.toCalendar
 import org.kde.bettercounter.extensions.truncated
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
-import org.kde.bettercounter.ui.ChartHolder
+import org.kde.bettercounter.ui.main.MainActivityViewModel
 import java.util.Calendar
 
 class ChartsAdapter(
     private val activity: AppCompatActivity,
-    private val viewModel: ViewModel,
+    private val viewModel: MainActivityViewModel,
     private val counter: CounterSummary,
     private val interval: Interval,
     private val onIntervalChange: (Interval) -> Unit,
     private val onDateChange: ChartsAdapter.(Calendar) -> Unit,
     private val onDataDisplayed: () -> Unit,
 ) : RecyclerView.Adapter<ChartHolder>() {
+
+    val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     private val boundViewHolders = mutableListOf<ChartHolder>()
 
@@ -32,24 +39,30 @@ class ChartsAdapter(
     private var numCharts: Int = countNumCharts(counter)
     override fun getItemCount(): Int = numCharts
 
-    private val maxCountLiveData = viewModel.getMaxCountForInterval(counter.name, interval)
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartHolder {
         val binding = FragmentChartBinding.inflate(inflater, parent, false)
         return ChartHolder(activity, viewModel, binding)
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        coroutineScope.cancel()
     }
 
     override fun onBindViewHolder(holder: ChartHolder, position: Int) {
         val rangeStart = findRangeStartForPosition(position)
         val rangeEnd = rangeStart.plusInterval(interval, 1)
         boundViewHolders.add(holder)
-        val entriesLiveData = viewModel.getEntriesForRangeSortedByDate(
+
+        val maxCountFlow = viewModel.getMaxCountForInterval(counter.name, interval)
+        val entriesFlow = viewModel.getEntriesForRangeSortedByDate(
             counter.name,
             rangeStart.time,
             rangeEnd.time
         )
-        maxCountLiveData.observe(activity) { maxCount ->
-            entriesLiveData.observe(activity) { entries ->
+
+        coroutineScope.launch {
+            combine(maxCountFlow, entriesFlow, ::Pair).collect { (maxCount, entries) ->
                 holder.display(
                     counter,
                     entries,
@@ -57,8 +70,8 @@ class ChartsAdapter(
                     rangeStart,
                     rangeEnd,
                     maxCount,
-                    onIntervalChange
-                ) { this.onDateChange(it) }
+                    onIntervalChange,
+                ) { onDateChange(it) }
                 onDataDisplayed()
             }
         }
