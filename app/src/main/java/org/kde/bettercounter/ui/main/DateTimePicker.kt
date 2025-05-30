@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.main
 
 import android.text.format.DateFormat
 import androidx.appcompat.app.AppCompatActivity

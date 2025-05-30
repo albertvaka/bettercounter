@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.main
 
 import android.view.HapticFeedbackConstants
 import androidx.appcompat.app.AppCompatActivity
@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip.OnDismissListener
 import org.kde.bettercounter.R
-import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
@@ -15,7 +14,7 @@ import java.util.Calendar
 class EntryViewHolder(
     private val activity: AppCompatActivity,
     val binding: FragmentEntryBinding,
-    private var viewModel: ViewModel,
+    private var viewModel: MainActivityViewModel,
     private val touchHelper: ItemTouchHelper,
     private val onClickListener: (counter: CounterSummary) -> Unit?,
     private val canDrag: () -> Boolean

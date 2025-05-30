@@ -1,7 +1,6 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui.main
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,23 +9,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip.OnDismissListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
-import org.kde.bettercounter.ui.EntryViewHolder
-import org.kde.bettercounter.ui.MainActivity
 import java.util.Collections
 import java.util.Date
 
-private const val TAG = "EntryListAdapter"
-
 class EntryListViewAdapter(
     private var activity: MainActivity,
-    private var viewModel: ViewModel,
+    private var viewModel: MainActivityViewModel,
     private var listObserver: EntryListObserver,
-
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback {
+
+    val coroutineScope = CoroutineScope(Dispatchers.Main)
+
     interface EntryListObserver {
         fun onItemSelected(position: Int, counter: CounterSummary)
         fun onSelectedItemUpdated(position: Int, counter: CounterSummary)
@@ -55,15 +56,17 @@ class EntryListViewAdapter(
     }
 
     init {
-        viewModel.observeCounterChange(object : ViewModel.CounterObserver {
+        viewModel.observeCounterChange(object : MainActivityViewModel.CounterObserver {
 
             fun observeNewCounter(counterName: String) {
-                viewModel.getCounterSummary(counterName).observe(activity) {
-                    val position = filteredCounters.indexOf(it.name)
-                    if (position >= 0) {
-                        notifyItemChanged(position, Unit)
-                        if (currentSelectedCounterName == it.name) {
-                            listObserver.onSelectedItemUpdated(position, it)
+                coroutineScope.launch {
+                    viewModel.getCounterSummary(counterName).collect {
+                        val position = filteredCounters.indexOf(it.name)
+                        if (position >= 0) {
+                            notifyItemChanged(position, Unit)
+                            if (currentSelectedCounterName == it.name) {
+                                listObserver.onSelectedItemUpdated(position, it)
+                            }
                         }
                     }
                 }
@@ -117,7 +120,7 @@ class EntryListViewAdapter(
                 }
                 if (currentSelectedCounterName == oldName) {
                     currentSelectedCounterName = newName
-                    listObserver.onSelectedItemUpdated(position, viewModel.getCounterSummary(newName).value!!)
+                    listObserver.onSelectedItemUpdated(position, viewModel.getCounterSummary(newName).value)
                 }
 
             }
@@ -200,11 +203,7 @@ class EntryListViewAdapter(
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
         val counterName = filteredCounters[position]
         val counter = viewModel.getCounterSummary(counterName).value
-        if (counter != null) {
-            holder.onBind(counter)
-        } else {
-            Log.d(TAG, "Counter not found or still loading at pos $position")
-        }
+        holder.onBind(counter)
     }
 
     override fun onMove(fromPosition: Int, toPosition: Int) {

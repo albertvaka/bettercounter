@@ -1,6 +1,9 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.main
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -16,6 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -26,11 +30,7 @@ import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.kde.bettercounter.BetterApplication
-import org.kde.bettercounter.ChartsAdapter
-import org.kde.bettercounter.EntryListViewAdapter
 import org.kde.bettercounter.R
-import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.boilerplate.OpenFileParams
@@ -43,13 +43,23 @@ import org.kde.bettercounter.extensions.dpToPx
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
+import org.kde.bettercounter.ui.chart.ChartHolder
+import org.kde.bettercounter.ui.chart.ChartsAdapter
+import org.kde.bettercounter.ui.editdialog.CounterSettingsDialogBuilder
+import org.kde.bettercounter.ui.settings.SettingsActivity
+import org.kde.bettercounter.ui.widget.WidgetProvider
 import kotlin.math.max
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: ViewModel
+    companion object {
+        const val ACTION_REFRESH_COUNTER = "org.kde.bettercounter.MainActivity.REFRESH_COUNTER"
+        const val EXTRA_COUNTER_NAME = "counterName"
+    }
+
+    private val viewModel : MainActivityViewModel by lazy { MainActivityViewModel(application) }
+    internal val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private lateinit var entryViewAdapter: EntryListViewAdapter
-    internal lateinit var binding: ActivityMainBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var searchMenuItem: MenuItem
     private var extraBottomPaddingForNavigationInset = 0
@@ -62,15 +72,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    private val broadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            viewModel.refreshCounter(intent.getStringExtra(EXTRA_COUNTER_NAME)!!)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         setAndroid15insets()
-
-        viewModel = (application as BetterApplication).viewModel
 
         // Bottom sheet with graph
         // -----------------------
@@ -129,9 +141,11 @@ class MainActivity : AppCompatActivity() {
                 searchView.setQuery("", false)
                 searchMenuItem.collapseActionView()
             }
+
             override fun onItemAdded(position: Int) {
                 binding.recycler.smoothScrollToPosition(position)
             }
+
             override fun onSelectedItemUpdated(position: Int, counter: CounterSummary) {
                 binding.detailsTitle.text = counter.name
                 val interval = intervalOverride ?: counter.interval.toChartDisplayableInterval()
@@ -174,6 +188,7 @@ class MainActivity : AppCompatActivity() {
                 binding.charts.swapAdapter(adapter, true)
                 binding.charts.scrollToPosition(adapter.itemCount - 1) // Select the latest chart
             }
+
             override fun onItemSelected(position: Int, counter: CounterSummary) {
                 setFabToEdit(counter)
                 intervalOverride = null
@@ -190,8 +205,17 @@ class MainActivity : AppCompatActivity() {
         binding.charts.isNestedScrollingEnabled = false
         PagerSnapHelper().attachToRecyclerView(binding.charts) // Scroll one by one
 
-        // Just in case it's not scheduled
+        // Just in case it's not yet scheduled (happens when installing from Android Studio)
         WidgetProvider.scheduleHourlyUpdate(this)
+
+        LocalBroadcastManager.getInstance(this)
+            .registerReceiver(broadcastReceiver, IntentFilter(ACTION_REFRESH_COUNTER))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LocalBroadcastManager.getInstance(this)
+            .unregisterReceiver(broadcastReceiver)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -260,7 +284,7 @@ class MainActivity : AppCompatActivity() {
                     val holder = binding.recycler.findViewHolderForAdapterPosition(0) as EntryViewHolder
                     entryViewAdapter.showDragTutorial(holder) {
                         entryViewAdapter.showPickDateTutorial(holder) {
-                            viewModel.resetTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
+                            viewModel.unsetTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
                             if (sheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                                 // Re-trigger the tutorial on the selected counter
                                 showChangeGraphIntervalTutorial()
@@ -269,7 +293,6 @@ class MainActivity : AppCompatActivity() {
                                 val firstCounterName = viewModel.getCounterList().firstOrNull()
                                     ?: return@showPickDateTutorial
                                 val counter = viewModel.getCounterSummary(firstCounterName).value
-                                    ?: return@showPickDateTutorial
                                 entryViewAdapter.selectCounter(counter)
                             }
                         }
@@ -293,6 +316,9 @@ class MainActivity : AppCompatActivity() {
                         .setCancelable(false)
                         .create()
                     dialog.show()
+
+                    // Disable all tutorials, they can cause problems when we update all the flows at once
+                    Tutorial.entries.forEach { tutorial -> viewModel.setTutorialShown(tutorial) }
 
                     viewModel.importAll(this, stream) { progress, status ->
                         runOnUiThread {
@@ -369,7 +395,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         viewModel.editCounterSameName(newCounterMetadata)
                     }
-                    // We are not subscribed to the summary livedata, so we won't get notified of the change we just made.
+                    // We are not subscribed to the summary flow, so we won't get notified of the change we just made.
                     // Update our local copy so it has the right data if we open the dialog again.
                     counter.name = newCounterMetadata.name
                     counter.interval = newCounterMetadata.interval
@@ -389,7 +415,6 @@ class MainActivity : AppCompatActivity() {
                         .setPositiveButton(R.string.delete) { _, _ ->
                             viewModel.deleteCounter(counter.name)
                             hideBottomSheet()
-                            WidgetProvider.removeWidgets(this, counter.name)
                         }
                         .setNegativeButton(R.string.cancel, null)
                         .show()

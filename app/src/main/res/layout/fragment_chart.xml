@@ -14,7 +14,7 @@
         android:textAppearance="?attr/textAppearanceListItemSmall"/>
 
 
-    <org.kde.bettercounter.ui.BetterChart
+    <org.kde.bettercounter.ui.chart.BetterChart
         android:id="@+id/chart"
         android:layout_width="match_parent"
         android:background="@color/colorDarkBackground"

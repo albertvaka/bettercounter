@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.chart
 
 import android.view.Gravity
 import androidx.appcompat.app.AppCompatActivity
@@ -6,7 +6,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.R
-import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.FragmentChartBinding
 import org.kde.bettercounter.extensions.count
 import org.kde.bettercounter.extensions.max
@@ -16,6 +15,8 @@ import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
+import org.kde.bettercounter.ui.main.MainActivityViewModel
+import org.kde.bettercounter.ui.main.showDatePicker
 import java.text.SimpleDateFormat
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
@@ -24,7 +25,7 @@ import java.util.Locale
 
 class ChartHolder(
     private val activity: AppCompatActivity,
-    private val viewModel: ViewModel,
+    private val viewModel: MainActivityViewModel,
     private val binding: FragmentChartBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -113,7 +114,6 @@ class ChartHolder(
         }
 
         val averageMode = viewModel.getAverageCalculationMode()
-
 
         val startDate = counter.leastRecent!!
         val endDate = when (averageMode) {

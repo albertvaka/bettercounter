@@ -1,23 +1,22 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui.main
 
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.MainThread
-import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import org.kde.bettercounter.boilerplate.AppDatabase
+import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.extensions.toCalendar
 import org.kde.bettercounter.extensions.truncated
@@ -26,18 +25,21 @@ import org.kde.bettercounter.persistence.CounterColor
 import org.kde.bettercounter.persistence.CounterMetadata
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
+import org.kde.bettercounter.persistence.Exporter
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Repository
 import org.kde.bettercounter.persistence.Tutorial
-import org.kde.bettercounter.ui.WidgetProvider
+import org.kde.bettercounter.ui.widget.WidgetProvider
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Calendar
 import java.util.Date
 
+const val alwaysShowTutorialsInDebugBuilds = false
+
 private const val TAG = "ViewModel"
 
-class ViewModel(val application: Application) {
+class MainActivityViewModel(val application: Application) {
 
     interface CounterObserver {
         fun onInitialCountersLoaded()
@@ -47,27 +49,27 @@ class ViewModel(val application: Application) {
         fun onCounterDecremented(counterName: String, oldEntryDate: Date)
     }
 
-    private val repo: Repository
+    private val repo: Repository = Repository.create(application)
+    private val exporter : Exporter  = Exporter(application, repo)
+
+    private var counters: List<String>
     private val counterObservers = HashSet<CounterObserver>()
-    private val summaryMap = HashMap<String, MutableLiveData<CounterSummary>>()
+    private val summaryMap = HashMap<String, MutableStateFlow<CounterSummary>>()
+    private val tutorialsShown: MutableSet<String>
 
     private val mutex = Mutex()
     private var initialized = false
-    private var autoExportJob : Job? = null
 
     init {
-        val db = AppDatabase.getInstance(application)
-        val prefs = application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
-        repo = Repository(application, db.entryDao(), prefs)
-        val initialCounters = repo.getCounterList()
-        for (name in initialCounters) {
-            summaryMap[name] = MutableLiveData()
+        counters = repo.getCounterList()
+        tutorialsShown = if (BuildConfig.DEBUG && alwaysShowTutorialsInDebugBuilds) {
+            mutableSetOf()
+        } else {
+            repo.getTutorialsShown().toMutableSet()
         }
         CoroutineScope(Dispatchers.IO).launch {
-            mutex.withLock {
-                for (name in initialCounters) {
-                    summaryMap[name]?.postValue(repo.getCounterSummary(name))
-                }
+            for (name in counters) {
+                summaryMap[name] = MutableStateFlow(repo.getCounterSummary(name))
             }
             withContext(Dispatchers.Main) {
                 synchronized(this) {
@@ -81,7 +83,7 @@ class ViewModel(val application: Application) {
             // Start updating counters every hour
             while (isActive) {
                 delay(millisecondsUntilNextHour())
-                refreshAllObservers()
+                refreshAllCounters()
             }
         }
     }
@@ -99,10 +101,11 @@ class ViewModel(val application: Application) {
 
     fun addCounter(counter: CounterMetadata) {
         val name = counter.name
-        repo.setCounterList(repo.getCounterList().toMutableList() + name)
+        counters = counters + name
+        repo.setCounterList(counters)
         repo.setCounterMetadata(counter)
         CoroutineScope(Dispatchers.IO).launch {
-            summaryMap[name] = MutableLiveData(repo.getCounterSummary(name))
+            summaryMap[name] = MutableStateFlow(repo.getCounterSummary(name))
             withContext(Dispatchers.Main) {
                 for (observer in counterObservers) {
                     observer.onCounterAdded(name)
@@ -119,10 +122,10 @@ class ViewModel(val application: Application) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.addEntry(name, date)
             mutex.withLock {
-                summaryMap[name]?.postValue(repo.getCounterSummary(name))
+                summaryMap[name]?.value = repo.getCounterSummary(name)
             }
-            WidgetProvider.refreshWidgets(application)
-            autoExportIfEnabled()
+            WidgetProvider.refreshWidget(application, name)
+            exporter.autoExportIfEnabled()
         }
     }
 
@@ -130,28 +133,30 @@ class ViewModel(val application: Application) {
         CoroutineScope(Dispatchers.IO).launch {
             val oldEntryDate = repo.removeEntry(name)
             mutex.withLock {
-                summaryMap[name]?.postValue(repo.getCounterSummary(name))
+                summaryMap[name]?.value = repo.getCounterSummary(name)
             }
             if (oldEntryDate != null) {
                 for (observer in counterObservers) {
                     observer.onCounterDecremented(name, oldEntryDate)
                 }
             }
-            WidgetProvider.refreshWidgets(application)
-            autoExportIfEnabled()
+            WidgetProvider.refreshWidget(application, name)
+            exporter.autoExportIfEnabled()
         }
     }
 
     fun setTutorialShown(id: Tutorial) {
-        repo.setTutorialShown(id)
+        tutorialsShown.add(id.name)
+        repo.setTutorialsShown(tutorialsShown)
     }
 
-    fun resetTutorialShown(id: Tutorial) {
-        repo.resetTutorialShown(id)
+    fun unsetTutorialShown(id: Tutorial) {
+        tutorialsShown.remove(id.name)
+        repo.setTutorialsShown(tutorialsShown)
     }
 
     fun isTutorialShown(id: Tutorial): Boolean {
-        return repo.isTutorialShown(id)
+        return tutorialsShown.contains(id.name)
     }
 
     fun editCounterSameName(counterMetadata: CounterMetadata) {
@@ -162,8 +167,9 @@ class ViewModel(val application: Application) {
 
         CoroutineScope(Dispatchers.IO).launch {
             mutex.withLock {
-                summaryMap[name]?.postValue(repo.getCounterSummary(name))
+                summaryMap[name]?.value = repo.getCounterSummary(name)
             }
+            WidgetProvider.refreshWidgets(application)
         }
     }
 
@@ -171,20 +177,21 @@ class ViewModel(val application: Application) {
         val newName = counterMetadata.name
         repo.deleteCounterMetadata(oldName)
         repo.setCounterMetadata(counterMetadata)
-        val list = repo.getCounterList().toMutableList()
+        val list = counters.toMutableList()
         list[list.indexOf(oldName)] = newName
+        counters = list
         repo.setCounterList(list)
 
         CoroutineScope(Dispatchers.IO).launch {
             repo.renameCounter(oldName, newName)
-            val counter: MutableLiveData<CounterSummary>? = summaryMap.remove(oldName)
-            if (counter == null) {
+            val counterFlow = summaryMap.remove(oldName)
+            if (counterFlow == null) {
                 Log.e(TAG, "Trying to rename a counter but the old counter doesn't exist")
                 return@launch
             }
-            summaryMap[newName] = counter
+            summaryMap[newName] = counterFlow
             mutex.withLock {
-                counter.postValue(repo.getCounterSummary(newName))
+                counterFlow.value = repo.getCounterSummary(newName)
             }
             WidgetProvider.renameCounter(application, oldName, newName)
             withContext(Dispatchers.Main) {
@@ -192,27 +199,31 @@ class ViewModel(val application: Application) {
                     observer.onCounterRenamed(oldName, newName)
                 }
             }
-            autoExportIfEnabled()
+            exporter.autoExportIfEnabled()
         }
     }
 
-    fun getCounterSummary(name: String): LiveData<CounterSummary> {
+    fun getCounterSummary(name: String): StateFlow<CounterSummary> {
         return summaryMap[name]!!
     }
 
-    fun counterExists(name: String): Boolean = repo.getCounterList().contains(name)
+    fun counterExists(name: String): Boolean = counters.contains(name)
 
-    fun getCounterList() = repo.getCounterList()
+    fun getCounterList() = counters
 
-    fun saveCounterOrder(value: List<String>) = repo.setCounterList(value)
+    fun saveCounterOrder(value: List<String>) = {
+        counters = value
+        repo.setCounterList(value)
+    }
 
     fun resetCounter(name: String) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.removeAllEntries(name)
             mutex.withLock {
-                summaryMap[name]?.postValue(repo.getCounterSummary(name))
+                summaryMap[name]?.value = repo.getCounterSummary(name)
             }
-            autoExportIfEnabled()
+            WidgetProvider.refreshWidget(application, name)
+            exporter.autoExportIfEnabled()
         }
     }
 
@@ -227,29 +238,61 @@ class ViewModel(val application: Application) {
         }
         summaryMap.remove(name)
         repo.deleteCounterMetadata(name)
-        val list = repo.getCounterList().toMutableList()
-        list.remove(name)
-        repo.setCounterList(list)
-        autoExportIfEnabled()
+        counters = counters - name
+        repo.setCounterList(counters)
+        exporter.autoExportIfEnabled()
+        WidgetProvider.removeWidgets(application, name)
+    }
+
+    fun getEntriesForRangeSortedByDate(name: String, since: Date, until: Date) = flow {
+        emit(repo.getEntriesForRangeSortedByDate(name, since, until))
+    }.flowOn(Dispatchers.IO)
+
+    fun getMaxCountForInterval(name: String, interval: Interval) = flow {
+        val counterBegin = repo.getLeastRecentEntry(name)?.toCalendar() ?: Calendar.getInstance()
+        val cal = counterBegin.truncated(interval)
+        val entries = repo.getAllEntriesSortedByDate(name)
+        val bucketIntervalAsCalendarField = interval.asCalendarField()
+        var maxCount = 0
+        var entriesIndex = 0
+        while (entriesIndex < entries.size) {
+            cal.add(bucketIntervalAsCalendarField, 1) // Calendar is now at the end of the current bucket
+            var bucketCount = 0
+            while (entriesIndex < entries.size && entries[entriesIndex].date.time < cal.timeInMillis) {
+                bucketCount++
+                entriesIndex++
+            }
+            if (bucketCount > maxCount) {
+                maxCount = bucketCount
+            }
+        }
+        emit(maxCount)
+    }
+
+    private suspend fun refreshAllCounters() {
+        Log.d(TAG, "refreshAllCounters called")
+        mutex.withLock {
+            for ((name, summary) in summaryMap) {
+                summary.value = repo.getCounterSummary(name)
+            }
+        }
+    }
+
+    fun refreshCounter(counterName: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            mutex.withLock {
+                summaryMap[counterName]?.value = repo.getCounterSummary(counterName)
+            }
+        }
+    }
+
+    fun getAverageCalculationMode(): AverageMode {
+        return repo.getAverageCalculationMode()
     }
 
     fun exportAll(stream: OutputStream, progressCallback: (progress: Int) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            stream.use {
-                it.bufferedWriter().use { writer ->
-                    for ((i, name) in repo.getCounterList().withIndex()) {
-                        progressCallback(i)
-                        val entries = repo.getAllEntriesSortedByDate(name)
-                        writer.write(name)
-                        for (entry in entries) {
-                            writer.write(",")
-                            writer.write(entry.date.time.toString())
-                        }
-                        writer.write("\n")
-                    }
-                    progressCallback(repo.getCounterList().size)
-                }
-            }
+            exporter.exportAll(stream, progressCallback)
         }
     }
 
@@ -263,12 +306,14 @@ class ViewModel(val application: Application) {
                 // We read everything into memory before we update the DB so we know there are no errors
                 val namesToImport: MutableList<String> = mutableListOf()
                 val entriesToImport: MutableList<Entry> = mutableListOf()
-                // Disable all tutorials, they can cause problems when we update all the flows at once
-                Tutorial.entries.forEach { tutorial -> setTutorialShown(tutorial) }
                 try {
                     stream.bufferedReader().use { reader ->
                         reader.forEachLine { line ->
-                            parseImportLine(line, namesToImport, entriesToImport)
+                            parseImportLine(
+                                line,
+                                namesToImport,
+                                entriesToImport
+                            )
                             progressCallback(namesToImport.size, 0)
                         }
                     }
@@ -281,11 +326,12 @@ class ViewModel(val application: Application) {
                     }
                     repo.bulkAddEntries(entriesToImport)
                     mutex.withLock {
-                        summaryMap.forEach { (name, flow) ->
-                            flow.postValue(repo.getCounterSummary(name))
+                        summaryMap.forEach { (name, counterFlow) ->
+                            counterFlow.value = repo.getCounterSummary(name)
                         }
                     }
                     progressCallback(namesToImport.size, 1)
+                    WidgetProvider.refreshWidgets(application)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     progressCallback(namesToImport.size, -1)
@@ -294,102 +340,6 @@ class ViewModel(val application: Application) {
         }
     }
 
-    fun getEntriesForRangeSortedByDate(name: String, since: Date, until: Date): LiveData<List<Entry>> {
-        val ret = MutableLiveData<List<Entry>>()
-        // TODO: Maybe we should cancel the existing coroutine if already running?
-        CoroutineScope(Dispatchers.IO).launch {
-            val entries = repo.getEntriesForRangeSortedByDate(name, since, until)
-            //Log.e(TAG, "Queried ${entries.size} entries")
-            CoroutineScope(Dispatchers.Main).launch {
-                ret.value = entries
-            }
-        }
-        return ret
-    }
-
-    fun getMaxCountForInterval(name: String, interval: Interval) : LiveData<Int> {
-        val ret = MutableLiveData<Int>()
-        // TODO: Maybe we should cancel the existing coroutine if already running?
-        CoroutineScope(Dispatchers.IO).launch {
-            val counterBegin = repo.getLeastRecentEntry(name)?.toCalendar() ?: Calendar.getInstance()
-            val cal = counterBegin.truncated(interval)
-            val entries = repo.getAllEntriesSortedByDate(name)
-            val bucketIntervalAsCalendarField = interval.asCalendarField()
-            var maxCount = 0
-            var entriesIndex = 0
-            while (entriesIndex < entries.size) {
-                cal.add(bucketIntervalAsCalendarField, 1) // Calendar is now at the end of the current bucket
-                var bucketCount = 0
-                while (entriesIndex < entries.size && entries[entriesIndex].date.time < cal.timeInMillis) {
-                    bucketCount++
-                    entriesIndex++
-                }
-                if (bucketCount > maxCount) {
-                    maxCount = bucketCount
-                }
-            }
-            withContext(Dispatchers.Main) {
-                ret.value = maxCount
-            }
-        }
-        return ret
-    }
-
-    private suspend fun refreshAllObservers() {
-        Log.d(TAG, "refreshAllObservers called")
-        val widgetCounterNames = WidgetProvider.getAllWidgetCounterNames(application)
-        mutex.withLock {
-            for ((name, summary) in summaryMap) {
-                if (summary.hasObservers() || name in widgetCounterNames) {
-                    summary.postValue(repo.getCounterSummary(name))
-                } else {
-                    Log.d(TAG, "Not refreshing $name because it has no observers")
-                }
-            }
-        }
-    }
-
-    fun autoExportIfEnabled() {
-        if (!repo.isAutoExportOnSaveEnabled()) {
-            return
-        }
-        autoExportJob?.cancel() // Ensure we don't have two exports running in parallel
-        autoExportJob = CoroutineScope(Dispatchers.Main).launch {
-            try {
-                val uri = getAutoExportFileUri()!!.toUri()
-                application.contentResolver.openOutputStream(uri, "wt")?.let { stream ->
-                    exportAll(stream) { }
-                }
-            } catch (_: Exception) {
-                setAutoExportOnSave(false)
-                Toast.makeText(application, R.string.export_error, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    fun isAutoExportOnSaveEnabled(): Boolean {
-        return repo.isAutoExportOnSaveEnabled()
-    }
-
-    fun setAutoExportOnSave(enabled: Boolean) {
-        repo.setAutoExportOnSave(enabled)
-    }
-
-    fun getAutoExportFileUri(): String? {
-        return repo.getAutoExportFileUri()
-    }
-
-    fun setAutoExportFileUri(uriString: String) {
-        repo.setAutoExportFileUri(uriString)
-    }
-
-    fun getAverageCalculationMode(): AverageMode {
-        return repo.getAverageCalculationMode()
-    }
-
-    fun setAverageCalculationMode(mode: AverageMode) {
-        repo.setAverageCalculationMode(mode)
-    }
 
     companion object {
         fun parseImportLine(line: String, namesToImport: MutableList<String>, entriesToImport: MutableList<Entry>) {
