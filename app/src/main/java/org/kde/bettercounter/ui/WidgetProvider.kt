@@ -10,10 +10,13 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.RemoteViews
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
-import org.kde.bettercounter.ViewModel
+import org.kde.bettercounter.WidgetViewModel
 import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -27,9 +30,12 @@ class WidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Log.d(TAG, "onUpdate")
-        val viewModel = (context.applicationContext as BetterApplication).viewModel
-        for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, viewModel, AppWidgetManager.getInstance(context), appWidgetId)
+        val application = (context.applicationContext as BetterApplication)
+        val viewModel = WidgetViewModel(application)
+        CoroutineScope(Dispatchers.Main).launch {
+            for (appWidgetId in appWidgetIds) {
+                updateAppWidget(context, viewModel, AppWidgetManager.getInstance(context), appWidgetId)
+            }
         }
     }
 
@@ -54,7 +60,9 @@ class WidgetProvider : AppWidgetProvider() {
                 return
             }
             val counterName = loadWidgetCounterNamePref(context, appWidgetId)
-            val viewModel = (context.applicationContext as BetterApplication).viewModel
+
+            val application = (context.applicationContext as BetterApplication)
+            val viewModel = WidgetViewModel(application)
             viewModel.incrementCounter(counterName)
         }
         Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
@@ -131,9 +139,9 @@ class WidgetProvider : AppWidgetProvider() {
             }
         }
 
-        internal fun updateAppWidget(
+        internal suspend fun updateAppWidget(
             context: Context,
-            viewModel: ViewModel,
+            viewModel: WidgetViewModel,
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int
         ) {
@@ -142,8 +150,7 @@ class WidgetProvider : AppWidgetProvider() {
             if (!existsWidgetCounterNamePref(context, appWidgetId)) {
                 // This gets called right after placing the widget even if it hasn't been configured yet.
                 // In that case we can't do anything. This is useful for reconfigurable widgets, which don't
-                // require an initial configuration dialog. Our widget isn't reconfigurable though (because
-                // I didn't find a way to stop observing the previous livedata).
+                // require an initial configuration dialog. Our widget isn't reconfigurable though.
                 Log.e(TAG, "Ignoring updateAppWidget for an unconfigured widget")
                 return
             }
@@ -169,39 +176,40 @@ class WidgetProvider : AppWidgetProvider() {
                 return
             }
 
-            val counter = viewModel.getCounterSummary(counterName).value
-            if (counter == null) {
-                views.setTextViewText(R.id.widgetCounter, "...")
-                return
-            }
+            val counter = viewModel.getCounterSummary(counterName).collect { counter ->
+                val countIntent = Intent(context, WidgetProvider::class.java)
+                countIntent.action = ACTION_COUNT
+                countIntent.putExtra(EXTRA_WIDGET_ID, appWidgetId)
+                // We pass appWidgetId as requestCode even if it's not used to force the creation a new PendingIntent
+                // instead of reusing an existing one, which is what happens if only the "extras" field differs.
+                // Docs: https://developer.android.com/reference/android/app/PendingIntent.html
+                val countPendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    appWidgetId,
+                    countIntent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+                views.setOnClickPendingIntent(R.id.widgetBackground, countPendingIntent)
 
-            val countIntent = Intent(context, WidgetProvider::class.java)
-            countIntent.action = ACTION_COUNT
-            countIntent.putExtra(EXTRA_WIDGET_ID, appWidgetId)
-            // We pass appWidgetId as requestCode even if it's not used to force the creation a new PendingIntent
-            // instead of reusing an existing one, which is what happens if only the "extras" field differs.
-            // Docs: https://developer.android.com/reference/android/app/PendingIntent.html
-            val countPendingIntent = PendingIntent.getBroadcast(context, appWidgetId, countIntent, PendingIntent.FLAG_IMMUTABLE)
-            views.setOnClickPendingIntent(R.id.widgetBackground, countPendingIntent)
-
-            views.setInt(R.id.widgetBackground, "setBackgroundColor", counter.color.colorInt)
-            views.setTextViewText(R.id.widgetCounter, counter.getFormattedCount())
-            val date = counter.mostRecent
-            if (date != null) {
-                val now = Date()
-                val diffInMillis = now.time - date.time
-                val isRecent = diffInMillis < (12 * 60 * 60 * 1000L) // 12 hours
-                val dateFormat = if (isRecent) {
-                    SimpleDateFormat.getTimeInstance()
+                views.setInt(R.id.widgetBackground, "setBackgroundColor", counter.color.colorInt)
+                views.setTextViewText(R.id.widgetCounter, counter.getFormattedCount())
+                val date = counter.mostRecent
+                if (date != null) {
+                    val now = Date()
+                    val diffInMillis = now.time - date.time
+                    val isRecent = diffInMillis < (12 * 60 * 60 * 1000L) // 12 hours
+                    val dateFormat = if (isRecent) {
+                        SimpleDateFormat.getTimeInstance()
+                    } else {
+                        SimpleDateFormat.getDateInstance()
+                    }
+                    val formattedDate = dateFormat.format(Date())
+                    views.setTextViewText(R.id.widgetTime, formattedDate)
                 } else {
-                    SimpleDateFormat.getDateInstance()
+                    views.setTextViewText(R.id.widgetTime, context.getString(R.string.never))
                 }
-                val formattedDate = dateFormat.format(date)
-                views.setTextViewText(R.id.widgetTime, formattedDate)
-            } else {
-                views.setTextViewText(R.id.widgetTime, context.getString(R.string.never))
+                appWidgetManager.updateAppWidget(appWidgetId, views)
             }
-            appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     }
 }

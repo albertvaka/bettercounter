@@ -32,7 +32,7 @@ interface EntryDao {
     suspend fun getCountInRange(name: String, since: Date, until: Date): Int
 
     @Query("UPDATE entry set name = (:newName) WHERE name = (:oldName)")
-    suspend fun renameCounter(oldName: String, newName: String): Int
+    suspend fun renameAllEntries(oldName: String, newName: String): Int
 
     @Query("SELECT * FROM entry WHERE name = (:name) AND date >= (:since) AND date <= (:until) ORDER BY date ASC")
     suspend fun getAllEntriesInRangeSortedByDate(name: String, since: Date, until: Date): List<Entry>

@@ -46,7 +46,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="24dp"
                 android:gravity="center_vertical">
 
                 <TextView
@@ -67,6 +66,7 @@
             </LinearLayout>
 
             <TextView
+                android:layout_marginTop="24dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/average_calculation_settings"
@@ -90,6 +90,32 @@
                     android:layout_height="wrap_content"
                     android:text="@string/average_mode_first_to_now" />
             </RadioGroup>
+
+            <TextView
+                android:layout_marginTop="24dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/export_logs_settings_title"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/export_logs_settings_description"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                />
+
+
+            <Button
+                android:id="@+id/export_button"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/export_logs_settings_button" />
+
         </LinearLayout>
+
     </ScrollView>
 </LinearLayout> 

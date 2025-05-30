@@ -2,6 +2,7 @@ package org.kde.bettercounter.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.MenuItem
@@ -10,9 +11,12 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.google.android.material.snackbar.Snackbar
-import org.kde.bettercounter.BetterApplication
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
-import org.kde.bettercounter.ViewModel
+import org.kde.bettercounter.SettingsViewModel
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.databinding.ActivitySettingsBinding
@@ -21,7 +25,7 @@ import org.kde.bettercounter.persistence.AverageMode
 class SettingsActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var viewModel: ViewModel
+    private val viewModel = SettingsViewModel(application)
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +35,6 @@ class SettingsActivity : AppCompatActivity() {
         setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.settings)
-        
-        viewModel = (application as BetterApplication).viewModel
 
         // Auto-export
         binding.switchAutoExport.isChecked = viewModel.isAutoExportOnSaveEnabled()
@@ -62,6 +64,10 @@ class SettingsActivity : AppCompatActivity() {
                 else -> AverageMode.FIRST_TO_LAST
             }
             viewModel.setAverageCalculationMode(mode)
+        }
+
+        binding.exportButton.setOnClickListener {
+            exportLogs.launch(CreateFileParams("text/plain", "bettercounter-log.txt"))
         }
     }
     
@@ -142,4 +148,25 @@ class SettingsActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+
+    private val exportLogs: ActivityResultLauncher<CreateFileParams> = registerForActivityResult(
+        CreateFileResultContract()
+    ) { uri: Uri? ->
+        val output = uri?.let { baseContext?.contentResolver?.openOutputStream(uri) } ?: return@registerForActivityResult
+        CoroutineScope(Dispatchers.IO).launch {
+            val process = Runtime.getRuntime().exec(arrayOf("logcat", "-d"))
+            val reader = process.inputStream
+            output.use {
+                it.write("BetterCounter ${BuildConfig.VERSION_NAME}\n".toByteArray(Charsets.UTF_8))
+                it.write("Android ${Build.VERSION.RELEASE} (${Build.MANUFACTURER} ${Build.MODEL})\n".toByteArray(Charsets.UTF_8))
+                val buffer = ByteArray(4096)
+                var n: Int
+                while ((reader.read(buffer).also { n = it }) != -1) {
+                    it.write(buffer, 0, n)
+                }
+            }
+        }
+    }
+
 } 

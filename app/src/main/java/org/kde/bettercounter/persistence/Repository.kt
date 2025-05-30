@@ -3,14 +3,11 @@ package org.kde.bettercounter.persistence
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.boilerplate.Converters
 import org.kde.bettercounter.extensions.plusInterval
 import org.kde.bettercounter.extensions.truncated
 import java.util.Calendar
 import java.util.Date
-
-const val alwaysShowTutorialsInDebugBuilds = false
 
 const val COUNTERS_PREFS_KEY = "counters"
 const val COUNTERS_INTERVAL_PREFS_KEY = "interval.%s"
@@ -26,39 +23,21 @@ class Repository(
     private val entryDao: EntryDao,
     private val sharedPref: SharedPreferences,
 ) {
-
-    private var tutorials: MutableSet<String>
     private var counters: List<String>
 
     init {
         val countersStr = sharedPref.getString(COUNTERS_PREFS_KEY, "[]")
         counters = Converters.stringToStringList(countersStr)
-        tutorials = sharedPref.getStringSet(TUTORIALS_PREFS_KEY, setOf())!!.toMutableSet()
-        if (BuildConfig.DEBUG && alwaysShowTutorialsInDebugBuilds) {
-            tutorials = mutableSetOf()
-        }
     }
 
     fun getCounterList(): List<String> = counters
+
+    fun counterExists(name: String): Boolean = counters.contains(name)
 
     fun setCounterList(list: List<String>) {
         val jsonStr = Converters.stringListToString(list)
         sharedPref.edit { putString(COUNTERS_PREFS_KEY, jsonStr) }
         counters = list
-    }
-
-    fun setTutorialShown(id: Tutorial) {
-        tutorials.add(id.name)
-        sharedPref.edit { putStringSet(TUTORIALS_PREFS_KEY, tutorials) }
-    }
-
-    fun resetTutorialShown(id: Tutorial) {
-        tutorials.remove(id.name)
-        sharedPref.edit { putStringSet(TUTORIALS_PREFS_KEY, tutorials) }
-    }
-
-    fun isTutorialShown(id: Tutorial): Boolean {
-        return tutorials.contains(id.name)
     }
 
     private fun getCounterColor(name: String): CounterColor {
@@ -127,7 +106,7 @@ class Repository(
     }
 
     suspend fun renameCounter(oldName: String, newName: String) {
-        entryDao.renameCounter(oldName, newName)
+        entryDao.renameAllEntries(oldName, newName)
     }
 
     suspend fun addEntry(name: String, date: Date = Calendar.getInstance().time) {
@@ -156,6 +135,14 @@ class Repository(
 
     suspend fun bulkAddEntries(entries: List<Entry>) {
         entryDao.bulkInsert(entries)
+    }
+
+    fun getTutorialsShown() : Set<String> {
+        return sharedPref.getStringSet(TUTORIALS_PREFS_KEY, setOf())!!
+    }
+
+    fun setTutorialsShown(tutorials: Set<String>) {
+        sharedPref.edit { putStringSet(TUTORIALS_PREFS_KEY, tutorials) }
     }
 
     fun isAutoExportOnSaveEnabled(): Boolean {

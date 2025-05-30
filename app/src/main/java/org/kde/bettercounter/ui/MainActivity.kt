@@ -26,11 +26,10 @@ import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.ChartsAdapter
 import org.kde.bettercounter.EntryListViewAdapter
+import org.kde.bettercounter.MainActivityViewModel
 import org.kde.bettercounter.R
-import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.boilerplate.OpenFileParams
@@ -47,7 +46,7 @@ import kotlin.math.max
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: ViewModel
+    private val viewModel : MainActivityViewModel by lazy { MainActivityViewModel(application) }
     private lateinit var entryViewAdapter: EntryListViewAdapter
     internal lateinit var binding: ActivityMainBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<LinearLayout>
@@ -69,8 +68,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         setAndroid15insets()
-
-        viewModel = (application as BetterApplication).viewModel
 
         // Bottom sheet with graph
         // -----------------------
@@ -260,7 +257,7 @@ class MainActivity : AppCompatActivity() {
                     val holder = binding.recycler.findViewHolderForAdapterPosition(0) as EntryViewHolder
                     entryViewAdapter.showDragTutorial(holder) {
                         entryViewAdapter.showPickDateTutorial(holder) {
-                            viewModel.resetTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
+                            viewModel.unsetTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
                             if (sheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                                 // Re-trigger the tutorial on the selected counter
                                 showChangeGraphIntervalTutorial()
@@ -269,7 +266,6 @@ class MainActivity : AppCompatActivity() {
                                 val firstCounterName = viewModel.getCounterList().firstOrNull()
                                     ?: return@showPickDateTutorial
                                 val counter = viewModel.getCounterSummary(firstCounterName).value
-                                    ?: return@showPickDateTutorial
                                 entryViewAdapter.selectCounter(counter)
                             }
                         }
@@ -369,7 +365,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         viewModel.editCounterSameName(newCounterMetadata)
                     }
-                    // We are not subscribed to the summary livedata, so we won't get notified of the change we just made.
+                    // We are not subscribed to the summary flow, so we won't get notified of the change we just made.
                     // Update our local copy so it has the right data if we open the dialog again.
                     counter.name = newCounterMetadata.name
                     counter.interval = newCounterMetadata.interval

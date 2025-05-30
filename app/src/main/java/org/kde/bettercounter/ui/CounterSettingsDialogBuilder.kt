@@ -14,15 +14,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import org.kde.bettercounter.ColorAdapter
 import org.kde.bettercounter.IntervalAdapter
+import org.kde.bettercounter.MainActivityViewModel
 import org.kde.bettercounter.R
-import org.kde.bettercounter.ViewModel
 import org.kde.bettercounter.databinding.CounterSettingsBinding
 import org.kde.bettercounter.persistence.CounterColor
 import org.kde.bettercounter.persistence.CounterMetadata
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 
-class CounterSettingsDialogBuilder(private val context: Context, private val viewModel: ViewModel) {
+class CounterSettingsDialogBuilder(private val context: Context, private val viewModel: MainActivityViewModel) {
 
     private val builder = MaterialAlertDialogBuilder(context)
     private val binding: CounterSettingsBinding = CounterSettingsBinding.inflate(LayoutInflater.from(context))

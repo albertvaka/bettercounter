@@ -8,14 +8,16 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
-import org.kde.bettercounter.BetterApplication
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.kde.bettercounter.R
-import org.kde.bettercounter.ViewModel
+import org.kde.bettercounter.WidgetViewModel
 import org.kde.bettercounter.databinding.WidgetConfigureBinding
 
 class WidgetConfigureActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: ViewModel
+    private val viewModel = WidgetViewModel(application)
     private lateinit var binding: WidgetConfigureBinding
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
@@ -39,7 +41,6 @@ class WidgetConfigureActivity : AppCompatActivity() {
             return
         }
 
-        viewModel = (application as BetterApplication).viewModel
         val counterNames = viewModel.getCounterList()
         if (counterNames.isEmpty()) {
             Toast.makeText(this, R.string.no_counters, Toast.LENGTH_SHORT).show()
@@ -53,7 +54,10 @@ class WidgetConfigureActivity : AppCompatActivity() {
             saveWidgetCounterNamePref(this, appWidgetId, counterName)
 
             val appWidgetManager = AppWidgetManager.getInstance(this)
-            WidgetProvider.updateAppWidget(this, viewModel, appWidgetManager, appWidgetId)
+
+            CoroutineScope(Dispatchers.Main).launch {
+                WidgetProvider.updateAppWidget(application, viewModel, appWidgetManager, appWidgetId)
+            }
 
             val resultValue = Intent()
             resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
