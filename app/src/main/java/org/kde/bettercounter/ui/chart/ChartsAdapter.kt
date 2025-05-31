@@ -1,4 +1,4 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui.chart
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -17,7 +17,7 @@ import org.kde.bettercounter.extensions.toCalendar
 import org.kde.bettercounter.extensions.truncated
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
-import org.kde.bettercounter.ui.ChartHolder
+import org.kde.bettercounter.ui.main.MainActivityViewModel
 import java.util.Calendar
 
 class ChartsAdapter(

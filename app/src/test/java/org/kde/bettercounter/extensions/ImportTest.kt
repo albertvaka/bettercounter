@@ -4,8 +4,8 @@ import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.kde.bettercounter.MainActivityViewModel
 import org.kde.bettercounter.persistence.Entry
+import org.kde.bettercounter.ui.main.MainActivityViewModel
 
 class ImportTest {
 

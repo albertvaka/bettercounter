@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.settings
 
 import android.content.Intent
 import android.net.Uri
@@ -16,22 +16,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
-import org.kde.bettercounter.SettingsViewModel
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.databinding.ActivitySettingsBinding
 import org.kde.bettercounter.persistence.AverageMode
 
 class SettingsActivity : AppCompatActivity() {
-    
-    private lateinit var binding: ActivitySettingsBinding
-    private val viewModel = SettingsViewModel(application)
-    
+
+    private val viewModel : SettingsViewModel by lazy { SettingsViewModel(application) }
+    private val binding: ActivitySettingsBinding by lazy { ActivitySettingsBinding.inflate(layoutInflater) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
         setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.settings)
@@ -50,13 +48,13 @@ class SettingsActivity : AppCompatActivity() {
             selectAutoExportFile()
         }
         updateAutoExportFileButtonVisibility(binding.switchAutoExport.isChecked)
-        
+
         // Average calculation mode
         when (viewModel.getAverageCalculationMode()) {
             AverageMode.FIRST_TO_NOW -> binding.radioFirstToNow.isChecked = true
             AverageMode.FIRST_TO_LAST -> binding.radioFirstToLast.isChecked = true
         }
-        
+
         binding.radioGroupAverageMode.setOnCheckedChangeListener { _, checkedId ->
             val mode = when (checkedId) {
                 R.id.radioFirstToNow -> AverageMode.FIRST_TO_NOW
@@ -70,7 +68,7 @@ class SettingsActivity : AppCompatActivity() {
             exportLogs.launch(CreateFileParams("text/plain", "bettercounter-log.txt"))
         }
     }
-    
+
     private fun updateAutoExportFileButtonVisibility(autoExportEnabled: Boolean) {
         val existingUri = viewModel.getAutoExportFileUri()?.toUri()
         if (autoExportEnabled && existingUri != null) {
@@ -110,12 +108,12 @@ class SettingsActivity : AppCompatActivity() {
             uri.toString()
         }
     }
-    
+
     private fun selectAutoExportFile() {
         val fileName = "bettercounter-auto-export.csv"
         autoExportFilePicker.launch(CreateFileParams("text/csv", fileName))
     }
-    
+
     private val autoExportFilePicker: ActivityResultLauncher<CreateFileParams> = registerForActivityResult(
         CreateFileResultContract()
     ) { uri: Uri? ->
@@ -124,12 +122,12 @@ class SettingsActivity : AppCompatActivity() {
                 contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
                 viewModel.setAutoExportFileUri(uri.toString())
-                
+
                 displayCurrentExportFileName(uri)
             } catch (e: Exception) {
                 e.printStackTrace()
                 Snackbar.make(binding.root, getString(R.string.export_error), Snackbar.LENGTH_LONG).show()
-                
+
                 viewModel.setAutoExportOnSave(false)
                 binding.switchAutoExport.isChecked = false
             }
@@ -140,7 +138,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
     }
-    
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             finish()
@@ -169,4 +167,4 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-} 
+}

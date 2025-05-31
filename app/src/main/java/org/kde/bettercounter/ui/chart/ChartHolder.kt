@@ -1,11 +1,10 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.chart
 
 import android.view.Gravity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
-import org.kde.bettercounter.MainActivityViewModel
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
 import org.kde.bettercounter.extensions.count
@@ -16,6 +15,8 @@ import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
+import org.kde.bettercounter.ui.main.MainActivityViewModel
+import org.kde.bettercounter.ui.main.showDatePicker
 import java.text.SimpleDateFormat
 import java.time.temporal.ChronoUnit
 import java.util.Calendar

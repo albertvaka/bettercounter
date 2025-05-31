@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.main
 
 import android.content.Context
 import android.os.Handler
@@ -8,6 +8,7 @@ import android.os.Parcelable
 import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.view.View
+import androidx.appcompat.widget.AppCompatTextView
 import org.kde.bettercounter.R
 import java.lang.ref.WeakReference
 import kotlin.math.abs
@@ -16,7 +17,7 @@ import kotlin.math.abs
  * A `TextView` that, given a reference time, renders that time as a time period relative to the current time.
  * @author Based on RelativeTimeTextView by Kiran Rao
  */
-open class BetterRelativeTimeTextView : androidx.appcompat.widget.AppCompatTextView {
+open class BetterRelativeTimeTextView : AppCompatTextView {
     var referenceTime: Long = -1L
         set(value) {
             field = value

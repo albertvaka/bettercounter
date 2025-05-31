@@ -1,4 +1,4 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui.main
 
 import android.app.Application
 import android.content.Context
@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.kde.bettercounter.BuildConfig
+import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.extensions.toCalendar
@@ -31,7 +33,7 @@ import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Repository
 import org.kde.bettercounter.persistence.Tutorial
-import org.kde.bettercounter.ui.WidgetProvider
+import org.kde.bettercounter.ui.widget.WidgetProvider
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Calendar
@@ -127,7 +129,7 @@ class MainActivityViewModel(val application: Application) {
             mutex.withLock {
                 summaryMap[name]?.value = repo.getCounterSummary(name)
             }
-            WidgetProvider.refreshWidgets(application)
+            WidgetProvider.refreshWidget(application, name)
             autoExportIfEnabled()
         }
     }
@@ -143,7 +145,7 @@ class MainActivityViewModel(val application: Application) {
                     observer.onCounterDecremented(name, oldEntryDate)
                 }
             }
-            WidgetProvider.refreshWidgets(application)
+            WidgetProvider.refreshWidget(application, name)
             autoExportIfEnabled()
         }
     }

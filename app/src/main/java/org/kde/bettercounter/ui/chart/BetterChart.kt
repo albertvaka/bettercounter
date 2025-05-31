@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.chart
 
 import android.content.Context
 import android.util.AttributeSet

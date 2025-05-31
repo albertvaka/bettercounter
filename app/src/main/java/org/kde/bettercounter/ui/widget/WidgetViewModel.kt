@@ -1,4 +1,4 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui.widget
 
 import android.app.Application
 import android.content.Context
@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import org.kde.bettercounter.boilerplate.AppDatabase
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Repository
-import org.kde.bettercounter.ui.WidgetProvider
 import java.util.Calendar
 import java.util.Date
 
@@ -20,7 +19,7 @@ class WidgetViewModel(val application: Application) {
     private val repo: Repository
 
     init {
-        val db = AppDatabase.Companion.getInstance(application)
+        val db = AppDatabase.getInstance(application)
         val prefs = application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
         repo = Repository(application, db.entryDao(), prefs)
     }
@@ -28,7 +27,7 @@ class WidgetViewModel(val application: Application) {
     fun incrementCounter(name: String, date: Date = Calendar.getInstance().time) {
         CoroutineScope(Dispatchers.IO).launch {
             repo.addEntry(name, date)
-            WidgetProvider.refreshWidgets(application)
+            WidgetProvider.refreshWidget(application, name)
         }
     }
 

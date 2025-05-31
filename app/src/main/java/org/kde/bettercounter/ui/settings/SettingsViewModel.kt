@@ -1,4 +1,4 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui.settings
 
 import android.app.Application
 import android.content.Context
@@ -13,7 +13,7 @@ class SettingsViewModel(val application: Application) {
     private val repo: Repository
 
     init {
-        val db = AppDatabase.Companion.getInstance(application)
+        val db = AppDatabase.getInstance(application)
         val prefs = application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
         repo = Repository(application, db.entryDao(), prefs)
     }

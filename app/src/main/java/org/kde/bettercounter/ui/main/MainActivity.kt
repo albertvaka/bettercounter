@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.main
 
 import android.content.Intent
 import android.net.Uri
@@ -26,9 +26,6 @@ import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.kde.bettercounter.ChartsAdapter
-import org.kde.bettercounter.EntryListViewAdapter
-import org.kde.bettercounter.MainActivityViewModel
 import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
@@ -42,13 +39,18 @@ import org.kde.bettercounter.extensions.dpToPx
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
+import org.kde.bettercounter.ui.chart.ChartHolder
+import org.kde.bettercounter.ui.chart.ChartsAdapter
+import org.kde.bettercounter.ui.editdialog.CounterSettingsDialogBuilder
+import org.kde.bettercounter.ui.settings.SettingsActivity
+import org.kde.bettercounter.ui.widget.WidgetProvider
 import kotlin.math.max
 
 class MainActivity : AppCompatActivity() {
 
     private val viewModel : MainActivityViewModel by lazy { MainActivityViewModel(application) }
+    internal val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private lateinit var entryViewAdapter: EntryListViewAdapter
-    internal lateinit var binding: ActivityMainBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var searchMenuItem: MenuItem
     private var extraBottomPaddingForNavigationInset = 0
@@ -64,7 +66,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         setAndroid15insets()
@@ -126,9 +127,11 @@ class MainActivity : AppCompatActivity() {
                 searchView.setQuery("", false)
                 searchMenuItem.collapseActionView()
             }
+
             override fun onItemAdded(position: Int) {
                 binding.recycler.smoothScrollToPosition(position)
             }
+
             override fun onSelectedItemUpdated(position: Int, counter: CounterSummary) {
                 binding.detailsTitle.text = counter.name
                 val interval = intervalOverride ?: counter.interval.toChartDisplayableInterval()
@@ -171,6 +174,7 @@ class MainActivity : AppCompatActivity() {
                 binding.charts.swapAdapter(adapter, true)
                 binding.charts.scrollToPosition(adapter.itemCount - 1) // Select the latest chart
             }
+
             override fun onItemSelected(position: Int, counter: CounterSummary) {
                 setFabToEdit(counter)
                 intervalOverride = null

@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.widget
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -12,19 +12,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kde.bettercounter.R
-import org.kde.bettercounter.WidgetViewModel
 import org.kde.bettercounter.databinding.WidgetConfigureBinding
 
 class WidgetConfigureActivity : AppCompatActivity() {
 
-    private val viewModel = WidgetViewModel(application)
-    private lateinit var binding: WidgetConfigureBinding
+    private val viewModel : WidgetViewModel by lazy { WidgetViewModel(application) }
+    private val binding: WidgetConfigureBinding by lazy { WidgetConfigureBinding.inflate(layoutInflater) }
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = WidgetConfigureBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
@@ -67,7 +65,7 @@ class WidgetConfigureActivity : AppCompatActivity() {
     }
 }
 
-private const val PREFS_NAME = "org.kde.bettercounter.ui.WidgetProvider"
+private const val PREFS_NAME = "org.kde.bettercounter.ui.widget.WidgetProvider"
 private const val PREF_PREFIX_KEY = "appwidget_"
 
 internal fun saveWidgetCounterNamePref(context: Context, appWidgetId: Int, counterName: String) {

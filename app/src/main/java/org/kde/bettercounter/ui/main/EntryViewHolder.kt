@@ -1,11 +1,10 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.main
 
 import android.view.HapticFeedbackConstants
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip.OnDismissListener
-import org.kde.bettercounter.MainActivityViewModel
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary

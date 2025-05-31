@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui
+package org.kde.bettercounter.ui.widget
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
-import org.kde.bettercounter.WidgetViewModel
 import org.kde.bettercounter.extensions.millisecondsUntilNextHour
+import org.kde.bettercounter.ui.main.MainActivity
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -64,6 +64,8 @@ class WidgetProvider : AppWidgetProvider() {
             val application = (context.applicationContext as BetterApplication)
             val viewModel = WidgetViewModel(application)
             viewModel.incrementCounter(counterName)
+
+            // TODO: Broadcast so the main activity knows
         }
         Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
             scheduleHourlyUpdate(context)
@@ -114,6 +116,25 @@ class WidgetProvider : AppWidgetProvider() {
             val intent = Intent(context, WidgetProvider::class.java)
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
+            context.sendBroadcast(intent)
+        }
+
+        fun refreshWidget(context: Context, counterName: String) {
+            val widgetIds = getAllWidgetIds(context)
+            if (widgetIds.isEmpty()) return
+            Log.d(TAG, "refreshing widget $counterName")
+            for (widgetId in widgetIds) {
+                if (counterName == loadWidgetCounterNamePref(context, widgetId)) {
+                    return refreshWidget(context, widgetId)
+                }
+            }
+        }
+
+        fun refreshWidget(context: Context, widgetId: Int) {
+            Log.d(TAG, "refreshing widget $widgetId")
+            val intent = Intent(context, WidgetProvider::class.java)
+            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
             context.sendBroadcast(intent)
         }
 

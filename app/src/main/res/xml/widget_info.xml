@@ -10,5 +10,5 @@
     android:previewLayout="@layout/widget_preview"
     android:previewImage="@drawable/widget_preview"
     android:description="@string/app_widget_description"
-    android:configure="org.kde.bettercounter.ui.WidgetConfigureActivity"
+    android:configure="org.kde.bettercounter.ui.widget.WidgetConfigureActivity"
 />

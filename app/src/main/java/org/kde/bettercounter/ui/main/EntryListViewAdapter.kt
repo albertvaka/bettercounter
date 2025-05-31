@@ -1,4 +1,4 @@
-package org.kde.bettercounter
+package org.kde.bettercounter.ui.main
 
 import android.annotation.SuppressLint
 import android.view.Gravity
@@ -12,12 +12,11 @@ import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip.OnDismissListe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
-import org.kde.bettercounter.ui.EntryViewHolder
-import org.kde.bettercounter.ui.MainActivity
 import java.util.Collections
 import java.util.Date
 
