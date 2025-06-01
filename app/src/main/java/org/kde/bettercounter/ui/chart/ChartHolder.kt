@@ -11,6 +11,7 @@ import org.kde.bettercounter.extensions.count
 import org.kde.bettercounter.extensions.max
 import org.kde.bettercounter.extensions.min
 import org.kde.bettercounter.persistence.AverageMode
+import org.kde.bettercounter.persistence.CounterColors
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
@@ -79,7 +80,8 @@ class ChartHolder(
         val goalLine = computeGoalLine(counter, interval)
 
         // Chart
-        binding.chart.setDataBucketized(entries, rangeStart, interval, counter.color.toColorForChart(activity), goalLine, maxCount)
+        val colorInt = CounterColors.getInstance(activity).getColorIntForChart(counter.color)
+        binding.chart.setDataBucketized(entries, rangeStart, interval, colorInt, goalLine, maxCount)
 
         // Stats
         val periodAverage = getPeriodAverageString(counter, entries, rangeStart, rangeEnd)

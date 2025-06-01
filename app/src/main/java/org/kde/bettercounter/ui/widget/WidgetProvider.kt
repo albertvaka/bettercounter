@@ -17,6 +17,7 @@ import org.kde.bettercounter.BetterApplication
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
 import org.kde.bettercounter.extensions.millisecondsUntilNextHour
+import org.kde.bettercounter.persistence.CounterColors
 import org.kde.bettercounter.ui.main.MainActivity
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -217,7 +218,12 @@ class WidgetProvider : AppWidgetProvider() {
                 )
                 views.setOnClickPendingIntent(R.id.widgetBackground, countPendingIntent)
 
-                views.setInt(R.id.widgetBackground, "setBackgroundColor", counter.color.colorInt)
+                val rippleRes = CounterColors.getInstance(context).getRippleDrawableRes(counter.color)
+                if (rippleRes != null) {
+                    views.setInt(R.id.widgetBackground, "setBackgroundResource", rippleRes)
+                } else {
+                    views.setInt(R.id.widgetBackground, "setBackground", counter.color.colorInt)
+                }
                 views.setTextViewText(R.id.widgetCounter, counter.getFormattedCount())
                 val date = counter.mostRecent
                 if (date != null) {

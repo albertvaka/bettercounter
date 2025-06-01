@@ -45,7 +45,7 @@ class Repository(
 
     private fun getCounterColor(name: String): CounterColor {
         val key = COUNTERS_COLOR_PREFS_KEY.format(name)
-        return CounterColor(sharedPref.getInt(key, CounterColor.getDefault(application).colorInt))
+        return CounterColor(sharedPref.getInt(key, CounterColors.getInstance(application).defaultColor.colorInt))
     }
 
     private fun getCounterInterval(name: String): Interval {

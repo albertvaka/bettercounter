@@ -14,7 +14,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.CounterSettingsBinding
-import org.kde.bettercounter.persistence.CounterColor
 import org.kde.bettercounter.persistence.CounterMetadata
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
@@ -115,7 +114,7 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
         binding.nameEditBox.isHintAnimationEnabled = true
         binding.fakeSpinnerInterval.setText(counter.interval.toHumanReadableResourceId())
         binding.spinnerInterval.setSelection(intervalAdapter.positionOf(counter.interval))
-        colorAdapter.selectedColor = counter.color.colorInt
+        colorAdapter.selectedColor = counter.color
         goal = counter.goal
         updateGoalText()
         return this
@@ -154,7 +153,7 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
                             name,
                             intervalAdapter.itemAt(binding.spinnerInterval.selectedItemPosition),
                             goal,
-                            CounterColor(colorAdapter.selectedColor),
+                            colorAdapter.selectedColor,
                         )
                     )
                     dialog.dismiss()

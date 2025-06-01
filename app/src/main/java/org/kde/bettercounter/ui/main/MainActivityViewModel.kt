@@ -21,7 +21,7 @@ import org.kde.bettercounter.extensions.millisecondsUntilNextHour
 import org.kde.bettercounter.extensions.toCalendar
 import org.kde.bettercounter.extensions.truncated
 import org.kde.bettercounter.persistence.AverageMode
-import org.kde.bettercounter.persistence.CounterColor
+import org.kde.bettercounter.persistence.CounterColors
 import org.kde.bettercounter.persistence.CounterMetadata
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Entry
@@ -317,7 +317,7 @@ class MainActivityViewModel(val application: Application) {
                             progressCallback(namesToImport.size, 0)
                         }
                     }
-                    val reusedCounterMetadata = CounterMetadata("", Interval.DEFAULT, 0, CounterColor.getDefault(context))
+                    val reusedCounterMetadata = CounterMetadata("", Interval.DEFAULT, 0, CounterColors.getInstance(context).defaultColor)
                     namesToImport.forEach { name ->
                         if (!counterExists(name)) {
                             reusedCounterMetadata.name = name

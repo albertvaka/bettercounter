@@ -6,15 +6,24 @@
     <color name="colorAccentDisabled">#505050</color>
     <color name="colorTextHint">#D0D0D0</color>
 
-    <array name="picker_colors">
-        <item>@color/colorLightBackground</item>
-        <item>#1B5496</item>
-        <item>#6232B0</item>
-        <item>#833434</item>
-        <item>#67506F</item>
-        <item>#0A616C</item>
-        <item>#AB1E27</item>
-        <item>#8D1E6A</item>
-        <item>#085816</item>
-    </array>
+    <color name="color1">#1B5496</color>
+    <color name="color2">#6232B0</color>
+    <color name="color3">#833434</color>
+    <color name="color4">#67506F</color>
+    <color name="color5">#0A616C</color>
+    <color name="color6">#AB1E27</color>
+    <color name="color7">#8D1E6A</color>
+    <color name="color8">#085816</color>
+
+    <!-- 10% lighter -->
+    <color name="colorLightBackgroundRipple">#454545</color>
+    <color name="color1ripple">#2064b2</color>
+    <color name="color2ripple">#6e38c6</color>
+    <color name="color3ripple">#9a3d3d</color>
+    <color name="color4ripple">#785d82</color>
+    <color name="color5ripple">#0d8190</color>
+    <color name="color6ripple">#c5232d</color>
+    <color name="color7ripple">#a9247f</color>
+    <color name="color8ripple">#0b7e1f</color>
+
 </resources>

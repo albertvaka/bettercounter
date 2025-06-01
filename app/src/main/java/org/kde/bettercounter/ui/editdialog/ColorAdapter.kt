@@ -10,11 +10,13 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
+import org.kde.bettercounter.persistence.CounterColor
+import org.kde.bettercounter.persistence.CounterColors
 
 // Based on https://github.com/kristiyanP/colorpicker
 class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
 
-    var selectedColor: Int
+    var selectedColor: CounterColor
         get() {
             return colors[selectedPosition]
         }
@@ -35,17 +37,7 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
             notifyItemChanged(prevSelected)
         }
 
-    private var colors: List<Int>
-
-    init {
-        val colorList = mutableListOf<Int>()
-        val resArray = context.resources.obtainTypedArray(R.array.picker_colors)
-        for (i in 0 until resArray.length()) {
-            colorList.add(resArray.getColor(i, 0))
-        }
-        resArray.recycle()
-        colors = colorList
-    }
+    private var colors: List<CounterColor> = CounterColors.getInstance(context).allColors
 
     inner class ViewHolder(val colorButton: AppCompatButton) :
         RecyclerView.ViewHolder(colorButton),
@@ -76,15 +68,15 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val color = colors[position]
-        val textColor = if (isDarkColor(color)) Color.WHITE else Color.BLACK
+        val colorInt = colors[position].colorInt
+        val textColor = if (isDarkColor(colorInt)) Color.WHITE else Color.BLACK
         val tickText = if (position == selectedPosition) "✔" else ""
 
         holder.colorButton.text = tickText
         holder.colorButton.setTextColor(textColor)
         holder.colorButton.contentDescription = context.getString(R.string.color_hint, position + 1)
         val background = DrawableCompat.wrap(holder.colorButton.background)
-        DrawableCompat.setTint(background, color)
+        DrawableCompat.setTint(background, colorInt)
         holder.colorButton.background = background
     }
 
