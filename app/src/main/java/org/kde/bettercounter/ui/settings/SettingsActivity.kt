@@ -77,8 +77,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun getFileNameFromUri(uri: Uri): String? {
-        return try {
-            when (uri.scheme) {
+        try {
+            return when (uri.scheme) {
                 "content" -> {
                     contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                         if (cursor.moveToFirst()) {
@@ -96,7 +96,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            uri.toString()
+            return uri.toString()
         }
     }
 
