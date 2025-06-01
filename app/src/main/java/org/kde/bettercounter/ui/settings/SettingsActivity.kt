@@ -2,6 +2,7 @@ package org.kde.bettercounter.ui.settings
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.MenuItem
@@ -10,6 +11,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
@@ -57,6 +62,10 @@ class SettingsActivity : AppCompatActivity() {
                 else -> AverageMode.FIRST_TO_LAST
             }
             viewModel.setAverageCalculationMode(mode)
+        }
+
+        binding.exportButton.setOnClickListener {
+            exportLogs.launch(CreateFileParams("text/plain", "bettercounter-log.txt"))
         }
     }
 
@@ -138,4 +147,22 @@ class SettingsActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    private val exportLogs: ActivityResultLauncher<CreateFileParams> = registerForActivityResult(
+        CreateFileResultContract()
+    ) { uri: Uri? ->
+        val output = uri?.let { baseContext?.contentResolver?.openOutputStream(uri) } ?: return@registerForActivityResult
+        CoroutineScope(Dispatchers.IO).launch {
+            val process = Runtime.getRuntime().exec(arrayOf("logcat", "-d"))
+            val reader = process.inputStream
+            output.use {
+                it.write("BetterCounter ${BuildConfig.VERSION_NAME}\n".toByteArray(Charsets.UTF_8))
+                it.write("Android ${Build.VERSION.RELEASE} (${Build.MANUFACTURER} ${Build.MODEL})\n".toByteArray(Charsets.UTF_8))
+                val buffer = ByteArray(4096)
+                var n: Int
+                while ((reader.read(buffer).also { n = it }) != -1) {
+                    it.write(buffer, 0, n)
+                }
+            }
+        }
+    }
 }
