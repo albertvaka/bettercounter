@@ -50,31 +50,30 @@ class WidgetProvider : AppWidgetProvider() {
         super.onReceive(context, intent)
         Log.d(TAG, "onReceive " + intent.action)
         when (intent.action) {
-        ACTION_COUNT -> {
-            val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-            if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-                Log.e(TAG, "No widget id extra set")
-                return
-            }
-            if (!WidgetViewModel.existsWidgetCounterNamePref(context, appWidgetId)) {
-                Log.e(TAG, "Counter doesn't exist")
-                return
-            }
-            val counterName = WidgetViewModel.loadWidgetCounterNamePref(context, appWidgetId)
+            ACTION_COUNT -> {
+                val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+                if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    Log.e(TAG, "No widget id extra set")
+                    return
+                }
+                if (!WidgetViewModel.existsWidgetCounterNamePref(context, appWidgetId)) {
+                    Log.e(TAG, "Counter doesn't exist")
+                    return
+                }
+                val counterName = WidgetViewModel.loadWidgetCounterNamePref(context, appWidgetId)
 
-            val application = (context.applicationContext as BetterApplication)
-            val viewModel = WidgetViewModel(application)
-            viewModel.incrementCounter(counterName)
+                val application = (context.applicationContext as BetterApplication)
+                val viewModel = WidgetViewModel(application)
+                viewModel.incrementCounter(counterName)
+            }
+            Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
+                scheduleHourlyUpdate(context)
+            }
+            ACTION_HOURLY_UPDATE -> {
+                refreshWidgets(context)
+                scheduleHourlyUpdate(context) // Schedule next update, we don't use repeating alarms for precision
+            }
         }
-        Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
-            scheduleHourlyUpdate(context)
-        }
-        ACTION_HOURLY_UPDATE -> {
-            refreshWidgets(context)
-            scheduleHourlyUpdate(context) // Schedule next update, we don't use repeating alarms for precision
-        }
-    }
-
     }
 
     companion object {
