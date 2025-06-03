@@ -8,6 +8,6 @@ class BetterApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.e("BetterApplication", "onCreate")
+        Log.d("BetterApplication", "onCreate")
     }
 }
