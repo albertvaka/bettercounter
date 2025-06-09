@@ -1,0 +1,10 @@
+5.1.1:
+- Fixed counter order not being saved
+
+5.1.0:
+- Improved widget responsiveness
+
+5.0:
+- Add a filter/search
+- Add settings to configure average calculation and auto-export
+- Keep Y axis the same for all charts
