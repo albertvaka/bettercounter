@@ -211,7 +211,7 @@ class MainActivityViewModel(val application: Application) {
 
     fun getCounterList() = counters
 
-    fun saveCounterOrder(value: List<String>) = {
+    fun saveCounterOrder(value: List<String>) {
         counters = value
         repo.setCounterList(value)
     }
