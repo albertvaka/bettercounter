@@ -24,8 +24,6 @@
         android:id="@+id/chartAverage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:paddingTop="3dp"
