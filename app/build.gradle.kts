@@ -13,11 +13,11 @@ plugins {
 
 android {
     namespace = "org.kde.bettercounter"
-    compileSdk = 35
+    compileSdk = 36
     defaultConfig {
         applicationId = "org.kde.bettercounter"
         minSdk = 21
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 50101
         versionName = "5.1.1"
 
