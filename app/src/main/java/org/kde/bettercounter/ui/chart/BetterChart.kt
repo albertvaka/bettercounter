@@ -18,7 +18,6 @@ import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.ViewPortHandler
 import org.kde.bettercounter.R
 import org.kde.bettercounter.extensions.copy
-import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import java.text.DateFormatSymbols
 import java.text.FieldPosition
@@ -105,63 +104,33 @@ class BetterChart : BarChart {
     }
 
     fun setDataBucketized(
-        intervalEntries: List<Entry>,
+        buckets: List<Int>,
         rangeStart: Calendar,
-        totalInterval: Interval,
+        interval: Interval,
         color: Int,
-        goalLine: Float,
+        goalLine: Int,
         maxCount: Int,
     ) {
         mDataSet.color = color
 
-        if (intervalEntries.isEmpty()) {
+        if (buckets.isEmpty()) {
             clear()
             return
         }
 
-        val bucketIntervalAsCalendarField = totalInterval.asCalendarField()
-        val numBuckets = when (totalInterval) {
-            Interval.HOUR -> 60
-            Interval.DAY -> 24
-            Interval.WEEK -> 7
-            Interval.MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH)
-            Interval.YEAR -> 12
-            else -> 0.also { assert(false) }
+        val series = buckets.mapIndexed { num, count ->
+            BarEntry(num.toFloat(), count.toFloat())
         }
 
-        xAxis.granularity = when (totalInterval) {
+        xAxis.granularity = when (interval) {
             Interval.HOUR -> 3.0f
             Interval.MONTH -> 2.0f
             else -> 1f
         }
 
-        val cal = rangeStart.copy()
-
-        // All given entries should be after rangeStart and before rangeStart+numBuckets
-        assert(intervalEntries.first().date.time >= cal.timeInMillis) {
-            "Entry on ${intervalEntries.first().date} is not after ${cal.time}}"
-        }
-        val endCal = ((cal.clone() as Calendar).apply { add(bucketIntervalAsCalendarField, numBuckets) })
-        assert(intervalEntries.last().date.time < endCal.timeInMillis) {
-            "Entry on ${intervalEntries.first().date} is not before ${endCal.time}}"
-        }
-
-        var entriesIndex = 0
-        val series: MutableList<BarEntry> = mutableListOf()
-        for (bucket in 0 until numBuckets) {
-            cal.add(bucketIntervalAsCalendarField, 1) // Calendar is now at the end of the current bucket
-            var bucketCount = 0
-            while (entriesIndex < intervalEntries.size && intervalEntries[entriesIndex].date.time < cal.timeInMillis) {
-                bucketCount++
-                entriesIndex++
-            }
-            // Log.e("Bucket", "$bucket (ends ${cal.debugToSimpleDateString()}) -> $bucketCount")
-            series.add(BarEntry(bucket.toFloat(), bucketCount.toFloat()))
-        }
-
         yAxis.limitLines.clear()
         if (goalLine > 0) {
-            val limitLine = LimitLine(goalLine).apply {
+            val limitLine = LimitLine(goalLine.toFloat()).apply {
                 lineColor = color
             }
             yAxis.limitLines.add(limitLine)
@@ -170,6 +139,7 @@ class BetterChart : BarChart {
         yAxis.axisMinimum = 0f
         yAxis.axisMaximum = maxCount.toFloat()
         xAxis.labelCount = series.size
+        val bucketIntervalAsCalendarField = interval.asCalendarField()
         xAxis.valueFormatter = when (bucketIntervalAsCalendarField) {
             Calendar.MINUTE -> RawFormatter()
             Calendar.HOUR_OF_DAY -> RawFormatter()

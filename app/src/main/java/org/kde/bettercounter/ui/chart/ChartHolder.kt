@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
+import org.kde.bettercounter.extensions.copy
 import org.kde.bettercounter.extensions.count
 import org.kde.bettercounter.extensions.max
 import org.kde.bettercounter.extensions.min
@@ -76,12 +77,14 @@ class ChartHolder(
             true
         }
 
+        val buckets = bucketizeData(entries, rangeStart, interval)
+
         // Only show a goal line if the displayed interval is larger than the counter's
         val goalLine = computeGoalLine(counter, interval)
 
         // Chart
         val colorInt = CounterColors.getInstance(activity).getColorIntForChart(counter.color)
-        binding.chart.setDataBucketized(entries, rangeStart, interval, colorInt, goalLine, maxCount)
+        binding.chart.setDataBucketized(buckets, rangeStart, interval, colorInt, goalLine, maxCount)
 
         // Stats
         val periodAverage = getPeriodAverageString(counter, entries, rangeStart, rangeEnd)
@@ -96,9 +99,9 @@ class ChartHolder(
         Tutorial.CHANGE_GRAPH_INTERVAL.show(activity, binding.chartName, onDismissListener)
     }
 
-    private fun computeGoalLine(counter: CounterSummary, displayInterval: Interval): Float {
-        if (counter.goal <= 0) return -1.0f
-        val baseGoal = counter.goal.toFloat()
+    private fun computeGoalLine(counter: CounterSummary, displayInterval: Interval): Int {
+        if (counter.goal <= 0) return -1
+        val baseGoal = counter.goal
         return when (counter.interval to displayInterval) {
             Interval.DAY to Interval.WEEK -> baseGoal
             Interval.DAY to Interval.MONTH -> baseGoal
@@ -106,7 +109,7 @@ class ChartHolder(
             Interval.WEEK to Interval.MONTH -> baseGoal / 7
             Interval.WEEK to Interval.YEAR -> (baseGoal / 7) * 30
             Interval.MONTH to Interval.YEAR -> baseGoal
-            else -> -1.0f
+            else -> -1
         }
     }
 
@@ -197,4 +200,54 @@ class ChartHolder(
             activity.getString(R.string.stats_average_every_hours, 1 / avgPerHour)
         }
     }
+
+    private fun bucketizeData(
+        intervalEntries: List<Entry>,
+        rangeStart: Calendar,
+        interval: Interval,
+    ): List<Int> {
+        if (intervalEntries.isEmpty()) {
+            return emptyList()
+        }
+
+        val bucketIntervalAsCalendarField = interval.asCalendarField()
+        val numBuckets = when (interval) {
+            Interval.HOUR -> 60
+            Interval.DAY -> 24
+            Interval.WEEK -> 7
+            Interval.MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH)
+            Interval.YEAR -> 12
+            else -> throw RuntimeException("Invalid interval")
+        }
+
+        val cal = rangeStart.copy()
+
+        // All given entries should be after rangeStart and before rangeStart+numBuckets
+        assert(intervalEntries.first().date.time >= cal.timeInMillis) {
+            "Entry on ${intervalEntries.first().date} is not after ${cal.time}}"
+        }
+        val endCal =
+            ((cal.clone() as Calendar).apply { add(bucketIntervalAsCalendarField, numBuckets) })
+        assert(intervalEntries.last().date.time < endCal.timeInMillis) {
+            "Entry on ${intervalEntries.first().date} is not before ${endCal.time}}"
+        }
+
+        val buckets: MutableList<Int> = ArrayList(numBuckets)
+        var entriesIndex = 0
+        repeat(numBuckets) {
+            cal.add(
+                bucketIntervalAsCalendarField,
+                1
+            ) // Calendar is now at the end of the current bucket
+            var bucketCount = 0
+            while (entriesIndex < intervalEntries.size && intervalEntries[entriesIndex].date.time < cal.timeInMillis) {
+                bucketCount++
+                entriesIndex++
+            }
+            // Log.e("Bucket", "$bucket (ends ${cal.debugToSimpleDateString()}) -> $bucketCount")
+            buckets.add(bucketCount)
+        }
+        return buckets
+    }
+
 }
