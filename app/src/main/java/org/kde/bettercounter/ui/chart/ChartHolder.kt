@@ -7,14 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
-import org.kde.bettercounter.extensions.copy
 import org.kde.bettercounter.extensions.count
 import org.kde.bettercounter.extensions.max
 import org.kde.bettercounter.extensions.min
 import org.kde.bettercounter.persistence.AverageMode
 import org.kde.bettercounter.persistence.CounterColors
 import org.kde.bettercounter.persistence.CounterSummary
-import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
 import org.kde.bettercounter.ui.main.MainActivityViewModel
@@ -35,7 +33,7 @@ class ChartHolder(
         binding.chart.setup()
     }
 
-    fun display(counter: CounterSummary, entries: List<Entry>, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, maxCount: Int, onIntervalChange: (Interval) -> Unit, onDateChange: (Calendar) -> Unit) {
+    fun display(counter: CounterSummary, buckets: List<Int>, intervalEntries : Int, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, maxCount: Int, onIntervalChange: (Interval) -> Unit, onDateChange: (Calendar) -> Unit) {
         // Chart name
         val dateFormat = when (interval) {
             Interval.HOUR -> SimpleDateFormat.getDateTimeInstance()
@@ -45,7 +43,7 @@ class ChartHolder(
             Interval.LIFETIME -> throw IllegalStateException("Interval not valid as a chart display interval")
         }
         val dateString = dateFormat.format(rangeStart.time)
-        binding.chartName.text = activity.resources.getQuantityString(R.plurals.chart_title, entries.size, dateString, entries.size)
+        binding.chartName.text = activity.resources.getQuantityString(R.plurals.chart_title, intervalEntries, dateString, intervalEntries)
         binding.chartName.setOnClickListener { view ->
             val popupMenu = PopupMenu(activity, view, Gravity.END)
             popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
@@ -77,8 +75,6 @@ class ChartHolder(
             true
         }
 
-        val buckets = bucketizeData(entries, rangeStart, interval)
-
         // Only show a goal line if the displayed interval is larger than the counter's
         val goalLine = computeGoalLine(counter, interval)
 
@@ -87,7 +83,7 @@ class ChartHolder(
         binding.chart.setDataBucketized(buckets, rangeStart, interval, colorInt, goalLine, maxCount)
 
         // Stats
-        val periodAverage = getPeriodAverageString(counter, entries, rangeStart, rangeEnd)
+        val periodAverage = getPeriodAverageString(counter, intervalEntries, rangeStart, rangeEnd)
         val lifetimeAverage = getLifetimeAverageString(counter)
         binding.chartAverage.text = activity.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
         if (binding.chartAverage.lineCount > 1) {
@@ -136,8 +132,8 @@ class ChartHolder(
         }
     }
 
-    private fun getPeriodAverageString(counter: CounterSummary, intervalEntries: List<Entry>, rangeStart: Calendar, rangeEnd: Calendar): String {
-        if (intervalEntries.isEmpty()) {
+    private fun getPeriodAverageString(counter: CounterSummary, intervalEntries: Int, rangeStart: Calendar, rangeEnd: Calendar): String {
+        if (intervalEntries == 0) {
             return activity.getString(R.string.stats_average_n_a)
         }
 
@@ -160,13 +156,13 @@ class ChartHolder(
         val endDate = min(rangeEnd.time, lastEntryDate)
 
         val numEntries = when (averageMode) {
-            AverageMode.FIRST_TO_NOW -> intervalEntries.size
+            AverageMode.FIRST_TO_NOW -> intervalEntries
             AverageMode.FIRST_TO_LAST -> {
                 val isFromRangeLimit = endDate == rangeEnd.time || startDate == rangeStart.time
                 if (isFromRangeLimit) {
-                    intervalEntries.size
+                    intervalEntries
                 } else {
-                    intervalEntries.size - 1
+                    intervalEntries - 1
                 }
             }
         }
@@ -201,53 +197,5 @@ class ChartHolder(
         }
     }
 
-    private fun bucketizeData(
-        intervalEntries: List<Entry>,
-        rangeStart: Calendar,
-        interval: Interval,
-    ): List<Int> {
-        if (intervalEntries.isEmpty()) {
-            return emptyList()
-        }
-
-        val bucketIntervalAsCalendarField = interval.getBucketSize()
-        val numBuckets = when (interval) {
-            Interval.HOUR -> 60
-            Interval.DAY -> 24
-            Interval.WEEK -> 7
-            Interval.MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH)
-            Interval.YEAR -> 12
-            else -> throw RuntimeException("Invalid interval")
-        }
-
-        val cal = rangeStart.copy()
-
-        // All given entries should be after rangeStart and before rangeStart+numBuckets
-        assert(intervalEntries.first().date.time >= cal.timeInMillis) {
-            "Entry on ${intervalEntries.first().date} is not after ${cal.time}}"
-        }
-        val endCal =
-            ((cal.clone() as Calendar).apply { add(bucketIntervalAsCalendarField, numBuckets) })
-        assert(intervalEntries.last().date.time < endCal.timeInMillis) {
-            "Entry on ${intervalEntries.first().date} is not before ${endCal.time}}"
-        }
-
-        val buckets: MutableList<Int> = ArrayList(numBuckets)
-        var entriesIndex = 0
-        repeat(numBuckets) {
-            cal.add(
-                bucketIntervalAsCalendarField,
-                1
-            ) // Calendar is now at the end of the current bucket
-            var bucketCount = 0
-            while (entriesIndex < intervalEntries.size && intervalEntries[entriesIndex].date.time < cal.timeInMillis) {
-                bucketCount++
-                entriesIndex++
-            }
-            // Log.e("Bucket", "$bucket (ends ${cal.debugToSimpleDateString()}) -> $bucketCount")
-            buckets.add(bucketCount)
-        }
-        return buckets
-    }
 
 }

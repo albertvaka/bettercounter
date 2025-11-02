@@ -7,7 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import org.kde.bettercounter.databinding.FragmentChartBinding
 import org.kde.bettercounter.extensions.between
@@ -39,6 +42,12 @@ class ChartsAdapter(
     private var numCharts: Int = countNumCharts(counter)
     override fun getItemCount(): Int = numCharts
 
+    val maxCountFlow = viewModel
+        .getAllEntriesSortedByDate(counter.name)
+        .map { entries ->
+            ChartDataAggregation.computeMaxCountForAllEntries(entries, interval)
+        }.shareIn(coroutineScope, SharingStarted.Eagerly, 1)
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartHolder {
         val binding = FragmentChartBinding.inflate(inflater, parent, false)
         return ChartHolder(activity, viewModel, binding)
@@ -54,7 +63,6 @@ class ChartsAdapter(
         val rangeEnd = rangeStart.plusInterval(interval, 1)
         boundViewHolders.add(holder)
 
-        val maxCountFlow = viewModel.getMaxCountForInterval(counter.name, interval)
         val entriesFlow = viewModel.getEntriesForRangeSortedByDate(
             counter.name,
             rangeStart.time,
@@ -63,9 +71,12 @@ class ChartsAdapter(
 
         coroutineScope.launch {
             combine(maxCountFlow, entriesFlow, ::Pair).collect { (maxCount, entries) ->
+                val buckets = ChartDataAggregation
+                    .computeBucketsForIntervalEntries(entries, interval,  rangeStart)
                 holder.display(
                     counter,
-                    entries,
+                    buckets,
+                    entries.size,
                     interval,
                     rangeStart,
                     rangeEnd,

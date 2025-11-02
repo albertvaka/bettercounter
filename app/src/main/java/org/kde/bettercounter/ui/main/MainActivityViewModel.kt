@@ -18,8 +18,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.kde.bettercounter.BuildConfig
 import org.kde.bettercounter.extensions.millisecondsUntilNextHour
-import org.kde.bettercounter.extensions.toCalendar
-import org.kde.bettercounter.extensions.truncated
 import org.kde.bettercounter.persistence.AverageMode
 import org.kde.bettercounter.persistence.CounterColors
 import org.kde.bettercounter.persistence.CounterMetadata
@@ -248,26 +246,9 @@ class MainActivityViewModel(val application: Application) {
         emit(repo.getEntriesForRangeSortedByDate(name, since, until))
     }.flowOn(Dispatchers.IO)
 
-    fun getMaxCountForInterval(name: String, interval: Interval) = flow {
-        val counterBegin = repo.getLeastRecentEntry(name)?.toCalendar() ?: Calendar.getInstance()
-        val cal = counterBegin.truncated(interval)
-        val entries = repo.getAllEntriesSortedByDate(name)
-        val bucketIntervalAsCalendarField = interval.getBucketSize()
-        var maxCount = 0
-        var entriesIndex = 0
-        while (entriesIndex < entries.size) {
-            cal.add(bucketIntervalAsCalendarField, 1) // Calendar is now at the end of the current bucket
-            var bucketCount = 0
-            while (entriesIndex < entries.size && entries[entriesIndex].date.time < cal.timeInMillis) {
-                bucketCount++
-                entriesIndex++
-            }
-            if (bucketCount > maxCount) {
-                maxCount = bucketCount
-            }
-        }
-        emit(maxCount)
-    }
+    fun getAllEntriesSortedByDate(name: String) = flow {
+        emit(repo.getAllEntriesSortedByDate(name))
+    }.flowOn(Dispatchers.IO)
 
     private suspend fun refreshAllCounters() {
         Log.d(TAG, "refreshAllCounters called")
