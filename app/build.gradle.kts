@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.localbroadcastmanager)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.recyclerview)
     implementation(libs.material)

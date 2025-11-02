@@ -1,19 +1,20 @@
 [versions]
-gradle = "8.11.0"
-kotlin = "2.2.0"
-ksp = "2.2.0-2.0.2"
-coreKtx = "1.16.0"
+androidGradlePlugin = "8.13.0"
+kotlin = "2.2.21"
+ksp = "2.3.0"
+coreKtx = "1.17.0"
 recyclerview = "1.4.0"
 appcompat = "1.7.1"
-material = "1.12.0"
+material = "1.13.0"
 room = "2.7.2"
+localbroadcastmanager = "1.1.0"
 androidDesugarJdkLibs = "2.1.5"
 simpleTooltip = "1.1.0"
 mpAndroidChart = "3.1.0.27"
 junit = "4.13.2"
 
 [libraries]
-android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
@@ -22,12 +23,13 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-localbroadcastmanager = { module = "androidx.localbroadcastmanager:localbroadcastmanager", version.ref = "localbroadcastmanager" }
 android-desugarJdkLibs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 douglasjunior-android-simple-tooltip = { module = "com.github.douglasjunior:android-simple-tooltip", version.ref = "simpleTooltip" }
 appdevnext-mpAndroidChart = { module = "com.github.AppDevNext:AndroidChart", version.ref = "mpAndroidChart" }
 junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "gradle" }
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 kotlin-android = { id ="org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
