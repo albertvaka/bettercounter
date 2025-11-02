@@ -42,10 +42,18 @@ class ChartsAdapter(
     private var numCharts: Int = countNumCharts(counter)
     override fun getItemCount(): Int = numCharts
 
-    val maxCountFlow = viewModel
+    val allEntriesFlow = viewModel
         .getAllEntriesSortedByDate(counter.name)
+        .shareIn(coroutineScope, SharingStarted.Eagerly, 1)
+
+    val maxCountFlow = allEntriesFlow
         .map { entries ->
             ChartDataAggregation.computeMaxCountForAllEntries(entries, interval)
+        }.shareIn(coroutineScope, SharingStarted.Eagerly, 1)
+
+    val lifetimeGoalReachedFlow = allEntriesFlow
+        .map { entries ->
+            ChartDataAggregation.computeGoalReached(counter.goal, counter.interval, Interval.LIFETIME, entries)
         }.shareIn(coroutineScope, SharingStarted.Eagerly, 1)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartHolder {
@@ -69,10 +77,25 @@ class ChartsAdapter(
             rangeEnd.time
         )
 
+        // Use the end of this interval and not at the beginning of the next,
+        // so weeks have 7 days and not 8 because of the rounding up we do later.
+        // FIXME: What rounding? Is this still needed?
+        rangeEnd.add(Calendar.MINUTE, -1)
+
         coroutineScope.launch {
-            combine(maxCountFlow, entriesFlow, ::Pair).collect { (maxCount, entries) ->
-                val buckets = ChartDataAggregation
-                    .computeBucketsForIntervalEntries(entries, interval,  rangeStart)
+            combine(maxCountFlow, lifetimeGoalReachedFlow, entriesFlow, ::Triple)
+                .collect { (maxCount, lifetimeGoalReached, entries) ->
+                val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(
+                    intervalEntries = entries,
+                    interval = interval,
+                    rangeStart = rangeStart,
+                )
+                val periodGoalReached = ChartDataAggregation.computeGoalReached(
+                    goal = counter.goal,
+                    counterInterval = counter.interval,
+                    displayInterval = interval,
+                    entries = entries,
+                )
                 holder.display(
                     counter,
                     buckets,
@@ -81,6 +104,8 @@ class ChartsAdapter(
                     rangeStart,
                     rangeEnd,
                     maxCount,
+                    periodGoalReached,
+                    lifetimeGoalReached,
                     onIntervalChange,
                 ) { onDateChange(it) }
                 onDataDisplayed()

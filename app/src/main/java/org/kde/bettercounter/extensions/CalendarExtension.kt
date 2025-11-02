@@ -38,13 +38,17 @@ fun Calendar.copy(): Calendar = clone() as Calendar
 
 fun Calendar.plusInterval(interval: Interval, times: Int): Calendar {
     val cal = copy()
-    when (interval) {
-        Interval.HOUR -> cal.add(Calendar.HOUR_OF_DAY, 1 * times)
-        Interval.DAY -> cal.add(Calendar.DAY_OF_YEAR, 1 * times)
-        Interval.WEEK -> cal.add(Calendar.DAY_OF_YEAR, 7 * times)
-        Interval.MONTH -> cal.add(Calendar.MONTH, 1 * times)
-        Interval.YEAR -> cal.add(Calendar.YEAR, 1 * times)
-        Interval.LIFETIME -> cal.add(Calendar.YEAR, 1000)
-    }
+    cal.addInterval(interval, times)
     return cal
+}
+
+fun Calendar.addInterval(interval: Interval, times: Int) {
+    when (interval) {
+        Interval.HOUR -> add(Calendar.HOUR_OF_DAY, 1 * times)
+        Interval.DAY -> add(Calendar.DAY_OF_YEAR, 1 * times)
+        Interval.WEEK -> add(Calendar.DAY_OF_YEAR, 7 * times)
+        Interval.MONTH -> add(Calendar.MONTH, 1 * times)
+        Interval.YEAR -> add(Calendar.YEAR, 1 * times)
+        Interval.LIFETIME -> add(Calendar.YEAR, 1000)
+    }
 }

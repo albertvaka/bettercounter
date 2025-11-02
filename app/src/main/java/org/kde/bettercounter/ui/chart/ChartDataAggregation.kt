@@ -1,5 +1,6 @@
 package org.kde.bettercounter.ui.chart
 
+import org.kde.bettercounter.extensions.addInterval
 import org.kde.bettercounter.extensions.copy
 import org.kde.bettercounter.extensions.toCalendar
 import org.kde.bettercounter.extensions.truncated
@@ -16,18 +17,18 @@ object ChartDataAggregation {
     ): Int {
         val counterBegin = entries.firstOrNull()?.date?.toCalendar() ?: Calendar.getInstance()
         val cal = counterBegin.truncated(interval)
-        val bucketSize = interval.getBucketSize()
+        val bucketSize = interval.getBucketSubdivisions()
         var maxCount = 0
         var entriesIndex = 0
         while (entriesIndex < entries.size) {
             cal.add(bucketSize, 1) // Calendar is now at the end of the current bucket
-            var bucketCount = 0
+            var countInBucket = 0
             while (entriesIndex < entries.size && entries[entriesIndex].date.time < cal.timeInMillis) {
-                bucketCount++
+                countInBucket++
                 entriesIndex++
             }
-            if (bucketCount > maxCount) {
-                maxCount = bucketCount
+            if (countInBucket > maxCount) {
+                maxCount = countInBucket
             }
         }
         return maxCount
@@ -43,7 +44,7 @@ object ChartDataAggregation {
             return emptyList()
         }
 
-        val bucketSize = interval.getBucketSize()
+        val bucketSize = interval.getBucketSubdivisions()
         val numBuckets = when (interval) {
             Interval.HOUR -> 60
             Interval.DAY -> 24
@@ -69,14 +70,35 @@ object ChartDataAggregation {
         var entriesIndex = 0
         repeat(numBuckets) {
             cal.add(bucketSize, 1) // Calendar is now at the end of the current bucket
-            var bucketCount = 0
+            var countInBucket = 0
             while (entriesIndex < intervalEntries.size && intervalEntries[entriesIndex].date.time < cal.timeInMillis) {
-                bucketCount++
+                countInBucket++
                 entriesIndex++
             }
-            // Log.e("Bucket", "$bucket (ends ${cal.debugToSimpleDateString()}) -> $bucketCount")
-            buckets.add(bucketCount)
+            // Log.e("Bucket", "$bucket (ends ${cal.debugToSimpleDateString()}) -> $countInBucket")
+            buckets.add(countInBucket)
         }
         return buckets
+    }
+
+    fun computeGoalReached(goal : Int, counterInterval: Interval, displayInterval: Interval, entries: List<Entry>): Int {
+        if (goal <= 0 || counterInterval == Interval.LIFETIME || displayInterval <= counterInterval) return -1
+        if (entries.isEmpty()) return -1
+        val counterBegin = entries.firstOrNull()?.date?.toCalendar() ?: Calendar.getInstance()
+        val cal = counterBegin.truncated(counterInterval)
+        var goalReached = 0
+        var entriesIndex = 0
+        while (entriesIndex < entries.size) {
+            cal.addInterval(counterInterval, 1) // Calendar is now at the end of the current bucket
+            var countInBucket = 0
+            while (entriesIndex < entries.size && entries[entriesIndex].date.time < cal.timeInMillis) {
+                countInBucket++
+                entriesIndex++
+            }
+            if (countInBucket >= goal) {
+                goalReached++
+            }
+        }
+        return goalReached
     }
 }

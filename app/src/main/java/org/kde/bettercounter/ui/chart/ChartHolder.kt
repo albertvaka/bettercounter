@@ -1,6 +1,7 @@
 package org.kde.bettercounter.ui.chart
 
 import android.view.Gravity
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
@@ -33,7 +34,7 @@ class ChartHolder(
         binding.chart.setup()
     }
 
-    fun display(counter: CounterSummary, buckets: List<Int>, intervalEntries : Int, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, maxCount: Int, onIntervalChange: (Interval) -> Unit, onDateChange: (Calendar) -> Unit) {
+    fun display(counter: CounterSummary, buckets: List<Int>, intervalEntries: Int, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, maxCount: Int, periodGoalReached: Int, lifetimeGoalReached: Int, onIntervalChange: (Interval) -> Unit, onDateChange: (Calendar) -> Unit) {
         // Chart name
         val dateFormat = when (interval) {
             Interval.HOUR -> SimpleDateFormat.getDateTimeInstance()
@@ -83,11 +84,20 @@ class ChartHolder(
         binding.chart.setDataBucketized(buckets, rangeStart, interval, colorInt, goalLine, maxCount)
 
         // Stats
-        val periodAverage = getPeriodAverageString(counter, intervalEntries, rangeStart, rangeEnd)
-        val lifetimeAverage = getLifetimeAverageString(counter)
+        val averageMode = viewModel.getAverageCalculationMode()
+        val periodAverage = getPeriodAverageString(counter, intervalEntries, rangeStart, rangeEnd, averageMode)
+        val lifetimeAverage = getLifetimeAverageString(counter, averageMode)
         binding.chartAverage.text = activity.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
         if (binding.chartAverage.lineCount > 1) {
             binding.chartAverage.text = activity.getString(R.string.stats_averages_multiline, periodAverage, lifetimeAverage)
+        }
+
+        // Goal stats
+        if (counter.goal >= 0 && counter.interval != Interval.LIFETIME) {
+            binding.chartGoalAverage.text = getGoalStatsString(counter, interval, periodGoalReached, lifetimeGoalReached, rangeStart, rangeEnd, averageMode)
+            binding.chartGoalAverage.visibility = View.VISIBLE
+        } else {
+            binding.chartGoalAverage.visibility = View.GONE
         }
     }
 
@@ -113,18 +123,12 @@ class ChartHolder(
         }
     }
 
-    private fun getLifetimeAverageString(counter: CounterSummary): String {
+    private fun getLifetimeAverageString(counter: CounterSummary, averageMode: AverageMode): String {
         if (counter.totalCount <= 1) {
             return activity.getString(R.string.stats_average_n_a)
         }
 
-        val averageMode = viewModel.getAverageCalculationMode()
-
-        val startDate = counter.leastRecent!!
-        val endDate = when (averageMode) {
-            AverageMode.FIRST_TO_NOW ->  counter.latestBetweenNowAndMostRecentEntry()
-            AverageMode.FIRST_TO_LAST -> counter.mostRecent ?: Date()
-        }
+        val (startDate, endDate) = getLifetimeRange(counter, averageMode)
         val numEntries = when (averageMode) {
             AverageMode.FIRST_TO_NOW -> counter.totalCount
             AverageMode.FIRST_TO_LAST -> counter.totalCount - 1
@@ -136,29 +140,18 @@ class ChartHolder(
         }
     }
 
-    private fun getPeriodAverageString(counter: CounterSummary, intervalEntries: Int, rangeStart: Calendar, rangeEnd: Calendar): String {
+    private fun getPeriodAverageString(
+        counter: CounterSummary,
+        intervalEntries: Int,
+        rangeStart: Calendar,
+        rangeEnd: Calendar,
+        averageMode: AverageMode
+    ): String {
         if (intervalEntries == 0) {
             return activity.getString(R.string.stats_average_n_a)
         }
 
-        val averageMode = viewModel.getAverageCalculationMode()
-
-        // Use the end of this interval and not at the beginning of the next,
-        // so weeks have 7 days and not 8 because of the rounding up we do later.
-        rangeEnd.add(Calendar.MINUTE, -1)
-
-        val firstEntryDate = when (averageMode) {
-            AverageMode.FIRST_TO_NOW -> min(counter.leastRecent!!, Date())
-            AverageMode.FIRST_TO_LAST -> counter.leastRecent!!
-        }
-        val lastEntryDate = when (averageMode) {
-            AverageMode.FIRST_TO_NOW -> max(counter.mostRecent!!, Date())
-            AverageMode.FIRST_TO_LAST -> counter.mostRecent!!
-        }
-
-        val startDate = max(rangeStart.time, firstEntryDate)
-        val endDate = min(rangeEnd.time, lastEntryDate)
-
+        val (startDate, endDate) = getIntervalRange(counter, rangeStart, rangeEnd, averageMode)
         val numEntries = when (averageMode) {
             AverageMode.FIRST_TO_NOW -> intervalEntries
             AverageMode.FIRST_TO_LAST -> {
@@ -179,6 +172,68 @@ class ChartHolder(
             Interval.DAY, Interval.HOUR -> getAverageStringPerHour(numEntries, startDate, endDate)
             else -> getAverageStringPerDay(numEntries, startDate, endDate)
         }
+    }
+
+    private fun getGoalStatsString(
+        counter: CounterSummary,
+        interval: Interval,
+        periodGoalReached: Int,
+        lifetimeGoalReached: Int,
+        rangeStart: Calendar,
+        rangeEnd: Calendar,
+        averageMode: AverageMode,
+    ): String {
+        val intervalChronoUnit = counter.interval.toChronoUnit()
+
+        val lifetimeGoalReachedStr = if (lifetimeGoalReached < 0) {
+            activity.getString(R.string.stats_average_n_a)
+        } else {
+            val (startDate, endDate) = getLifetimeRange(counter, averageMode)
+            val intervalUnits = intervalChronoUnit.count(startDate, endDate)
+            String.format(Locale.getDefault(), "%.1f%%", 100*lifetimeGoalReached/intervalUnits.toFloat())
+        }
+
+        if (interval > counter.interval) {
+            val goalReachedStr = if (periodGoalReached < 0) {
+                activity.getString(R.string.stats_average_n_a)
+            } else {
+                val (startDate, endDate) = getIntervalRange(counter, rangeStart, rangeEnd, averageMode)
+                val intervalUnits = intervalChronoUnit.count(startDate, endDate)
+                String.format(Locale.getDefault(), "%.1f%%", 100*periodGoalReached/intervalUnits.toFloat())
+            }
+            return activity.getString(R.string.goal_stats_averages, goalReachedStr, lifetimeGoalReachedStr)
+        } else {
+            return activity.getString(R.string.goal_stats_lifetime_averages, lifetimeGoalReachedStr)
+        }
+    }
+
+    private fun getLifetimeRange(counter: CounterSummary, averageMode: AverageMode): Pair<Date, Date> {
+        val startDate = counter.leastRecent!!
+        val endDate = when (averageMode) {
+            AverageMode.FIRST_TO_NOW ->  counter.latestBetweenNowAndMostRecentEntry()
+            AverageMode.FIRST_TO_LAST -> counter.mostRecent ?: Date()
+        }
+        return Pair(startDate, endDate)
+    }
+
+    private fun getIntervalRange(
+        counter: CounterSummary,
+        rangeStart: Calendar,
+        rangeEnd: Calendar,
+        averageMode: AverageMode
+    ): Pair<Date, Date> {
+        val firstEntryDate = when (averageMode) {
+            AverageMode.FIRST_TO_NOW -> min(counter.leastRecent!!, Date())
+            AverageMode.FIRST_TO_LAST -> counter.leastRecent!!
+        }
+        val lastEntryDate = when (averageMode) {
+            AverageMode.FIRST_TO_NOW -> max(counter.mostRecent!!, Date())
+            AverageMode.FIRST_TO_LAST -> counter.mostRecent!!
+        }
+
+        val startDate = max(rangeStart.time, firstEntryDate)
+        val endDate = min(rangeEnd.time, lastEntryDate)
+        return Pair(startDate, endDate)
     }
 
     private fun getAverageStringPerDay(count: Int, startDate: Date, endDate: Date): String {

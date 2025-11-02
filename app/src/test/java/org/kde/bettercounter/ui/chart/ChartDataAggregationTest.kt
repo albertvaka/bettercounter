@@ -260,5 +260,76 @@ class ChartDataAggregationTest {
         assertEquals(1, buckets[11])
     }
 
+    @Test
+    fun `goal reached - invalid input`() {
+        val entries = listOf(createEntry(2025, Calendar.DECEMBER, 1, 10, 0))
+        assertEquals(-1, ChartDataAggregation.computeGoalReached(
+            goal = -1,
+            counterInterval = Interval.DAY,
+            displayInterval = Interval.WEEK,
+            entries = entries,
+        ))
+        assertEquals(-1, ChartDataAggregation.computeGoalReached(
+            goal = 3,
+            counterInterval = Interval.WEEK,
+            displayInterval = Interval.WEEK,
+            entries = entries,
+        ))
+        assertEquals(-1, ChartDataAggregation.computeGoalReached(
+            goal = 3,
+            counterInterval = Interval.DAY,
+            displayInterval = Interval.WEEK,
+            entries = emptyList(),
+        ))
+        assertEquals(-1, ChartDataAggregation.computeGoalReached(
+            goal = 3,
+            counterInterval = Interval.LIFETIME,
+            displayInterval = Interval.WEEK,
+            entries = emptyList(),
+        ))
+    }
+
+    @Test
+    fun `goal reached - daily`() {
+        val entries = listOf(
+            createEntry(2025, Calendar.DECEMBER, 1, 10, 0), // monday
+            createEntry(2025, Calendar.DECEMBER, 1, 11, 0), // monday
+            createEntry(2025, Calendar.DECEMBER, 1, 12, 0), // monday
+            createEntry(2025, Calendar.DECEMBER, 2, 13, 0), // tuesday
+            createEntry(2025, Calendar.DECEMBER, 2, 14, 0), // tuesday
+            createEntry(2025, Calendar.DECEMBER, 3, 15, 0),  // wednesday
+            createEntry(2025, Calendar.DECEMBER, 3, 16, 0),  // wednesday
+            createEntry(2025, Calendar.DECEMBER, 3, 17, 0),  // wednesday
+            createEntry(2025, Calendar.DECEMBER, 3, 18, 0),  // wednesday
+        )
+        val goalReached = ChartDataAggregation.computeGoalReached(
+            goal = 3,
+            counterInterval = Interval.DAY,
+            displayInterval = Interval.WEEK,
+            entries = entries,
+        )
+        assertEquals(2, goalReached)
+    }
+
+
+    @Test
+    fun `goal reached - hourly`() {
+        val entries = listOf(
+            createEntry(2025, Calendar.DECEMBER, 1, 10, 15),
+            createEntry(2025, Calendar.DECEMBER, 1, 10, 30),
+            createEntry(2025, Calendar.DECEMBER, 1, 11, 0),
+            createEntry(2025, Calendar.DECEMBER, 1, 12, 10),
+            createEntry(2025, Calendar.DECEMBER, 1, 12, 20),
+            createEntry(2025, Calendar.DECEMBER, 1, 12, 30),
+        )
+        val goalReached = ChartDataAggregation.computeGoalReached(
+            goal = 2,
+            counterInterval = Interval.HOUR,
+            displayInterval = Interval.WEEK,
+            entries = entries,
+        )
+        assertEquals(2, goalReached)
+    }
+
 
 }

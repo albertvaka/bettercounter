@@ -22,7 +22,7 @@ enum class Interval(val humanReadableResource: Int) {
         }
     }
 
-    fun getBucketSize(): Int = when (this) {
+    fun getBucketSubdivisions(): Int = when (this) {
         HOUR -> Calendar.MINUTE
         DAY -> Calendar.HOUR_OF_DAY
         WEEK -> Calendar.DAY_OF_WEEK
