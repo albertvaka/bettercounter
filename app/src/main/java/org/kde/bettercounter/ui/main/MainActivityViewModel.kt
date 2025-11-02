@@ -252,7 +252,7 @@ class MainActivityViewModel(val application: Application) {
         val counterBegin = repo.getLeastRecentEntry(name)?.toCalendar() ?: Calendar.getInstance()
         val cal = counterBegin.truncated(interval)
         val entries = repo.getAllEntriesSortedByDate(name)
-        val bucketIntervalAsCalendarField = interval.asCalendarField()
+        val bucketIntervalAsCalendarField = interval.getBucketSize()
         var maxCount = 0
         var entriesIndex = 0
         while (entriesIndex < entries.size) {

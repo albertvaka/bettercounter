@@ -96,7 +96,7 @@ class BetterChart : BarChart {
         data = mBarData
     }
 
-    private fun setBarEntries(series: List<BarEntry>) {
+    private fun setBarSeries(series: List<BarEntry>) {
         mDataSet.entries = series
         mBarData.notifyDataChanged()
         data = mBarData
@@ -118,16 +118,7 @@ class BetterChart : BarChart {
             return
         }
 
-        val series = buckets.mapIndexed { num, count ->
-            BarEntry(num.toFloat(), count.toFloat())
-        }
-
-        xAxis.granularity = when (interval) {
-            Interval.HOUR -> 3.0f
-            Interval.MONTH -> 2.0f
-            else -> 1f
-        }
-
+        // Y axis
         yAxis.limitLines.clear()
         if (goalLine > 0) {
             val limitLine = LimitLine(goalLine.toFloat()).apply {
@@ -135,21 +126,29 @@ class BetterChart : BarChart {
             }
             yAxis.limitLines.add(limitLine)
         }
-
         yAxis.axisMinimum = 0f
         yAxis.axisMaximum = maxCount.toFloat()
-        xAxis.labelCount = series.size
-        val bucketIntervalAsCalendarField = interval.asCalendarField()
-        xAxis.valueFormatter = when (bucketIntervalAsCalendarField) {
-            Calendar.MINUTE -> RawFormatter()
-            Calendar.HOUR_OF_DAY -> RawFormatter()
-            Calendar.DAY_OF_WEEK -> DayOfWeekFormatter()
-            Calendar.DAY_OF_MONTH -> MonthDayFormatter()
-            Calendar.MONTH -> MonthFormatter(rangeStart)
-            else -> null.also { assert(false) }
+
+        // X axis
+        xAxis.labelCount = buckets.size
+        xAxis.valueFormatter = when (interval) {
+            Interval.HOUR -> RawFormatter()
+            Interval.DAY -> RawFormatter()
+            Interval.WEEK -> DayOfWeekFormatter()
+            Interval.MONTH -> MonthDayFormatter()
+            Interval.YEAR -> MonthFormatter(rangeStart)
+            else -> throw IllegalStateException("Interval not valid as a chart display interval")
+        }
+        xAxis.granularity = when (interval) {
+            Interval.HOUR -> 3.0f
+            Interval.MONTH -> 2.0f
+            else -> 1f
         }
 
-        setBarEntries(series)
+        val series = buckets.mapIndexed { num, count ->
+            BarEntry(num.toFloat(), count.toFloat())
+        }
+        setBarSeries(series)
     }
 
     class DayOfWeekFormatter : IAxisValueFormatter {

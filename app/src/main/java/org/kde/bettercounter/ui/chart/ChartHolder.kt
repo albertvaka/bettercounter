@@ -210,7 +210,7 @@ class ChartHolder(
             return emptyList()
         }
 
-        val bucketIntervalAsCalendarField = interval.asCalendarField()
+        val bucketIntervalAsCalendarField = interval.getBucketSize()
         val numBuckets = when (interval) {
             Interval.HOUR -> 60
             Interval.DAY -> 24
