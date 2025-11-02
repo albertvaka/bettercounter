@@ -28,4 +28,13 @@
         android:paddingEnd="10dp"
         android:paddingTop="3dp"
         android:textAppearance="?attr/textAppearanceListItemSmall" />
+
+    <TextView
+        android:id="@+id/chartGoalAverage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="3dp"
+        android:textAppearance="?attr/textAppearanceListItemSmall" />
 </LinearLayout>

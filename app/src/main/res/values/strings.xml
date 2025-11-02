@@ -25,6 +25,8 @@
     <string name="time_in_hm">In %1$dh %2$dm</string>
     <string name="time_in_m">In %1$dm</string>
     <string name="just_now">Just now</string>
+    <string name="goal_stats_averages">Goal reached: %1$s, lifetime: %2$s</string>
+    <string name="goal_stats_lifetime_averages">Lifetime goal reached: %1$s</string>
     <string name="stats_averages">Avg: %1$s, lifetime: %2$s</string>
     <string name="stats_averages_multiline">Avg: %1$s\nLifetime: %2$s</string>
     <string name="stats_average_per_hour">%1$.2f times/hour</string>
