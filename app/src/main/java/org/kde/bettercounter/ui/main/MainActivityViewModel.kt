@@ -48,7 +48,7 @@ class MainActivityViewModel(val application: Application) {
     }
 
     private val repo: Repository = Repository.create(application)
-    private val exporter : Exporter  = Exporter(application, repo)
+    private val exporter: Exporter  = Exporter(application, repo)
 
     private var counters: List<String>
     private val counterObservers = HashSet<CounterObserver>()

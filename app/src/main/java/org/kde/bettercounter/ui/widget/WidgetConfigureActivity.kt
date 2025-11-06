@@ -14,7 +14,7 @@ import org.kde.bettercounter.databinding.WidgetConfigureBinding
 
 class WidgetConfigureActivity : AppCompatActivity() {
 
-    private val viewModel : WidgetViewModel by lazy { WidgetViewModel(application) }
+    private val viewModel: WidgetViewModel by lazy { WidgetViewModel(application) }
     private val binding: WidgetConfigureBinding by lazy { WidgetConfigureBinding.inflate(layoutInflater) }
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID

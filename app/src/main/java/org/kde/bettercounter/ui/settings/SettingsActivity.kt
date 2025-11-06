@@ -18,7 +18,7 @@ import org.kde.bettercounter.persistence.AverageMode
 
 class SettingsActivity : AppCompatActivity() {
 
-    private val viewModel : SettingsViewModel by lazy { SettingsViewModel(application) }
+    private val viewModel: SettingsViewModel by lazy { SettingsViewModel(application) }
     private val binding: ActivitySettingsBinding by lazy { ActivitySettingsBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

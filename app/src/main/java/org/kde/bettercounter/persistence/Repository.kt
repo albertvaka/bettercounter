@@ -28,7 +28,7 @@ class Repository(
     companion object {
         fun create(application: Application): Repository {
             val db = AppDatabase.getInstance(application)
-            val prefs : SharedPreferences = application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+            val prefs: SharedPreferences = application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
             return Repository(application, db.entryDao(), prefs)
         }
     }

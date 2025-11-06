@@ -8,12 +8,12 @@ import org.kde.bettercounter.R
 value class CounterColor(val colorInt: Int)
 
 class CounterColors {
-    val defaultColor : CounterColor
-    val allColors : List<CounterColor>
-    val rippleDrawables : Map<Int, Int>
-    val defaultColorIntForChart : Int
+    val defaultColor: CounterColor
+    val allColors: List<CounterColor>
+    val rippleDrawables: Map<Int, Int>
+    val defaultColorIntForChart: Int
 
-    private constructor(context : Context) {
+    private constructor(context: Context) {
         defaultColor = CounterColor(ContextCompat.getColor(context, R.color.colorLightBackground))
         defaultColorIntForChart = ContextCompat.getColor(context, R.color.colorAccent)
         rippleDrawables =  mapOf(

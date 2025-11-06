@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         const val EXTRA_COUNTER_NAME = "counterName"
     }
 
-    private val viewModel : MainActivityViewModel by lazy { MainActivityViewModel(application) }
+    private val viewModel: MainActivityViewModel by lazy { MainActivityViewModel(application) }
     internal val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private lateinit var entryViewAdapter: EntryListViewAdapter
     private lateinit var sheetBehavior: BottomSheetBehavior<LinearLayout>
