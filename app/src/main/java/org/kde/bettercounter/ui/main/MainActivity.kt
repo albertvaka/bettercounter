@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
@@ -265,6 +266,10 @@ class MainActivity : AppCompatActivity() {
         viewModel.setTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
     }
 
+    val activityLauncherWithChartsRefresh = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        binding.charts.adapter?.notifyDataSetChanged()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.export_csv -> {
@@ -274,7 +279,7 @@ class MainActivity : AppCompatActivity() {
                 importFilePicker.launch(OpenFileParams("text/*"))
             }
             R.id.settings -> {
-                startActivity(Intent(this, SettingsActivity::class.java))
+                activityLauncherWithChartsRefresh.launch(Intent(this, SettingsActivity::class.java))
             }
             R.id.show_tutorial -> {
                 if (viewModel.getCounterList().isEmpty()) {
