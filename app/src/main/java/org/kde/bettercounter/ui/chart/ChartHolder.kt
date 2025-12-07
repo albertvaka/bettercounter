@@ -99,6 +99,10 @@ class ChartHolder(
         if (counter.goal <= 0) return -1
         val baseGoal = counter.goal
         return when (counter.interval to displayInterval) {
+            Interval.HOUR to Interval.DAY -> baseGoal
+            Interval.HOUR to Interval.WEEK -> baseGoal * 24
+            Interval.HOUR to Interval.MONTH -> baseGoal * 24
+            Interval.HOUR to Interval.YEAR -> baseGoal * 24 * 30
             Interval.DAY to Interval.WEEK -> baseGoal
             Interval.DAY to Interval.MONTH -> baseGoal
             Interval.DAY to Interval.YEAR -> baseGoal * 30
