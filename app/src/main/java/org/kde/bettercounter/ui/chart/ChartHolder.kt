@@ -77,10 +77,14 @@ class ChartHolder(
         }
 
         // Chart
-        val bucketSize = displayInterval.getBucketSubdivisions()
-        val colorInt = CounterColors.getInstance(activity).getColorIntForChart(counter.color)
-        val goalLine = computeGoalLine(counter, displayInterval)
-        binding.chart.setDataBucketized(buckets, bucketSize, rangeStart, colorInt, goalLine, maxCount)
+        binding.chart.setDataBucketized(
+            buckets = buckets,
+            bucketSizeCalendarUnit = displayInterval.getBucketSubdivisions(),
+            rangeStart = rangeStart,
+            color = CounterColors.getInstance(activity).getColorIntForChart(counter.color),
+            goalLine = computeGoalLine(counter, displayInterval),
+            maxCount = maxCount,
+        )
 
         // Stats
         val averageMode = viewModel.getAverageCalculationMode()
