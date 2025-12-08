@@ -18,6 +18,7 @@ import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.ViewPortHandler
 import org.kde.bettercounter.R
 import org.kde.bettercounter.extensions.copy
+import org.kde.bettercounter.persistence.FirstHourOfDay
 import java.text.DateFormatSymbols
 import java.text.FieldPosition
 import java.text.SimpleDateFormat
@@ -132,7 +133,7 @@ class BetterChart : BarChart {
         xAxis.labelCount = buckets.size
         xAxis.valueFormatter = when (bucketSizeCalendarUnit) {
             Calendar.MINUTE -> RawFormatter()
-            Calendar.HOUR_OF_DAY -> RawFormatter()
+            Calendar.HOUR_OF_DAY -> HourOfDayFormatter()
             Calendar.DAY_OF_WEEK -> DayOfWeekFormatter()
             Calendar.DAY_OF_MONTH -> MonthDayFormatter()
             Calendar.MONTH -> MonthFormatter(rangeStart)
@@ -196,6 +197,16 @@ class BetterChart : BarChart {
             axis: AxisBase?
         ): String {
             return (value.toInt()).toString()
+        }
+    }
+
+    class HourOfDayFormatter() : IAxisValueFormatter {
+        private val firstOurOfDay = FirstHourOfDay.get().hour
+        override fun getFormattedValue(
+            value: Float,
+            axis: AxisBase?
+        ): String {
+            return ((firstOurOfDay + value.toInt()) % 24).toString()
         }
     }
 }

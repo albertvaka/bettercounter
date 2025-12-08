@@ -8,28 +8,35 @@ import com.google.android.material.timepicker.TimeFormat
 import org.kde.bettercounter.extensions.toEpochMilli
 import org.kde.bettercounter.extensions.toLocalDateTime
 import org.kde.bettercounter.extensions.toUTCLocalDateTime
+import org.kde.bettercounter.persistence.HourOfDay
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.Calendar
 
 fun showDateTimePicker(activity: AppCompatActivity, initialDateTime: Calendar, callback: (Calendar) -> Unit) {
-    val initialHour = initialDateTime.get(Calendar.HOUR_OF_DAY)
-    val initialMinute = initialDateTime.get(Calendar.MINUTE)
-    val timeFormat = if (DateFormat.is24HourFormat(activity)) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
     showDatePicker(activity, initialDateTime) { cal ->
-        MaterialTimePicker.Builder()
-            .setTimeFormat(timeFormat)
-            .setHour(initialHour)
-            .setMinute(initialMinute)
-            .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-            .build().apply {
-                addOnPositiveButtonClickListener {
-                    cal.set(Calendar.MINUTE, minute)
-                    cal.set(Calendar.HOUR_OF_DAY, hour)
-                    callback(cal)
-                }
-            }.show(activity.supportFragmentManager, "timePicker")
+        val initialHour = initialDateTime.get(Calendar.HOUR_OF_DAY)
+        val initialMinute = initialDateTime.get(Calendar.MINUTE)
+        showTimePicker(activity, HourOfDay(initialHour, initialMinute)) {
+            cal.set(Calendar.HOUR_OF_DAY, it.hour)
+            cal.set(Calendar.MINUTE, it.minute)
+            callback(cal)
+        }
     }
+}
+
+fun showTimePicker(activity: AppCompatActivity, initialHourOfDay: HourOfDay, callback: (HourOfDay) -> Unit) {
+    val timeFormat = if (DateFormat.is24HourFormat(activity)) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
+    MaterialTimePicker.Builder()
+        .setTimeFormat(timeFormat)
+        .setHour(initialHourOfDay.hour)
+        .setMinute(initialHourOfDay.minute)
+        .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+        .build().apply {
+            addOnPositiveButtonClickListener {
+                callback(HourOfDay(hour, minute))
+            }
+        }.show(activity.supportFragmentManager, "timePicker")
 }
 
 fun showDatePicker(activity: AppCompatActivity, initialDateTime: Calendar, callback: (Calendar) -> Unit) {

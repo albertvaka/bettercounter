@@ -250,7 +250,7 @@ class MainActivityViewModel(val application: Application) {
         emit(repo.getAllEntriesSortedByDate(name))
     }.flowOn(Dispatchers.IO)
 
-    private suspend fun refreshAllCounters() {
+    suspend fun refreshAllCounters() {
         Log.d(TAG, "refreshAllCounters called")
         mutex.withLock {
             for ((name, summary) in summaryMap) {

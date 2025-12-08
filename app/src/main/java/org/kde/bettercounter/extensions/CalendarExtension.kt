@@ -1,5 +1,6 @@
 package org.kde.bettercounter.extensions
 
+import org.kde.bettercounter.persistence.FirstHourOfDay
 import org.kde.bettercounter.persistence.Interval
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -10,9 +11,10 @@ fun Calendar.truncated(field: Int): Calendar {
     cal.set(Calendar.MILLISECOND, 0)
     cal.set(Calendar.SECOND, 0)
     if (field == Calendar.MINUTE) return cal
-    cal.set(Calendar.MINUTE, 0)
+    val firstHourOfDay = FirstHourOfDay.get()
+    cal.set(Calendar.MINUTE, firstHourOfDay.minute)
     if (field == Calendar.HOUR_OF_DAY || field == Calendar.HOUR) return cal
-    cal.set(Calendar.HOUR_OF_DAY, 0)
+    cal.set(Calendar.HOUR_OF_DAY, firstHourOfDay.hour)
     if (field in listOf(Calendar.DATE, Calendar.DAY_OF_WEEK, Calendar.DAY_OF_MONTH, Calendar.DAY_OF_YEAR)) return cal
     if (field in listOf(Calendar.WEEK_OF_YEAR, Calendar.WEEK_OF_MONTH)) {
         val dow = cal.get(Calendar.DAY_OF_WEEK)
