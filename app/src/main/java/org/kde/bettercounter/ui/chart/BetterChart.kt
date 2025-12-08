@@ -80,7 +80,7 @@ class BetterChart : BarChart {
                 entry: com.github.mikephil.charting.data.Entry?,
                 dataSetIndex: Int,
                 viewPortHandler: ViewPortHandler?
-            ): String? {
+            ): String {
                 val integer = value.toInt()
                 if (integer == 0) {
                     return ""
@@ -156,7 +156,7 @@ class BetterChart : BarChart {
         override fun getFormattedValue(
             value: Float,
             axis: AxisBase?
-        ): String? {
+        ): String {
             // dayNames are meant to be indexed with Calendar.SATURDAY,
             // Calendar.MONDAY, etc. so the range is [1,7] with 1 being Sunday.
             // The range of bucket indices is [0,6] with 0 being Monday.
@@ -173,7 +173,7 @@ class BetterChart : BarChart {
         override fun getFormattedValue(
             value: Float,
             axis: AxisBase?
-        ): String? {
+        ): String {
             val cal = startDate.copy()
             cal.add(Calendar.MONTH, value.toInt())
             monthNamesFormatter.timeZone = cal.timeZone
@@ -185,7 +185,7 @@ class BetterChart : BarChart {
         override fun getFormattedValue(
             value: Float,
             axis: AxisBase?
-        ): String? {
+        ): String {
             return (value.toInt() + 1).toString()
         }
     }
@@ -194,7 +194,7 @@ class BetterChart : BarChart {
         override fun getFormattedValue(
             value: Float,
             axis: AxisBase?
-        ): String? {
+        ): String {
             return (value.toInt()).toString()
         }
     }
