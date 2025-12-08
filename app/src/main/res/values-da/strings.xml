@@ -25,6 +25,8 @@
     <string name="time_in_hm">Om %1$dh %2$dm</string>
     <string name="time_in_m">Om %1$dm</string>
     <string name="just_now">Netop nu</string>
+    <string name="goal_stats_averages">Mål nået: %1$s, livstid: %2$s</string>
+    <string name="goal_stats_lifetime_averages">Livstid mål nået: %1$s</string>
     <string name="stats_averages">Gns: %1$s, livstid: %2$s</string>
     <string name="stats_averages_multiline">Gns: %1$s\nLivstid: %2$s</string>
     <string name="stats_average_per_hour">%1$.2f gange/time</string>

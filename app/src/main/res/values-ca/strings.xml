@@ -25,6 +25,8 @@
     <string name="time_in_hm">En %1$dh %2$dm</string>
     <string name="time_in_m">En %1$dm</string>
     <string name="just_now">Ara mateix</string>
+    <string name="goal_stats_averages">Objectiu assolit: %1$s, de per vida: %2$s</string>
+    <string name="goal_stats_lifetime_averages">Objectiu de per vida assolit: %1$s</string>
     <string name="stats_averages">Mitjana: %1$s, de per vida: %2$s</string>
     <string name="stats_averages_multiline">Mitjana: %1$s\nDe per vida: %2$s</string>
     <string name="stats_average_per_hour">%1$.2f vegades cada hora</string>

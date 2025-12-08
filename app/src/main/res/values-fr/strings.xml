@@ -25,6 +25,8 @@
     <string name="time_in_hm">Dans %1$dh %2$dm</string>
     <string name="time_in_m">Dans %1$dm</string>
     <string name="just_now">A l\'instant</string>
+    <string name="goal_stats_averages">Objectif atteint: %1$s, vie entière: %2$s</string>
+    <string name="goal_stats_lifetime_averages">Objectif vie entière atteint: %1$s</string>
     <string name="stats_averages">Moyenne: %1$s, vie entière: %2$s</string>
     <string name="stats_averages_multiline">Moyenne: %1$s\nVie entière: %2$s</string>
     <string name="stats_average_per_hour">%1$.2f fois par heure</string>

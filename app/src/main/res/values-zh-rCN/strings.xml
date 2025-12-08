@@ -24,6 +24,8 @@
     <string name="time_in_hm">%1$d小时 %2$d分钟 后</string>
     <string name="time_in_m">%1$d分钟 后</string>
     <string name="just_now">刚刚</string>
+    <string name="goal_stats_averages">目标达成: %1$s, 所有时间: %2$s</string>
+    <string name="goal_stats_lifetime_averages">所有时间目标达成: %1$s</string>
     <string name="stats_averages">周期内: %1$s, 所有时间: %2$s</string>
     <string name="stats_averages_multiline">周期内: %1$s\n所有时间: %2$s</string>
     <string name="stats_average_per_hour">每小时 %1$.2f 次</string>

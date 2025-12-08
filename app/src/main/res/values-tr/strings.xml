@@ -25,6 +25,8 @@
     <string name="time_in_hm">%1$dh %2$dm içinde</string>
     <string name="time_in_m">%1$dm içinde</string>
     <string name="just_now">Şu anda</string>
+    <string name="goal_stats_averages">Hedef ulaşıldı: %1$s, ömür boyu: %2$s</string>
+    <string name="goal_stats_lifetime_averages">Ömür boyu hedef ulaşıldı: %1$s</string>
     <string name="stats_averages">Ort: %1$s, ömür boyu: %2$s</string>
     <string name="stats_averages_multiline">Ort: %1$s\nÖmür boyu: %2$s</string>
     <string name="stats_average_per_hour">%1$.2f kez/saat</string>

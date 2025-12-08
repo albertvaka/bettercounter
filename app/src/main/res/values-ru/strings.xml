@@ -25,6 +25,8 @@
     <string name="time_in_hm">На %1$dh %2$dm</string>
     <string name="time_in_m">На %1$dm</string>
     <string name="just_now">Только что</string>
+    <string name="goal_stats_averages">Цель достигнута: %1$s, Пожизненно: %2$s</string>
+    <string name="goal_stats_lifetime_averages">Пожизненная цель достигнута: %1$s</string>
     <string name="stats_averages">В среднем: %1$s, Пожизненно: %2$s</string>
     <string name="stats_averages_multiline">В среднем: %1$s\nПожизненно: %2$s</string>
     <string name="stats_average_per_hour">%1$.2f раз/час</string>
