@@ -34,9 +34,9 @@ class ChartHolder(
         binding.chart.setup()
     }
 
-    fun display(counter: CounterSummary, buckets: List<Int>, intervalEntries: Int, interval: Interval, rangeStart: Calendar, rangeEnd: Calendar, maxCount: Int, periodGoalReached: Int, lifetimeGoalReached: Int, onIntervalChange: (Interval) -> Unit, onDateChange: (Calendar) -> Unit) {
+    fun display(counter: CounterSummary, buckets: List<Int>, intervalEntries: Int, displayInterval: Interval, rangeStart: Calendar, rangeEnd: Calendar, maxCount: Int, periodGoalReached: Int, lifetimeGoalReached: Int, onIntervalChange: (Interval) -> Unit, onDateChange: (Calendar) -> Unit) {
         // Chart name
-        val dateFormat = when (interval) {
+        val dateFormat = when (displayInterval) {
             Interval.HOUR -> SimpleDateFormat.getDateTimeInstance()
             Interval.DAY, Interval.WEEK -> SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)
             Interval.MONTH -> SimpleDateFormat("LLL yyyy", Locale.getDefault())
@@ -60,7 +60,7 @@ class ChartHolder(
                 onIntervalChange(newInterval)
                 return@setOnMenuItemClickListener true
             }
-            val selectedItem = when (interval) {
+            val selectedItem = when (displayInterval) {
                 Interval.HOUR -> R.id.hour
                 Interval.DAY -> R.id.day
                 Interval.WEEK -> R.id.week
@@ -76,12 +76,11 @@ class ChartHolder(
             true
         }
 
-        // Only show a goal line if the displayed interval is larger than the counter's
-        val goalLine = computeGoalLine(counter, interval)
-
         // Chart
+        val bucketSize = displayInterval.getBucketSubdivisions()
         val colorInt = CounterColors.getInstance(activity).getColorIntForChart(counter.color)
-        binding.chart.setDataBucketized(buckets, rangeStart, interval, colorInt, goalLine, maxCount)
+        val goalLine = computeGoalLine(counter, displayInterval)
+        binding.chart.setDataBucketized(buckets, bucketSize, rangeStart, colorInt, goalLine, maxCount)
 
         // Stats
         val averageMode = viewModel.getAverageCalculationMode()
@@ -94,7 +93,7 @@ class ChartHolder(
 
         // Goal stats
         if (counter.goal >= 0 && counter.interval != Interval.LIFETIME) {
-            binding.chartGoalAverage.text = getGoalStatsString(counter, interval, periodGoalReached, lifetimeGoalReached, rangeStart, rangeEnd, averageMode)
+            binding.chartGoalAverage.text = getGoalStatsString(counter, displayInterval, periodGoalReached, lifetimeGoalReached, rangeStart, rangeEnd, averageMode)
             binding.chartGoalAverage.visibility = View.VISIBLE
         } else {
             binding.chartGoalAverage.visibility = View.GONE
@@ -108,6 +107,7 @@ class ChartHolder(
     private fun computeGoalLine(counter: CounterSummary, displayInterval: Interval): Int {
         if (counter.goal <= 0) return -1
         val baseGoal = counter.goal
+        // Only show a goal line if the displayed interval is larger than the counter's
         return when (counter.interval to displayInterval) {
             Interval.HOUR to Interval.DAY -> baseGoal
             Interval.HOUR to Interval.WEEK -> baseGoal * 24

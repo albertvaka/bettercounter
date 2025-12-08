@@ -18,7 +18,6 @@ import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.ViewPortHandler
 import org.kde.bettercounter.R
 import org.kde.bettercounter.extensions.copy
-import org.kde.bettercounter.persistence.Interval
 import java.text.DateFormatSymbols
 import java.text.FieldPosition
 import java.text.SimpleDateFormat
@@ -105,8 +104,8 @@ class BetterChart : BarChart {
 
     fun setDataBucketized(
         buckets: List<Int>,
+        bucketSizeCalendarUnit: Int,
         rangeStart: Calendar,
-        interval: Interval,
         color: Int,
         goalLine: Int,
         maxCount: Int,
@@ -131,17 +130,17 @@ class BetterChart : BarChart {
 
         // X axis
         xAxis.labelCount = buckets.size
-        xAxis.valueFormatter = when (interval) {
-            Interval.HOUR -> RawFormatter()
-            Interval.DAY -> RawFormatter()
-            Interval.WEEK -> DayOfWeekFormatter()
-            Interval.MONTH -> MonthDayFormatter()
-            Interval.YEAR -> MonthFormatter(rangeStart)
+        xAxis.valueFormatter = when (bucketSizeCalendarUnit) {
+            Calendar.MINUTE -> RawFormatter()
+            Calendar.HOUR_OF_DAY -> RawFormatter()
+            Calendar.DAY_OF_WEEK -> DayOfWeekFormatter()
+            Calendar.DAY_OF_MONTH -> MonthDayFormatter()
+            Calendar.MONTH -> MonthFormatter(rangeStart)
             else -> throw IllegalStateException("Interval not valid as a chart display interval")
         }
-        xAxis.granularity = when (interval) {
-            Interval.HOUR -> 3.0f
-            Interval.MONTH -> 2.0f
+        xAxis.granularity = when (bucketSizeCalendarUnit) {
+            Calendar.MINUTE -> 3.0f
+            Calendar.DAY_OF_MONTH -> 2.0f
             else -> 1f
         }
 
