@@ -115,6 +115,8 @@ class SettingsActivity : AppCompatActivity() {
                 viewModel.setAutoExportFileUri(uri.toString())
 
                 displayCurrentExportFileName(uri)
+
+                updateAutoExportFileButtonVisibility(true)
             } catch (e: Exception) {
                 e.printStackTrace()
                 Snackbar.make(binding.root, getString(R.string.export_error), Snackbar.LENGTH_LONG).show()
