@@ -10,7 +10,7 @@ room = "2.7.2"
 localbroadcastmanager = "1.1.0"
 androidDesugarJdkLibs = "2.1.5"
 simpleTooltip = "1.1.0"
-mpAndroidChart = "3.1.0.27"
+mpAndroidChart = "3.1.0.31"
 junit = "4.13.2"
 
 [libraries]
