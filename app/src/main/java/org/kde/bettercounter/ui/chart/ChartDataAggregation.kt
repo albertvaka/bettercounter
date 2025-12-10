@@ -45,13 +45,13 @@ object ChartDataAggregation {
         }
 
         val bucketSize = interval.getBucketSubdivisions()
-        val numBuckets = when (interval) {
-            Interval.HOUR -> 60
-            Interval.DAY -> 24
-            Interval.WEEK -> 7
-            Interval.MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH)
-            Interval.YEAR -> 12
-            else -> error("Invalid interval")
+        val numBuckets = when (bucketSize) {
+            Calendar.MINUTE -> 60
+            Calendar.HOUR_OF_DAY -> 24
+            Calendar.DAY_OF_WEEK -> 7
+            Calendar.DAY_OF_MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH)
+            Calendar.MONTH -> 12
+            else -> error("Invalid bucket size")
         }
 
         val cal = rangeStart.copy()
