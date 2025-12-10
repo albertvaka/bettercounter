@@ -17,7 +17,7 @@ import com.github.mikephil.charting.renderer.XAxisRenderer
 import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.ViewPortHandler
 import org.kde.bettercounter.R
-import org.kde.bettercounter.extensions.copy
+import org.kde.bettercounter.extensions.plus
 import java.text.DateFormatSymbols
 import java.text.FieldPosition
 import java.text.SimpleDateFormat
@@ -174,8 +174,7 @@ class BetterChart : BarChart {
             value: Float,
             axis: AxisBase?
         ): String {
-            val cal = startDate.copy()
-            cal.add(Calendar.MONTH, value.toInt())
+            val cal = startDate.plus(Calendar.MONTH, value.toInt())
             monthNamesFormatter.timeZone = cal.timeZone
             return monthNamesFormatter.format(cal.time, StringBuffer(), FieldPosition(0)).toString()
         }

@@ -2,6 +2,7 @@ package org.kde.bettercounter.ui.chart
 
 import org.kde.bettercounter.extensions.addInterval
 import org.kde.bettercounter.extensions.copy
+import org.kde.bettercounter.extensions.plus
 import org.kde.bettercounter.extensions.toCalendar
 import org.kde.bettercounter.extensions.truncated
 import org.kde.bettercounter.persistence.Entry
@@ -54,14 +55,12 @@ object ChartDataAggregation {
             else -> error("Invalid bucket size")
         }
 
-        val cal = rangeStart.copy()
-
         // All given entries should be after rangeStart and before rangeStart+numBuckets
+        val cal = rangeStart.copy()
         assert(intervalEntries.first().date.time >= cal.timeInMillis) {
             "Entry on ${intervalEntries.first().date} is not after ${cal.time}"
         }
-        val endCal =
-            ((cal.clone() as Calendar).apply { add(bucketSize, numBuckets) })
+        val endCal = cal.plus(bucketSize, numBuckets)
         assert(intervalEntries.last().date.time < endCal.timeInMillis) {
             "Entry on ${intervalEntries.last().date} is not before ${endCal.time}"
         }

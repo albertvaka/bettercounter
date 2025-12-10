@@ -36,6 +36,12 @@ fun Calendar.debugToSimpleDateString(): String {
 
 fun Calendar.copy(): Calendar = clone() as Calendar
 
+fun Calendar.plus(field: Int, amount: Int): Calendar {
+    val cal = copy()
+    cal.add(field, amount)
+    return cal
+}
+
 fun Calendar.plusInterval(interval: Interval, times: Int): Calendar {
     val cal = copy()
     cal.addInterval(interval, times)
