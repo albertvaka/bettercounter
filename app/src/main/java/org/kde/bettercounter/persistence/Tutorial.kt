@@ -18,7 +18,7 @@ enum class Tutorial {
         CHANGE_GRAPH_INTERVAL -> R.string.tutorial_change_graph_interval
     }
 
-    fun show(context: Context, anchorView : View, onDismissListener: SimpleTooltip.OnDismissListener? = null) {
+    fun show(context: Context, anchorView: View, onDismissListener: SimpleTooltip.OnDismissListener? = null) {
         SimpleTooltip.Builder(context)
             .anchorView(anchorView)
             .text(getText())

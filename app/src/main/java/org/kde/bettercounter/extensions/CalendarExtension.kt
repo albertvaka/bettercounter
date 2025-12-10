@@ -24,7 +24,7 @@ fun Calendar.truncated(field: Int): Calendar {
     if (field == Calendar.MONTH) return cal
     cal.set(Calendar.MONTH, Calendar.JANUARY)
     if (field == Calendar.YEAR) return cal
-    throw UnsupportedOperationException("truncate by $field not implemented")
+    error("truncate by $field not implemented")
 }
 
 fun Calendar.truncated(field: Interval): Calendar = truncated(field.toChronoUnit().toCalendarField())

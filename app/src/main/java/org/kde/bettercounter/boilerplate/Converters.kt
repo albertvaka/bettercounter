@@ -5,38 +5,36 @@ import org.json.JSONArray
 import org.json.JSONException
 import java.util.Date
 
-class Converters {
-    companion object {
-        @TypeConverter
-        @JvmStatic
-        fun dateFromTimestamp(value: Long?): Date? {
-            return value?.let { Date(it) }
-        }
+object Converters {
+    @TypeConverter
+    @JvmStatic
+    fun dateFromTimestamp(value: Long?): Date? {
+        return value?.let { Date(it) }
+    }
 
-        @TypeConverter
-        @JvmStatic
-        fun dateToTimestamp(date: Date?): Long? {
-            return date?.time
-        }
+    @TypeConverter
+    @JvmStatic
+    fun dateToTimestamp(date: Date?): Long? {
+        return date?.time
+    }
 
-        @JvmStatic
-        fun stringListToString(list: List<String>?): String {
-            return JSONArray(list).toString()
-        }
+    @JvmStatic
+    fun stringListToString(list: List<String>?): String {
+        return JSONArray(list).toString()
+    }
 
-        @JvmStatic
-        fun stringToStringList(jsonStr: String?): List<String> {
-            return try {
-                val json = JSONArray(jsonStr)
-                val ret: MutableList<String> = ArrayList()
-                for (i in 0 until json.length()) {
-                    ret.add(json.getString(i))
-                }
-                ret
-            } catch (e: JSONException) {
-                e.printStackTrace()
-                emptyList()
+    @JvmStatic
+    fun stringToStringList(jsonStr: String?): List<String> {
+        return try {
+            val json = JSONArray(jsonStr)
+            val ret: MutableList<String> = ArrayList()
+            for (i in 0 until json.length()) {
+                ret.add(json.getString(i))
             }
+            ret
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            emptyList()
         }
     }
 }

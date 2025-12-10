@@ -51,7 +51,7 @@ object ChartDataAggregation {
             Interval.WEEK -> 7
             Interval.MONTH -> rangeStart.getActualMaximum(Calendar.DAY_OF_MONTH)
             Interval.YEAR -> 12
-            else -> throw RuntimeException("Invalid interval")
+            else -> error("Invalid interval")
         }
 
         val cal = rangeStart.copy()

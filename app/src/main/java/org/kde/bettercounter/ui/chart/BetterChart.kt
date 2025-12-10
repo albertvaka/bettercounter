@@ -136,7 +136,7 @@ class BetterChart : BarChart {
             Calendar.DAY_OF_WEEK -> DayOfWeekFormatter()
             Calendar.DAY_OF_MONTH -> MonthDayFormatter()
             Calendar.MONTH -> MonthFormatter(rangeStart)
-            else -> throw IllegalStateException("Interval not valid as a chart display interval")
+            else -> error("Interval not valid as a chart display interval")
         }
         xAxis.granularity = when (bucketSizeCalendarUnit) {
             Calendar.MINUTE -> 3.0f

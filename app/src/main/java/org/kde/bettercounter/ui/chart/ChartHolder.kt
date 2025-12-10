@@ -41,7 +41,7 @@ class ChartHolder(
             Interval.DAY, Interval.WEEK -> SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)
             Interval.MONTH -> SimpleDateFormat("LLL yyyy", Locale.getDefault())
             Interval.YEAR -> SimpleDateFormat("yyyy", Locale.getDefault())
-            Interval.LIFETIME -> throw IllegalStateException("Interval not valid as a chart display interval")
+            Interval.LIFETIME -> error("Interval not valid as a chart display interval")
         }
         val dateString = dateFormat.format(rangeStart.time)
         binding.chartName.text = activity.resources.getQuantityString(R.plurals.chart_title, intervalEntries, dateString, intervalEntries)
@@ -66,7 +66,7 @@ class ChartHolder(
                 Interval.WEEK -> R.id.week
                 Interval.MONTH -> R.id.month
                 Interval.YEAR -> R.id.year
-                else -> throw IllegalStateException("Interval not valid as a chart display interval")
+                else -> error("Interval not valid as a chart display interval")
             }
             popupMenu.menu.findItem(selectedItem).isChecked = true
             popupMenu.show()

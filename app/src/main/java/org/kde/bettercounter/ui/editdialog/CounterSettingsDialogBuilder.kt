@@ -53,11 +53,12 @@ class CounterSettingsDialogBuilder(private val context: Context, private val vie
         binding.fakeSpinnerIntervalBox.endIconDrawable = AppCompatResources.getDrawable(context, com.google.android.material.R.drawable.mtrl_dropdown_arrow)
         binding.fakeSpinnerInterval.isLongClickable = false
         binding.spinnerInterval.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long
-            ) {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 binding.fakeSpinnerInterval.setText(intervalAdapter.getItem(position))
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) { }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // no-op
+            }
         }
 
         binding.colorpicker.adapter = colorAdapter

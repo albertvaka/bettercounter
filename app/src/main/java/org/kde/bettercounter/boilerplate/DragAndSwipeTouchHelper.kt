@@ -21,6 +21,7 @@ class DragAndSwipeTouchHelper(private val mAdapter: ListGesturesCallback) :
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
+        // no-op
     }
 
     override fun onMove(

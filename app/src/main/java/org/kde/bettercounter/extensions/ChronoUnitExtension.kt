@@ -30,7 +30,7 @@ fun ChronoUnit.toCalendarField(): Int =
         ChronoUnit.WEEKS -> Calendar.WEEK_OF_YEAR
         ChronoUnit.MONTHS -> Calendar.MONTH
         ChronoUnit.YEARS -> Calendar.YEAR
-        else -> throw UnsupportedOperationException("$this can't be converted to Calendar field")
+        else -> error("$this can't be converted to Calendar field")
     }
 
 fun millisecondsUntilNextHour(): Long {
