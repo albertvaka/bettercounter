@@ -266,8 +266,10 @@ class MainActivity : AppCompatActivity() {
         viewModel.setTutorialShown(Tutorial.CHANGE_GRAPH_INTERVAL)
     }
 
-    val activityLauncherWithChartsRefresh = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        binding.charts.adapter?.notifyDataSetChanged()
+    val activityLauncherWithCountersRefresh = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        lifecycleScope.launch {
+            viewModel.refreshAllCounters()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -279,7 +281,7 @@ class MainActivity : AppCompatActivity() {
                 importFilePicker.launch(OpenFileParams("text/*"))
             }
             R.id.settings -> {
-                activityLauncherWithChartsRefresh.launch(Intent(this, SettingsActivity::class.java))
+                activityLauncherWithCountersRefresh.launch(Intent(this, SettingsActivity::class.java))
             }
             R.id.show_tutorial -> {
                 if (viewModel.getCounterList().isEmpty()) {

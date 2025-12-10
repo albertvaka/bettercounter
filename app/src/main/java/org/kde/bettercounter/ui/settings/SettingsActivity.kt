@@ -15,6 +15,8 @@ import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.databinding.ActivitySettingsBinding
 import org.kde.bettercounter.persistence.AverageMode
+import org.kde.bettercounter.persistence.FirstHourOfDay
+import org.kde.bettercounter.ui.main.showTimePicker
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -44,6 +46,16 @@ class SettingsActivity : AppCompatActivity() {
         }
         updateAutoExportFileButtonVisibility(binding.switchAutoExport.isChecked)
 
+        // First hour of day
+        updateFirstHourOfDayText()
+        binding.buttonChangeFirstHourOfDay.setOnClickListener {
+            showTimePicker(this, FirstHourOfDay.get()) {
+                FirstHourOfDay.set(it)
+                updateFirstHourOfDayText()
+            }
+        }
+        updateAutoExportFileButtonVisibility(binding.switchAutoExport.isChecked)
+
         // Average calculation mode
         when (viewModel.getAverageCalculationMode()) {
             AverageMode.FIRST_TO_NOW -> binding.radioFirstToNow.isChecked = true
@@ -58,6 +70,11 @@ class SettingsActivity : AppCompatActivity() {
             }
             viewModel.setAverageCalculationMode(mode)
         }
+    }
+
+    private fun updateFirstHourOfDayText() {
+        val firstHourOfDay = FirstHourOfDay.get()
+        binding.textFirstHourOfDay.text = getString(R.string.first_hour_of_day_text, firstHourOfDay.hour, firstHourOfDay.minute)
     }
 
     private fun updateAutoExportFileButtonVisibility(autoExportEnabled: Boolean) {
