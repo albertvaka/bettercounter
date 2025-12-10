@@ -405,6 +405,7 @@ class MainActivity : AppCompatActivity() {
                     counter.name = newCounterMetadata.name
                     counter.interval = newCounterMetadata.interval
                     counter.color = newCounterMetadata.color
+                    counter.goal = newCounterMetadata.goal
                 }
                 .setOnDismissListener {
                     binding.fab.visibility = View.VISIBLE
