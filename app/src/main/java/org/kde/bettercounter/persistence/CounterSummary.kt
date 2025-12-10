@@ -8,10 +8,10 @@ class CounterSummary(
     var interval: Interval,
     var goal: Int,
     var color: CounterColor,
-    var lastIntervalCount: Int,
-    var totalCount: Int,
-    var leastRecent: Date?,
-    var mostRecent: Date?,
+    val lastIntervalCount: Int,
+    val totalCount: Int,
+    val leastRecent: Date?,
+    val mostRecent: Date?,
 ) {
     fun latestBetweenNowAndMostRecentEntry(): Date {
         val now = Calendar.getInstance().time

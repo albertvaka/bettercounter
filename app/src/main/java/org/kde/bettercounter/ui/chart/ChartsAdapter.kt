@@ -39,7 +39,8 @@ class ChartsAdapter(
 
     private val inflater: LayoutInflater = LayoutInflater.from(activity)
 
-    private var numCharts: Int = countNumCharts(counter)
+    private val numCharts: Int = countNumCharts(counter)
+
     override fun getItemCount(): Int = numCharts
 
     val allEntriesFlow = viewModel

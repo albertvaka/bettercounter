@@ -37,7 +37,7 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
             notifyItemChanged(prevSelected)
         }
 
-    private var colors: List<CounterColor> = CounterColors.getInstance(context).allColors
+    private val colors: List<CounterColor> = CounterColors.getInstance(context).allColors
 
     inner class ViewHolder(val colorButton: AppCompatButton) :
         RecyclerView.ViewHolder(colorButton),

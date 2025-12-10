@@ -21,9 +21,9 @@ import java.util.Collections
 import java.util.Date
 
 class EntryListViewAdapter(
-    private var activity: MainActivity,
-    private var viewModel: MainActivityViewModel,
-    private var listObserver: EntryListObserver,
+    private val activity: MainActivity,
+    private val viewModel: MainActivityViewModel,
+    private val listObserver: EntryListObserver,
 ) : RecyclerView.Adapter<EntryViewHolder>(), DragAndSwipeTouchHelper.ListGesturesCallback {
 
     val coroutineScope = CoroutineScope(Dispatchers.Main)

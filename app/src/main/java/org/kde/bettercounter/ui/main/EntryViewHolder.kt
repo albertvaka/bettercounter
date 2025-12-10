@@ -15,7 +15,7 @@ import java.util.Calendar
 class EntryViewHolder(
     private val activity: AppCompatActivity,
     val binding: FragmentEntryBinding,
-    private var viewModel: MainActivityViewModel,
+    private val viewModel: MainActivityViewModel,
     private val touchHelper: ItemTouchHelper,
     private val onClickListener: (counter: CounterSummary) -> Unit?,
     private val canDrag: () -> Boolean

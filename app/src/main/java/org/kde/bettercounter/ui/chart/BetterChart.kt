@@ -164,7 +164,7 @@ class BetterChart : BarChart {
         }
     }
 
-    class MonthFormatter(private var startDate: Calendar) : IAxisValueFormatter {
+    class MonthFormatter(private val startDate: Calendar) : IAxisValueFormatter {
         // We can't use DateFormatSymbols like for week days, because when
         // the user language uses different month name forms for formatting
         // and stand-alone usages, then DateFormatSymbols returns names in

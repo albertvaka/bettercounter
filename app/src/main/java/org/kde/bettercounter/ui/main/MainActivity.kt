@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
     private var extraBottomPaddingForNavigationInset = 0
     private var intervalOverride: Interval? = null
     private var sheetIsExpanding = false
-    private var onBackPressedCloseSheetCallback = object : OnBackPressedCallback(false) {
+    private val onBackPressedCloseSheetCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             if (sheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 hideBottomSheet()
