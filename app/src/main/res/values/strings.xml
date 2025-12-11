@@ -70,5 +70,5 @@
     <string name="average_mode_first_to_now">Average between first entry and now</string>
     <string name="search">Filter</string>
     <string name="first_hour_of_day_title">First Hour of Day</string>
-    <string name="first_hour_of_day_text">The day starts at %02d:%02d</string>
+    <string name="first_hour_of_day_text">The day starts at %s</string>
 </resources>

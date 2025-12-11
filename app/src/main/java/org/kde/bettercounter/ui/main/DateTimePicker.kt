@@ -8,10 +8,14 @@ import com.google.android.material.timepicker.TimeFormat
 import org.kde.bettercounter.extensions.toEpochMilli
 import org.kde.bettercounter.extensions.toLocalDateTime
 import org.kde.bettercounter.extensions.toUTCLocalDateTime
-import org.kde.bettercounter.persistence.HourOfDay
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.Calendar
+
+class HourOfDay(
+    val hour: Int,
+    val minute: Int,
+)
 
 fun showDateTimePicker(activity: AppCompatActivity, initialDateTime: Calendar, callback: (Calendar) -> Unit) {
     showDatePicker(activity, initialDateTime) { cal ->

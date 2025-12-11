@@ -200,7 +200,7 @@ class BetterChart : BarChart {
     }
 
     class HourOfDayFormatter : IAxisValueFormatter {
-        private val firstOurOfDay = FirstHourOfDay.get().hour
+        private val firstOurOfDay = FirstHourOfDay.get()
         override fun getFormattedValue(
             value: Float,
             axis: AxisBase?

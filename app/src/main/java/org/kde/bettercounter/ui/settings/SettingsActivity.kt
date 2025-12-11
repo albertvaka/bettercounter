@@ -9,6 +9,7 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.CreateFileParams
@@ -16,12 +17,18 @@ import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.databinding.ActivitySettingsBinding
 import org.kde.bettercounter.persistence.AverageMode
 import org.kde.bettercounter.persistence.FirstHourOfDay
-import org.kde.bettercounter.ui.main.showTimePicker
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+
 
 class SettingsActivity : AppCompatActivity() {
 
     private val viewModel: SettingsViewModel by lazy { SettingsViewModel(application) }
     private val binding: ActivitySettingsBinding by lazy { ActivitySettingsBinding.inflate(layoutInflater) }
+
+    private val hoursFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
+    private val hoursOfDay =  (0..23).map { LocalTime.of(it, 0).format(hoursFormatter) }.toTypedArray()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,14 +54,21 @@ class SettingsActivity : AppCompatActivity() {
         updateAutoExportFileButtonVisibility(binding.switchAutoExport.isChecked)
 
         // First hour of day
-        updateFirstHourOfDayText()
         binding.buttonChangeFirstHourOfDay.setOnClickListener {
-            showTimePicker(this, FirstHourOfDay.get()) {
-                FirstHourOfDay.set(it)
+            var currentSelection = FirstHourOfDay.get()
+            val builder = MaterialAlertDialogBuilder(this)
+            builder.setTitle(R.string.first_hour_of_day_title)
+            builder.setNegativeButton(R.string.cancel, null)
+            builder.setPositiveButton(R.string.save) { _, _ ->
+                FirstHourOfDay.set(currentSelection)
                 updateFirstHourOfDayText()
             }
+            builder.setSingleChoiceItems(hoursOfDay, currentSelection) { _, selection ->
+                currentSelection = selection
+            }
+            builder.show()
         }
-        updateAutoExportFileButtonVisibility(binding.switchAutoExport.isChecked)
+        updateFirstHourOfDayText()
 
         // Average calculation mode
         when (viewModel.getAverageCalculationMode()) {
@@ -73,8 +87,9 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun updateFirstHourOfDayText() {
-        val firstHourOfDay = FirstHourOfDay.get()
-        binding.textFirstHourOfDay.text = getString(R.string.first_hour_of_day_text, firstHourOfDay.hour, firstHourOfDay.minute)
+        val hour = FirstHourOfDay.get()
+        val formattedHour = LocalTime.of(hour, 0).format(hoursFormatter)
+        binding.textFirstHourOfDay.text = getString(R.string.first_hour_of_day_text, formattedHour)
     }
 
     private fun updateAutoExportFileButtonVisibility(autoExportEnabled: Boolean) {
@@ -156,5 +171,4 @@ class SettingsActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
 }
