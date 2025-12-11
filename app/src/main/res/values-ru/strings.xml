@@ -70,4 +70,6 @@
     <string name="average_mode_first_to_last">Среднее между первой и последней записью</string>
     <string name="average_mode_first_to_now">Среднее между первой записью и настоящим временем</string>
     <string name="search">Фильтр</string>
+    <string name="first_hour_of_day_title">Первый час дня</string>
+    <string name="first_hour_of_day_text">День начинается в %s</string>
 </resources>

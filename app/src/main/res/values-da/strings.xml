@@ -69,4 +69,6 @@
     <string name="average_mode_first_to_last">Gennemsnit mellem første og sidste indtastning</string>
     <string name="average_mode_first_to_now">Gennemsnit mellem første indtastning og nu</string>
     <string name="search">Filtrer</string>
+    <string name="first_hour_of_day_title">Dagens første time</string>
+    <string name="first_hour_of_day_text">Dagen starter kl. %s</string>
 </resources>

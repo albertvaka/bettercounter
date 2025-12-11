@@ -69,4 +69,6 @@
     <string name="average_mode_first_to_last">İlk ve son kayıt arasındaki ortalama</string>
     <string name="average_mode_first_to_now">İlk kayıt ile şimdi arasındaki ortalama</string>
     <string name="search">Filtrele</string>
+    <string name="first_hour_of_day_title">Günün ilk saati</string>
+    <string name="first_hour_of_day_text">Gün %s\'te başlar</string>
 </resources>

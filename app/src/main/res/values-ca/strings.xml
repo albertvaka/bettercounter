@@ -70,4 +70,6 @@
     <string name="average_mode_first_to_last">Mitjana entre la primera i l\'última entrada</string>
     <string name="average_mode_first_to_now">Mitjana entre la primera entrada i ara</string>
     <string name="search">Filtra</string>
+    <string name="first_hour_of_day_title">Primera hora del dia</string>
+    <string name="first_hour_of_day_text">El dia comença a les %s</string>
 </resources>

@@ -68,4 +68,6 @@
     <string name="average_mode_first_to_last">从第一次到最后一次的平均值</string>
     <string name="average_mode_first_to_now">从第一次到现在的平均值</string>
     <string name="search">筛选</string>
+    <string name="first_hour_of_day_title">每日首个小时</string>
+    <string name="first_hour_of_day_text">每日开始于 %s</string>
 </resources>

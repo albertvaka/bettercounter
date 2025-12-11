@@ -69,4 +69,6 @@
     <string name="average_mode_first_to_last">Durchschnitt zwischen erstem und letztem Eintrag</string>
     <string name="average_mode_first_to_now">Durchschnitt zwischen erstem Eintrag und jetzt</string>
     <string name="search">Filter</string>
+    <string name="first_hour_of_day_title">Erste Stunde des Tages</string>
+    <string name="first_hour_of_day_text">Der Tag beginnt um %s</string>
 </resources>

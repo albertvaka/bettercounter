@@ -70,4 +70,6 @@
     <string name="average_mode_first_to_last">Moyenne entre la première et la dernière entrée</string>
     <string name="average_mode_first_to_now">Moyenne entre la première entrée et maintenant</string>
     <string name="search">Filtrer</string>
+    <string name="first_hour_of_day_title">Première heure de la journée</string>
+    <string name="first_hour_of_day_text">La journée commence à %s</string>
 </resources>
