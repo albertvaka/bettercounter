@@ -78,11 +78,6 @@ class ChartsAdapter(
             rangeEnd.time
         )
 
-        // Use the end of this interval and not at the beginning of the next,
-        // so weeks have 7 days and not 8 because of the rounding up we do later.
-        // FIXME: What rounding? Is this still needed?
-        rangeEnd.add(Calendar.MINUTE, -1)
-
         coroutineScope.launch {
             combine(maxCountFlow, lifetimeGoalReachedFlow, entriesFlow, ::Triple)
                 .collect { (maxCount, lifetimeGoalReached, entries) ->
