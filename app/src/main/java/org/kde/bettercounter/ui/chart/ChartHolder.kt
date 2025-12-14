@@ -96,7 +96,7 @@ class ChartHolder(
         }
 
         // Goal stats
-        if (counter.goal >= 0 && counter.interval != Interval.LIFETIME) {
+        if (counter.goal > 0 && counter.interval != Interval.LIFETIME) {
             binding.chartGoalAverage.text = getGoalStatsString(counter, displayInterval, periodGoalReached, lifetimeGoalReached, rangeStart, rangeEnd, averageMode)
             binding.chartGoalAverage.visibility = View.VISIBLE
         } else {
