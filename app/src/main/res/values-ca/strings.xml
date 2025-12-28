@@ -64,6 +64,8 @@
     <string name="auto_export">Exporta automàticament quan canviï un comptador</string>
     <string name="current_export_file">Els comptadors s\'exportaran automàticament a %1$s</string>
     <string name="export_disabled">Sempre podeu exportar els comptadors manualment des del menú contextual de la pantalla principal.</string>
+    <string name="haptic_feedback">Resposta hàptica</string>
+    <string name="behavior_settings">Comportament</string>
     <string name="change_button">Canvia</string>
     <string name="export_error">Error en exportar</string>
     <string name="average_calculation_settings">Càlcul de la mitjana</string>

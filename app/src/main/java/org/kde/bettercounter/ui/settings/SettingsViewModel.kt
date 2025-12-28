@@ -24,6 +24,14 @@ class SettingsViewModel(application: Application) {
         repo.setAutoExportFileUri(uriString)
     }
 
+    fun isHapticFeedbackEnabled(): Boolean {
+        return repo.isHapticFeedbackEnabled()
+    }
+
+    fun setHapticFeedback(enabled: Boolean) {
+        repo.setHapticFeedback(enabled)
+    }
+
     fun getAverageCalculationMode(): AverageMode {
         return repo.getAverageCalculationMode()
     }

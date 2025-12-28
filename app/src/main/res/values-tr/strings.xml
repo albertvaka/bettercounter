@@ -63,6 +63,8 @@
     <string name="auto_export">Bir sayaç değiştiğinde otomatik olarak dışa aktar</string>
     <string name="current_export_file">Sayaçlar otomatik olarak %1$s konumuna dışa aktarılacak</string>
     <string name="export_disabled">Sayaçları her zaman ana ekran bağlam menüsünden manuel olarak dışa aktarabilirsiniz.</string>
+    <string name="haptic_feedback">Dokunsal geri bildirim</string>
+    <string name="behavior_settings">Davranış</string>
     <string name="change_button">Değiştir</string>
     <string name="export_error">Dışa aktarma başarısız</string>
     <string name="average_calculation_settings">Ortalama hesaplama</string>
