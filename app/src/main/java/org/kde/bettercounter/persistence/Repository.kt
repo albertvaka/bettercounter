@@ -154,7 +154,7 @@ class Repository(
     fun setAutoExportOnSave(enabled: Boolean) {
         sharedPref.edit { putBoolean(AUTO_EXPORT_ENABLED_KEY, enabled) }
     }
-
+    
     fun getAutoExportFileUri(): String? {
         return sharedPref.getString(AUTO_EXPORT_FILE_URI_KEY, null)
     }
