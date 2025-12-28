@@ -157,6 +157,10 @@ class MainActivityViewModel(val application: Application) {
         return tutorialsShown.contains(id.name)
     }
 
+    fun isHapticFeedbackEnabled(): Boolean {
+        return repo.isHapticFeedbackEnabled()
+    }
+
     fun editCounterSameName(counterMetadata: CounterMetadata) {
         val name = counterMetadata.name
         repo.setCounterMetadata(counterMetadata)

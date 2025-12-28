@@ -23,6 +23,7 @@ class EntryViewHolder(
 
     fun onBind(counter: CounterSummary) {
         binding.root.setBackgroundColor(counter.color.colorInt)
+        val isHapticFeebdackEnabled = viewModel.isHapticFeedbackEnabled()
         val rippleRes = CounterColors.getInstance(activity).getRippleDrawableRes(counter.color)
         if (rippleRes != null) {
             binding.increaseButton.setBackgroundResource(rippleRes)
@@ -33,6 +34,11 @@ class EntryViewHolder(
         }
         binding.increaseButton.setOnClickListener {
             viewModel.incrementCounter(counter.name)
+
+            if (isHapticFeedbackEnabled) {
+                binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            }
+
             if (!viewModel.isTutorialShown(Tutorial.PICK_DATE)) {
                 viewModel.setTutorialShown(Tutorial.PICK_DATE)
                 showPickDateTutorial()
@@ -41,10 +47,20 @@ class EntryViewHolder(
         binding.increaseButton.setOnLongClickListener {
             showDateTimePicker(activity, Calendar.getInstance()) { pickedDateTime ->
                 viewModel.incrementCounter(counter.name, pickedDateTime.time)
+
+                if (isHapticFeedbackEnabled) {
+                    binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                }
             }
             true
         }
-        binding.decreaseButton.setOnClickListener { viewModel.decrementCounter(counter.name) }
+        binding.decreaseButton.setOnClickListener {
+            viewModel.decrementCounter(counter.name)
+
+            if (isHapticFeedbackEnabled) {
+                binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            }
+        }
         binding.draggableArea.setOnClickListener { onClickListener(counter) }
         binding.draggableArea.setOnLongClickListener {
             if (!canDrag()) return@setOnLongClickListener false
