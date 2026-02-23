@@ -1,0 +1,9 @@
+6.0:
+- Show stats about goals completion
+- Add a setting to change the first hour of day
+- Add Czech translation
+
+5.0:
+- Add a filter/search
+- Add settings to configure average calculation and auto-export
+- Keep Y axis the same for all charts
