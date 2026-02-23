@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 buildscript {
     dependencies {
         classpath(libs.android.gradlePlugin)
@@ -7,8 +9,13 @@ buildscript {
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.devtools.ksp)
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+    }
 }
 
 android {
@@ -36,9 +43,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     androidResources {
         generateLocaleConfig = true
     }
@@ -51,14 +55,15 @@ android {
         }
     }
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".debug"
             versionNameSuffix = " Dev"
+        }
+        getByName("release") {
+            isShrinkResources = true
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }

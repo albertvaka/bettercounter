@@ -1,7 +1,7 @@
 [versions]
-androidGradlePlugin = "8.13.2"
-kotlin = "2.2.21"
-ksp = "2.3.0"
+androidGradlePlugin = "9.0.1"
+kotlin = "2.3.10"
+ksp = "2.3.4"
 coreKtx = "1.17.0"
 recyclerview = "1.4.0"
 appcompat = "1.7.1"
@@ -31,5 +31,4 @@ junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-kotlin-android = { id ="org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
