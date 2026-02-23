@@ -1,0 +1,10 @@
+- Sledujte dobré a špatné návyky (např. cvičení, kouření, pití alkoholu...).
+- Sledujte, kdy jste naposledy něco udělali (např. zalévali květiny, měnili povlečení, chodili na záchod...).
+- Počítejte své životy v MtG
+
+Funkce:
+- Zaznamenává datum a čas každého jednotlivého zvýšení počítadla.
+- Vytváří grafy vašich dat v čase a vypočítává statistiky.
+- Umožňuje exportovat data (např. pro analýzu pomocí nástrojů podle vašeho výběru).
+- Vaše data nejsou nikdy odesílána na žádný server (s výjimkou zálohování Google, pokud je povoleno)
+- Je to naprosto jednoduché a tak to i zůstane.
