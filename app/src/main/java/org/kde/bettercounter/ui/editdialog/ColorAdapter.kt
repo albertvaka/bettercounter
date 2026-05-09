@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import org.kde.bettercounter.R
 import org.kde.bettercounter.persistence.CounterColor
@@ -75,9 +74,7 @@ class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.Vie
         holder.colorButton.text = tickText
         holder.colorButton.setTextColor(textColor)
         holder.colorButton.contentDescription = context.getString(R.string.color_hint, position + 1)
-        val background = DrawableCompat.wrap(holder.colorButton.background)
-        DrawableCompat.setTint(background, colorInt)
-        holder.colorButton.background = background
+        holder.colorButton.background.setTint(colorInt)
     }
 
     override fun getItemCount(): Int = colors.size

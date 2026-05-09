@@ -71,7 +71,6 @@ android {
 dependencies {
     implementation(libs.douglasjunior.android.simple.tooltip)
     implementation(libs.appdevnext.mpAndroidChart)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)

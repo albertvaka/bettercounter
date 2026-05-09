@@ -2,7 +2,6 @@
 androidGradlePlugin = "9.1.1"
 kotlin = "2.3.10"
 ksp = "2.3.4"
-coreKtx = "1.17.0"
 recyclerview = "1.4.0"
 appcompat = "1.7.1"
 material = "1.13.0"
@@ -16,7 +15,6 @@ junit = "4.13.2"
 [libraries]
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
