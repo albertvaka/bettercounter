@@ -90,9 +90,10 @@ class ChartHolder(
         val averageMode = viewModel.getAverageCalculationMode()
         val periodAverage = getPeriodAverageString(counter, intervalEntries, rangeStart, rangeEnd, averageMode)
         val lifetimeAverage = getLifetimeAverageString(counter, averageMode)
-        binding.chartAverage.text = activity.getString(R.string.stats_averages, periodAverage, lifetimeAverage)
+        val firstDataDate = counter.leastRecent
+        binding.chartAverage.text = activity.getString(R.string.stats_averages, periodAverage, lifetimeAverage, firstDataDate)
         if (binding.chartAverage.lineCount > 1) {
-            binding.chartAverage.text = activity.getString(R.string.stats_averages_multiline, periodAverage, lifetimeAverage)
+            binding.chartAverage.text = activity.getString(R.string.stats_averages_multiline, periodAverage, lifetimeAverage, firstDataDate)
         }
 
         // Goal stats
