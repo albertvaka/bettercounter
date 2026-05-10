@@ -63,6 +63,8 @@
     <string name="auto_export">Automatisch exportieren, wenn sich ein Zähler ändert</string>
     <string name="current_export_file">Zähler werden automatisch nach %1$s exportiert</string>
     <string name="export_disabled">Sie können die Zähler jederzeit manuell über das Kontextmenü des Hauptbildschirms exportieren.</string>
+    <string name="haptic_feedback">Haptisches Feedback</string>
+    <string name="behavior_settings">Verhalten</string>
     <string name="change_button">Ändern</string>
     <string name="export_error">Export fehlgeschlagen</string>
     <string name="average_calculation_settings">Durchschnittsberechnung</string>

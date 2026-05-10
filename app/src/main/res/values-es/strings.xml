@@ -64,6 +64,8 @@
     <string name="auto_export">Exportar automáticamente cuando cambie un contador</string>
     <string name="current_export_file">Los contadores se exportarán automáticamente a %1$s</string>
     <string name="export_disabled">Siempre puedes exportar los contadores manualmente desde el menú contextual de la pantalla principal.</string>
+    <string name="haptic_feedback">Respuesta háptica</string>
+    <string name="behavior_settings">Comportamiento</string>
     <string name="change_button">Cambiar</string>
     <string name="export_error">Error al exportar</string>
     <string name="average_calculation_settings">Cálculo de la media</string>
