@@ -20,11 +20,11 @@ kotlin {
 
 android {
     namespace = "org.kde.bettercounter"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         applicationId = "org.kde.bettercounter"
-        minSdk = 21
-        targetSdk = 36
+        minSdk = 23
+        targetSdk = 37
         versionCode = 60003
         versionName = "6.0.3"
 
