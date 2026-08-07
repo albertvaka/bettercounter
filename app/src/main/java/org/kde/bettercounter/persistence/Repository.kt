@@ -17,6 +17,7 @@ const val COUNTERS_COLOR_PREFS_KEY = "color.%s"
 const val COUNTERS_GOAL_PREFS_KEY = "goal.%s"
 const val TUTORIALS_PREFS_KEY = "tutorials"
 const val AUTO_EXPORT_ENABLED_KEY = "auto_export_enabled"
+const val HAPTIC_FEEDBACK_ENABLED_KEY = "haptic_feedback_enabled"
 const val AVERAGE_CALCULATION_MODE_KEY = "average_calculation_mode"
 const val AUTO_EXPORT_FILE_URI_KEY = "auto_export_file_uri"
 
@@ -161,7 +162,16 @@ class Repository(
     fun setAutoExportFileUri(uriString: String) {
         sharedPref.edit { putString(AUTO_EXPORT_FILE_URI_KEY, uriString) }
     }
-    
+
+    fun isHapticFeedbackEnabled(): Boolean {
+        return sharedPref.getBoolean(HAPTIC_FEEDBACK_ENABLED_KEY, false)
+    }
+
+    fun setHapticFeedback(enabled: Boolean) {
+        sharedPref.edit { putBoolean(HAPTIC_FEEDBACK_ENABLED_KEY, enabled) }
+    }
+
+
     fun getAverageCalculationMode(): AverageMode {
         val ordinal = sharedPref.getInt(AVERAGE_CALCULATION_MODE_KEY, AverageMode.FIRST_TO_LAST.ordinal)
         return AverageMode.entries[ordinal]

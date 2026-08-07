@@ -63,6 +63,8 @@
     <string name="auto_export">Auto-export when a counter changes</string>
     <string name="current_export_file">Counters will be exported automatically to %1$s</string>
     <string name="export_disabled">You can always export the counters manually from the main screen\'s context menu.</string>
+    <string name="haptic_feedback">Haptic Feedback</string>
+    <string name="behavior_settings">Behavior</string>
     <string name="change_button">Change</string>
     <string name="export_error">Export failed</string>
     <string name="average_calculation_settings">Average Calculation</string>

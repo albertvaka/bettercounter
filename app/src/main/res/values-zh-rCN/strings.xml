@@ -62,6 +62,8 @@
     <string name="auto_export">计数器变更时自动导出</string>
     <string name="current_export_file">计数器将自动导出到 %1$s</string>
     <string name="export_disabled">您随时可以从主屏幕的上下文菜单手动导出计数器。</string>
+    <string name="haptic_feedback">触觉反馈</string>
+    <string name="behavior_settings">行为</string>
     <string name="change_button">更改</string>
     <string name="export_error">导出失败</string>
     <string name="average_calculation_settings">平均值计算</string>

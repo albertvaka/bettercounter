@@ -36,6 +36,19 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="@string/behavior_settings"
+                android:textAppearance="?attr/textAppearanceHeadline6" 
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchHapticFeedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/haptic_feedback" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="@string/export_settings"
                 android:textAppearance="?attr/textAppearanceHeadline6"
                 android:layout_marginBottom="8dp" />

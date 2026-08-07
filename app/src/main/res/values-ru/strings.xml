@@ -64,6 +64,8 @@
     <string name="auto_export">Автоматически экспортировать при изменении счетчика</string>
     <string name="current_export_file">Счетчики будут автоматически экспортированы в %1$s</string>
     <string name="export_disabled">Вы всегда можете экспортировать счетчики вручную из контекстного меню главного экрана.</string>
+    <string name="haptic_feedback">Тактильная отдача</string>
+    <string name="behavior_settings">Поведение</string>
     <string name="change_button">Изменить</string>
     <string name="export_error">Ошибка экспорта</string>
     <string name="average_calculation_settings">Расчет среднего значения</string>

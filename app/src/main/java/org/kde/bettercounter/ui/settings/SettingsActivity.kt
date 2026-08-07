@@ -53,6 +53,12 @@ class SettingsActivity : AppCompatActivity() {
         }
         updateAutoExportFileButtonVisibility(binding.switchAutoExport.isChecked)
 
+        // Haptic feedback
+        binding.switchHapticFeedback.isChecked = viewModel.isHapticFeedbackEnabled()
+        binding.switchHapticFeedback.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setHapticFeedback(isChecked)
+        }
+
         // First hour of day
         binding.buttonChangeFirstHourOfDay.setOnClickListener {
             var currentSelection = FirstHourOfDay.get()

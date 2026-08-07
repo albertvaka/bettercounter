@@ -63,6 +63,8 @@
     <string name="auto_export">Eksporter automatisk når en tæller ændres</string>
     <string name="current_export_file">Tællere vil automatisk blive eksporteret til %1$s</string>
     <string name="export_disabled">Du kan altid eksportere tællere manuelt fra hovedskærmens kontekstmenu.</string>
+    <string name="haptic_feedback">Haptisk feedback</string>
+    <string name="behavior_settings">Adfærd</string>
     <string name="change_button">Skift</string>
     <string name="export_error">Eksport mislykkedes</string>
     <string name="average_calculation_settings">Gennemsnitsberegning</string>

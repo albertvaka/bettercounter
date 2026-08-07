@@ -64,6 +64,8 @@
     <string name="auto_export">Exporter automatiquement lors d\'un changement de compteur</string>
     <string name="current_export_file">Les compteurs seront exportés automatiquement vers %1$s</string>
     <string name="export_disabled">Vous pouvez toujours exporter les compteurs manuellement depuis le menu contextuel de l\'écran principal.</string>
+    <string name="haptic_feedback">Retour haptique</string>
+    <string name="behavior_settings">Comportement</string>
     <string name="change_button">Changer</string>
     <string name="export_error">Échec de l\'exportation</string>
     <string name="average_calculation_settings">Calcul de la moyenne</string>
