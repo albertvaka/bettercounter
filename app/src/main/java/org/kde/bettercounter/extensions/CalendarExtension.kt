@@ -13,7 +13,7 @@ fun Calendar.truncated(field: Int): Calendar {
     if (field == Calendar.MINUTE) return cal
     cal.set(Calendar.MINUTE, 0)
     if (field == Calendar.HOUR_OF_DAY || field == Calendar.HOUR) return cal
-    val firstHourOfDay = FirstHourOfDay.get();
+    val firstHourOfDay = FirstHourOfDay.get()
     if (firstHourOfDay > cal.get(Calendar.HOUR_OF_DAY)) {
         cal.add(Calendar.DAY_OF_YEAR, -1)
     }

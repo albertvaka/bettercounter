@@ -50,6 +50,7 @@ import org.kde.bettercounter.ui.editdialog.CounterSettingsDialogBuilder
 import org.kde.bettercounter.ui.settings.SettingsActivity
 import org.kde.bettercounter.ui.widget.WidgetProvider
 import kotlin.math.max
+import kotlin.time.Duration.Companion.milliseconds
 
 class MainActivity : AppCompatActivity() {
 
@@ -166,7 +167,7 @@ class MainActivity : AppCompatActivity() {
                             if (isKeyboardVisible(binding.root)) {
                                 hideKeyboard(binding.root)
                                 // HACK so the keyboard has time to hide before the panel expands.
-                                delay(100)
+                                delay(100.milliseconds)
                             }
                             // We need to clear the focus so it triggers the onQueryTextFocusChangeListener  the next time it's clicked
                             (searchMenuItem.actionView as SearchView).clearFocus()

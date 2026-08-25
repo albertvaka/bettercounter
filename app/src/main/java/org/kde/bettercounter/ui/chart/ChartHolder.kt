@@ -66,7 +66,6 @@ class ChartHolder(
                 Interval.WEEK -> R.id.week
                 Interval.MONTH -> R.id.month
                 Interval.YEAR -> R.id.year
-                else -> error("Interval not valid as a chart display interval")
             }
             popupMenu.menu.findItem(selectedItem).isChecked = true
             popupMenu.show()

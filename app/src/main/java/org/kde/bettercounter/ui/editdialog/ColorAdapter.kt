@@ -16,9 +16,7 @@ import org.kde.bettercounter.persistence.CounterColors
 class ColorAdapter(val context: Context) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
 
     var selectedColor: CounterColor
-        get() {
-            return colors[selectedPosition]
-        }
+        get() = colors[selectedPosition]
         set(color) {
             for (i in colors.indices) {
                 val colorPal = colors[i]
