@@ -42,7 +42,7 @@
                 android:textAlignment="textStart"
                 android:textAppearance="?attr/textAppearanceListItem"
                 android:drawableStart="@drawable/ic_time"
-                android:drawablePadding="4.5dip"
+                android:drawablePadding="4.5dp"
                 tools:text="yesterday" />
 
         </LinearLayout>
@@ -52,10 +52,10 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:layout_margin="5dip"
+            android:layout_margin="5dp"
             android:paddingEnd="10dp"
             android:gravity="end|center_vertical"
-            android:drawablePadding="3dip"
+            android:drawablePadding="3dp"
             app:drawableTint="@color/colorAccent"
             android:textAppearance="?attr/textAppearanceListItem"
             android:textSize="24sp"

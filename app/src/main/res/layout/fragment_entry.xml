@@ -42,8 +42,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="5dip"
-            android:drawablePadding="3dip"
+            android:layout_margin="5dp"
+            android:drawablePadding="3dp"
             app:drawableTint="@color/colorAccent"
             android:textAppearance="?attr/textAppearanceListItem"
             android:textSize="24sp"
@@ -57,7 +57,7 @@
             android:textAlignment="center"
             android:textAppearance="?attr/textAppearanceListItem"
             android:drawableStart="@drawable/ic_time"
-            android:drawablePadding="4.5dip"
+            android:drawablePadding="4.5dp"
             tools:text="yesterday" />
 
     </LinearLayout>

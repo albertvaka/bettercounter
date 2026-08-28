@@ -18,7 +18,7 @@
         android:id="@+id/chart"
         android:layout_width="match_parent"
         android:background="@color/colorDarkBackground"
-        android:layout_height="260dip" />
+        android:layout_height="260dp" />
 
     <TextView
         android:id="@+id/chartAverage"
