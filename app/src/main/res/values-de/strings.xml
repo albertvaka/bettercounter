@@ -40,6 +40,7 @@
     <string name="export_csv">Daten exportieren</string>
     <string name="import_csv">Daten importieren</string>
     <string name="show_tutorial">Tutorial anzeigen</string>
+    <string name="show_minus_button">Minus-Schaltfläche anzeigen</string>
     <string name="exported_n">%1$d/%2$d Zähler exportiert</string>
     <string name="imported_n">%1$d Zähler importiert</string>
     <string name="import_error">Fehler: Ungültiges Dateiformat</string>

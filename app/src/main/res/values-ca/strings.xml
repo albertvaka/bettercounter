@@ -40,6 +40,7 @@
     <string name="export_csv">Exporta les dades</string>
     <string name="import_csv">Importa les dades</string>
     <string name="show_tutorial">Mostra el tutorial</string>
+    <string name="show_minus_button">Mostra el botó menys</string>
     <string name="exported_n">Exportats %1$d/%2$d comptadors</string>
     <string name="imported_n">Importats %1$d comptadors</string>
     <string name="delete_confirmation">Segur que voleu esborrar aquest comptador?</string>

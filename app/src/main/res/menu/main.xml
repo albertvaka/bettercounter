@@ -9,6 +9,10 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
     <item android:id="@+id/export_csv" android:title="@string/export_csv" />
     <item android:id="@+id/import_csv" android:title="@string/import_csv" />
+    <item
+        android:id="@+id/show_minus_button"
+        android:title="@string/show_minus_button"
+        android:checkable="true" />
     <item android:id="@+id/show_tutorial" android:title="@string/show_tutorial" />
     <item android:id="@+id/settings" android:title="@string/settings" />
 </menu>

@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
+import org.kde.bettercounter.databinding.CompactFragmentEntryBinding
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
@@ -47,6 +48,9 @@ class EntryListViewAdapter(
     private var filterQuery: String = ""
 
     override fun getItemCount(): Int = filteredCounters.size
+
+    override fun getItemViewType(position: Int): Int =
+        if (viewModel.isMinusButtonShown()) 1 else 0
 
     private val touchHelper = ItemTouchHelper(DragAndSwipeTouchHelper(this))
 
@@ -165,9 +169,12 @@ class EntryListViewAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
-        val binding = FragmentEntryBinding.inflate(inflater, parent, false)
-        val holder = EntryViewHolder(activity, binding, viewModel, touchHelper, ::selectCounter, ::canDrag)
-        return holder
+        val binding = if (viewModel.isMinusButtonShown()) {
+            EntryBinding(FragmentEntryBinding.inflate(inflater, parent, false))
+        } else {
+            EntryBinding(CompactFragmentEntryBinding.inflate(inflater, parent, false))
+        }
+        return EntryViewHolder(activity, binding, viewModel, touchHelper, ::selectCounter, ::canDrag)
     }
 
     fun selectCounter(counter: CounterSummary) {

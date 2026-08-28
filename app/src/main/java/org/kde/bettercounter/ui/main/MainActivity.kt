@@ -224,6 +224,7 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.main, menu)
 
         searchMenuItem = menu.findItem(R.id.action_search)
+        menu.findItem(R.id.show_minus_button).isChecked = viewModel.isMinusButtonShown()
         val searchView = searchMenuItem.actionView as SearchView
 
         searchView.setOnQueryTextFocusChangeListener { _, focus ->
@@ -275,6 +276,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.show_minus_button -> {
+                item.isChecked = !item.isChecked
+                viewModel.setMinusButtonShown(item.isChecked)
+                entryViewAdapter.notifyDataSetChanged()
+            }
             R.id.export_csv -> {
                 exportFilePicker.launch(CreateFileParams("text/csv", "bettercounter-export.csv"))
             }

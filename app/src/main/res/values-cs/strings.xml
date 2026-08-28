@@ -41,6 +41,7 @@
     <string name="export_csv">Exportovat data</string>
     <string name="import_csv">Importovat data</string>
     <string name="show_tutorial">Zobrazit návod</string>
+    <string name="show_minus_button">Zobrazit tlačítko minus</string>
     <string name="exported_n">Exportováno %1$d/%2$d počítadel</string>
     <string name="imported_n">Importováno %1$d počítadel</string>
     <string name="import_error">Chyba: neplatný formát souboru</string>

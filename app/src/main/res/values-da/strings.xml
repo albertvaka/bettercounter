@@ -40,6 +40,7 @@
     <string name="export_csv">Eksporter data</string>
     <string name="import_csv">Importer data</string>
     <string name="show_tutorial">Vis vejledning</string>
+    <string name="show_minus_button">Vis minusknap</string>
     <string name="exported_n">Eksporterede %1$d/%2$d tællere</string>
     <string name="imported_n">Importederde %1$d tællere</string>
     <string name="import_error">Fejl: ugyldigt filformat</string>

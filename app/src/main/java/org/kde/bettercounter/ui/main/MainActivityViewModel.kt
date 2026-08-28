@@ -143,6 +143,14 @@ class MainActivityViewModel(val application: Application) {
         }
     }
 
+    fun isMinusButtonShown(): Boolean {
+        return repo.isMinusButtonShown()
+    }
+
+    fun setMinusButtonShown(hidden: Boolean) {
+        repo.setMinusButtonShown(hidden)
+    }
+
     fun setTutorialShown(id: Tutorial) {
         tutorialsShown.add(id.name)
         repo.setTutorialsShown(tutorialsShown)

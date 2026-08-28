@@ -39,6 +39,7 @@
     <string name="export_csv">导出数据</string>
     <string name="import_csv">导入数据</string>
     <string name="show_tutorial">显示教程</string>
+    <string name="show_minus_button">显示减号按钮</string>
     <string name="exported_n">导出了 %1$d/%2$d 个计数器</string>
     <string name="imported_n">导入了 %1$d 个计数器</string>
     <string name="import_error">出错了：文件格式无效</string>
