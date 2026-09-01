@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -41,6 +42,7 @@ import org.kde.bettercounter.boilerplate.isKeyboardVisible
 import org.kde.bettercounter.databinding.ActivityMainBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
 import org.kde.bettercounter.extensions.dpToPx
+import org.kde.bettercounter.extensions.setKeepScreenOn
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.persistence.Tutorial
@@ -85,6 +87,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         setAndroid15insets()
+        window.setKeepScreenOn(viewModel.isKeepScreenOnEnabled())
 
         // Bottom sheet with graph
         // -----------------------
@@ -272,6 +275,16 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.refreshAllCounters()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        window.setKeepScreenOn(viewModel.isKeepScreenOnEnabled())
+    }
+
+    override fun onPause() {
+        window.setKeepScreenOn(false)
+        super.onPause()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -24,6 +24,14 @@ class SettingsViewModel(application: Application) {
         repo.setAutoExportFileUri(uriString)
     }
 
+    fun isKeepScreenOnEnabled(): Boolean {
+        return repo.isKeepScreenOnEnabled()
+    }
+
+    fun setKeepScreenOn(enabled: Boolean) {
+        repo.setKeepScreenOn(enabled)
+    }
+
     fun getAverageCalculationMode(): AverageMode {
         return repo.getAverageCalculationMode()
     }

@@ -151,6 +151,10 @@ class MainActivityViewModel(val application: Application) {
         repo.setMinusButtonShown(hidden)
     }
 
+    fun isKeepScreenOnEnabled(): Boolean {
+        return repo.isKeepScreenOnEnabled()
+    }
+
     fun setTutorialShown(id: Tutorial) {
         tutorialsShown.add(id.name)
         repo.setTutorialsShown(tutorialsShown)

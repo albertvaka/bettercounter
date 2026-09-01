@@ -67,6 +67,8 @@
     <string name="export_disabled">Sempre podeu exportar els comptadors manualment des del menú contextual de la pantalla principal.</string>
     <string name="change_button">Canvia</string>
     <string name="export_error">Error en exportar</string>
+    <string name="keep_screen_on">Mantenir la pantalla encesa</string>
+    <string name="keep_screen_on_description">Mantén la pantalla encesa mentre es fa servir l\'aplicació</string>
     <string name="average_calculation_settings">Càlcul de la mitjana</string>
     <string name="average_mode_first_to_last">Mitjana entre la primera i l\'última entrada</string>
     <string name="average_mode_first_to_now">Mitjana entre la primera entrada i ara</string>

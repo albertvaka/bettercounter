@@ -19,6 +19,7 @@ const val TUTORIALS_PREFS_KEY = "tutorials"
 const val AUTO_EXPORT_ENABLED_KEY = "auto_export_enabled"
 const val AVERAGE_CALCULATION_MODE_KEY = "average_calculation_mode"
 const val AUTO_EXPORT_FILE_URI_KEY = "auto_export_file_uri"
+const val KEEP_SCREEN_ON_KEY = "keep_screen_on"
 const val SHOW_MINUS_BUTTON_KEY = "show_minus_button"
 
 class Repository(
@@ -161,6 +162,14 @@ class Repository(
 
     fun setAutoExportFileUri(uriString: String) {
         sharedPref.edit { putString(AUTO_EXPORT_FILE_URI_KEY, uriString) }
+    }
+
+    fun isKeepScreenOnEnabled(): Boolean {
+        return sharedPref.getBoolean(KEEP_SCREEN_ON_KEY, false)
+    }
+
+    fun setKeepScreenOn(enabled: Boolean) {
+        sharedPref.edit { putBoolean(KEEP_SCREEN_ON_KEY, enabled) }
     }
 
     fun isMinusButtonShown(): Boolean {

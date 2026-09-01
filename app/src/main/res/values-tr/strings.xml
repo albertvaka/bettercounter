@@ -66,6 +66,8 @@
     <string name="export_disabled">Sayaçları her zaman ana ekran bağlam menüsünden manuel olarak dışa aktarabilirsiniz.</string>
     <string name="change_button">Değiştir</string>
     <string name="export_error">Dışa aktarma başarısız</string>
+    <string name="keep_screen_on">Ekranı açık tut</string>
+    <string name="keep_screen_on_description">Uygulama etkin olduğu sürece ekranı açık tut</string>
     <string name="average_calculation_settings">Ortalama hesaplama</string>
     <string name="average_mode_first_to_last">İlk ve son kayıt arasındaki ortalama</string>
     <string name="average_mode_first_to_now">İlk kayıt ile şimdi arasındaki ortalama</string>

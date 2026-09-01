@@ -67,6 +67,8 @@
     <string name="export_disabled">Вы всегда можете экспортировать счетчики вручную из контекстного меню главного экрана.</string>
     <string name="change_button">Изменить</string>
     <string name="export_error">Ошибка экспорта</string>
+    <string name="keep_screen_on">Не выключать экран</string>
+    <string name="keep_screen_on_description">Не выключать экран, пока приложение активно</string>
     <string name="average_calculation_settings">Расчет среднего значения</string>
     <string name="average_mode_first_to_last">Среднее между первой и последней записью</string>
     <string name="average_mode_first_to_now">Среднее между первой записью и настоящим временем</string>

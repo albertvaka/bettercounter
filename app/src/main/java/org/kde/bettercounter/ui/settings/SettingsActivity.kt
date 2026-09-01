@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
@@ -15,6 +16,7 @@ import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.databinding.ActivitySettingsBinding
+import org.kde.bettercounter.extensions.setKeepScreenOn
 import org.kde.bettercounter.persistence.AverageMode
 import org.kde.bettercounter.persistence.FirstHourOfDay
 import java.time.LocalTime
@@ -53,6 +55,14 @@ class SettingsActivity : AppCompatActivity() {
         }
         updateAutoExportFileButtonVisibility(binding.switchAutoExport.isChecked)
 
+        // Keep screen on
+        binding.switchKeepScreenOn.isChecked = viewModel.isKeepScreenOnEnabled()
+        binding.switchKeepScreenOn.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setKeepScreenOn(isChecked)
+            window.setKeepScreenOn(isChecked)
+        }
+        window.setKeepScreenOn(binding.switchKeepScreenOn.isChecked)
+
         // First hour of day
         binding.buttonChangeFirstHourOfDay.setOnClickListener {
             var currentSelection = FirstHourOfDay.get()
@@ -84,6 +94,16 @@ class SettingsActivity : AppCompatActivity() {
             }
             viewModel.setAverageCalculationMode(mode)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        window.setKeepScreenOn(viewModel.isKeepScreenOnEnabled())
+    }
+
+    override fun onPause() {
+        window.setKeepScreenOn(false)
+        super.onPause()
     }
 
     private fun updateFirstHourOfDayText() {

@@ -66,6 +66,8 @@
     <string name="export_disabled">Počítadla můžete kdykoli exportovat ručně z kontextového menu hlavní obrazovky.</string>
     <string name="change_button">Změnit</string>
     <string name="export_error">Export se nezdařil</string>
+    <string name="keep_screen_on">Ponechat obrazovku zapnutou</string>
+    <string name="keep_screen_on_description">Ponechat obrazovku zapnutou, když je aplikace aktivní</string>
     <string name="average_calculation_settings">Výpočet průměru</string>
     <string name="average_mode_first_to_last">Průměr mezi prvním a posledním záznamem</string>
     <string name="average_mode_first_to_now">Průměr mezi prvním záznamem a současností</string>

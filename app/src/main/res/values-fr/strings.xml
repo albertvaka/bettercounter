@@ -67,6 +67,8 @@
     <string name="export_disabled">Vous pouvez toujours exporter les compteurs manuellement depuis le menu contextuel de l\'écran principal.</string>
     <string name="change_button">Changer</string>
     <string name="export_error">Échec de l\'exportation</string>
+    <string name="keep_screen_on">Garder l\'écran allumé</string>
+    <string name="keep_screen_on_description">Garder l\'écran allumé lorsque l\'application est active</string>
     <string name="average_calculation_settings">Calcul de la moyenne</string>
     <string name="average_mode_first_to_last">Moyenne entre la première et la dernière entrée</string>
     <string name="average_mode_first_to_now">Moyenne entre la première entrée et maintenant</string>
