@@ -40,9 +40,7 @@
                 android:layout_gravity="start"
                 android:gravity="start"
                 android:textAlignment="textStart"
-                android:textAppearance="?attr/textAppearanceListItem"
-                android:drawableStart="@drawable/ic_time"
-                android:drawablePadding="4.5dp"
+                android:textAppearance="?attr/textAppearanceListItemSecondary"
                 tools:text="yesterday" />
 
         </LinearLayout>
