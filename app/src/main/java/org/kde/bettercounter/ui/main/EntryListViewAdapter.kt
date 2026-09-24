@@ -1,16 +1,19 @@
 package org.kde.bettercounter.ui.main
 
 import android.annotation.SuppressLint
-import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip.OnDismissListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.DragAndSwipeTouchHelper
@@ -18,6 +21,8 @@ import org.kde.bettercounter.databinding.CompactFragmentEntryBinding
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
+import org.kde.bettercounter.ui.chart.ChartDataAggregation
+import java.util.Calendar
 import java.util.Collections
 import java.util.Date
 
@@ -174,7 +179,41 @@ class EntryListViewAdapter(
         } else {
             EntryBinding(CompactFragmentEntryBinding.inflate(inflater, parent, false))
         }
-        return EntryViewHolder(activity, binding, viewModel, touchHelper, ::selectCounter, ::canDrag)
+        return EntryViewHolder(
+            binding,
+            ::selectCounter,
+            ::incrementCounter,
+            ::decrementCounter,
+            ::pickDate,
+            ::dragRequested,
+        )
+    }
+
+    private fun incrementCounter(counter: CounterSummary, tutorialAnchor: View) {
+        viewModel.incrementCounter(counter.name)
+        if (!viewModel.isTutorialShown(Tutorial.PICK_DATE)) {
+            viewModel.setTutorialShown(Tutorial.PICK_DATE)
+            Tutorial.PICK_DATE.show(activity, tutorialAnchor)
+        }
+    }
+
+    private fun decrementCounter(counter: CounterSummary) {
+        viewModel.decrementCounter(counter.name)
+    }
+
+    private fun pickDate(counter: CounterSummary) {
+        activity.lifecycleScope.launch {
+            val entries = viewModel.getAllEntriesSortedByDate(counter.name).first()
+            val calendarDecorator = CalendarDecorator(ChartDataAggregation.computeHasEntriesByDay(entries))
+            if (!activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) ||
+                activity.supportFragmentManager.isStateSaved
+            ) {
+                return@launch
+            }
+            showDateTimePicker(activity, Calendar.getInstance(), calendarDecorator) { pickedDateTime ->
+                viewModel.incrementCounter(counter.name, pickedDateTime.time)
+            }
+        }
     }
 
     fun selectCounter(counter: CounterSummary) {
@@ -190,21 +229,20 @@ class EntryListViewAdapter(
         }
     }
 
+    fun dragRequested(holder: EntryViewHolder): Boolean {
+        if (canDrag()) {
+            touchHelper.startDrag(holder)
+            return true
+        }
+        return false
+    }
+
     fun showDragTutorial(holder: EntryViewHolder, onDismissListener: OnDismissListener? = null) {
-        SimpleTooltip.Builder(activity)
-            .anchorView(holder.binding.countText)
-            .text(R.string.tutorial_drag)
-            .gravity(Gravity.BOTTOM)
-            .animated(true)
-            .focusable(true) // modal requires focusable
-            .modal(true)
-            .onDismissListener(onDismissListener)
-            .build()
-            .show()
+        Tutorial.DRAG.show(activity, holder.binding.countText, onDismissListener)
     }
 
     fun showPickDateTutorial(holder: EntryViewHolder, onDismissListener: OnDismissListener? = null) {
-        holder.showPickDateTutorial(onDismissListener)
+        Tutorial.PICK_DATE.show(activity, holder.binding.increaseButton, onDismissListener)
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
@@ -230,7 +268,11 @@ class EntryListViewAdapter(
     }
 
     override fun onDragStart(viewHolder: RecyclerView.ViewHolder?) {
-        // nothing to do
+        @Suppress("DEPRECATION")
+        (viewHolder as? EntryViewHolder)?.binding?.root?.performHapticFeedback(
+            HapticFeedbackConstants.LONG_PRESS,
+            HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING,
+        )
     }
 
     override fun onDragEnd(viewHolder: RecyclerView.ViewHolder?) {
@@ -241,5 +283,4 @@ class EntryListViewAdapter(
     fun canDrag(): Boolean {
         return filterQuery.isEmpty()
     }
-
 }

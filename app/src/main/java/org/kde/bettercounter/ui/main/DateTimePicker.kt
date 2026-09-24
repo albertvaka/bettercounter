@@ -2,6 +2,7 @@ package org.kde.bettercounter.ui.main
 
 import android.text.format.DateFormat
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.datepicker.DayViewDecorator
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -17,8 +18,8 @@ class HourOfDay(
     val minute: Int,
 )
 
-fun showDateTimePicker(activity: AppCompatActivity, initialDateTime: Calendar, callback: (Calendar) -> Unit) {
-    showDatePicker(activity, initialDateTime) { cal ->
+fun showDateTimePicker(activity: AppCompatActivity, initialDateTime: Calendar, calendarDecorator: DayViewDecorator? = null, callback: (Calendar) -> Unit) {
+    showDatePicker(activity, initialDateTime, calendarDecorator) { cal ->
         val initialHour = initialDateTime.get(Calendar.HOUR_OF_DAY)
         val initialMinute = initialDateTime.get(Calendar.MINUTE)
         showTimePicker(activity, HourOfDay(initialHour, initialMinute)) {
@@ -43,11 +44,12 @@ fun showTimePicker(activity: AppCompatActivity, initialHourOfDay: HourOfDay, cal
         }.show(activity.supportFragmentManager, "timePicker")
 }
 
-fun showDatePicker(activity: AppCompatActivity, initialDateTime: Calendar, callback: (Calendar) -> Unit) {
+fun showDatePicker(activity: AppCompatActivity, initialDateTime: Calendar, calendarDecorator: DayViewDecorator? = null, callback: (Calendar) -> Unit) {
     // MaterialDatePicker needs UTC, see https://stackoverflow.com/questions/63929730/materialdatepicker-returning-wrong-value/71541489#71541489
     val initialTime = initialDateTime.timeInMillis.toLocalDateTime().atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toEpochMilli()
     MaterialDatePicker.Builder.datePicker()
         .setSelection(initialTime)
+        .setDayViewDecorator(calendarDecorator)
         .build().apply {
             addOnPositiveButtonClickListener {
                 val cal = Calendar.getInstance()

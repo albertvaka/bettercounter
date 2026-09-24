@@ -71,7 +71,7 @@ class ChartHolder(
             popupMenu.show()
         }
         binding.chartName.setOnLongClickListener {
-            showDatePicker(activity, rangeStart, onDateChange)
+            showDatePicker(activity, rangeStart, null, onDateChange)
             true
         }
 

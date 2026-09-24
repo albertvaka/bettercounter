@@ -3,6 +3,7 @@ package org.kde.bettercounter.extensions
 import org.kde.bettercounter.persistence.FirstHourOfDay
 import org.kde.bettercounter.persistence.Interval
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
 
@@ -63,3 +64,10 @@ fun Calendar.addInterval(interval: Interval, times: Int) {
         Interval.LIFETIME -> add(Calendar.YEAR, 1000)
     }
 }
+
+fun Calendar.toLocalDate(): LocalDate =
+    LocalDate.of(
+        get(Calendar.YEAR),
+        get(Calendar.MONTH) + 1,
+        get(Calendar.DAY_OF_MONTH),
+    )

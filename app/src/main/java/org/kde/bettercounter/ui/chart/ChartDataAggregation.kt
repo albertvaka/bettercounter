@@ -4,9 +4,11 @@ import org.kde.bettercounter.extensions.addInterval
 import org.kde.bettercounter.extensions.copy
 import org.kde.bettercounter.extensions.plus
 import org.kde.bettercounter.extensions.toCalendar
+import org.kde.bettercounter.extensions.toLocalDate
 import org.kde.bettercounter.extensions.truncated
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
+import java.time.LocalDate
 import java.util.Calendar
 
 object ChartDataAggregation {
@@ -100,4 +102,26 @@ object ChartDataAggregation {
         }
         return goalReached
     }
+
+    fun computeHasEntriesByDay(entries: List<Entry>): Set<LocalDate> {
+        if (entries.isEmpty()) return emptySet()
+        val counterBegin = entries.firstOrNull()?.date?.toCalendar() ?: Calendar.getInstance()
+        val cal = counterBegin.truncated(Calendar.DAY_OF_YEAR)
+        var entriesIndex = 0
+        val ret = mutableSetOf<LocalDate>()
+        while (entriesIndex < entries.size) {
+            val bucketStart = cal.copy()
+            cal.add(Calendar.DAY_OF_YEAR, 1) // Calendar is now at the end of the current bucket
+            var hasEntry = false
+            while (entriesIndex < entries.size && entries[entriesIndex].date.time < cal.timeInMillis) {
+                hasEntry = true
+                entriesIndex++
+            }
+            if (hasEntry) {
+                ret.add(bucketStart.toLocalDate())
+            }
+        }
+        return ret
+    }
+
 }

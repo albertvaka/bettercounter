@@ -1,28 +1,23 @@
 package org.kde.bettercounter.ui.main
 
-import android.view.HapticFeedbackConstants
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.ItemTouchHelper
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip.OnDismissListener
 import org.kde.bettercounter.R
 import org.kde.bettercounter.persistence.CounterColors
 import org.kde.bettercounter.persistence.CounterSummary
-import org.kde.bettercounter.persistence.Tutorial
-import java.util.Calendar
 
 class EntryViewHolder(
-    private val activity: AppCompatActivity,
     val binding: EntryBinding,
-    private val viewModel: MainActivityViewModel,
-    private val touchHelper: ItemTouchHelper,
-    private val onClickListener: (counter: CounterSummary) -> Unit?,
-    private val canDrag: () -> Boolean
+    private val onClickListener: (counter: CounterSummary) -> Unit,
+    private val onIncrement: (counter: CounterSummary, tutorialAnchor: View) -> Unit,
+    private val onDecrement: (counter: CounterSummary) -> Unit,
+    private val onPickDate: (counter: CounterSummary) -> Unit,
+    private val onDragRequest: (EntryViewHolder) -> Boolean
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun onBind(counter: CounterSummary) {
         binding.root.setBackgroundColor(counter.color.colorInt)
-        val rippleRes = CounterColors.getInstance(activity).getRippleDrawableRes(counter.color)
+        val rippleRes = CounterColors.getInstance(binding.root.context).getRippleDrawableRes(counter.color)
         if (rippleRes != null) {
             binding.increaseButton.setBackgroundResource(rippleRes)
             binding.decreaseButton?.setBackgroundResource(rippleRes)
@@ -31,30 +26,15 @@ class EntryViewHolder(
             binding.decreaseButton?.background = null
         }
         binding.increaseButton.setOnClickListener {
-            viewModel.incrementCounter(counter.name)
-            if (!viewModel.isTutorialShown(Tutorial.PICK_DATE)) {
-                viewModel.setTutorialShown(Tutorial.PICK_DATE)
-                showPickDateTutorial()
-            }
+            onIncrement(counter, binding.increaseButton)
         }
         binding.increaseButton.setOnLongClickListener {
-            showDateTimePicker(activity, Calendar.getInstance()) { pickedDateTime ->
-                viewModel.incrementCounter(counter.name, pickedDateTime.time)
-            }
+            onPickDate(counter)
             true
         }
-        binding.decreaseButton?.setOnClickListener { viewModel.decrementCounter(counter.name) }
+        binding.decreaseButton?.setOnClickListener { onDecrement(counter) }
         binding.draggableArea.setOnClickListener { onClickListener(counter) }
-        binding.draggableArea.setOnLongClickListener {
-            if (!canDrag()) return@setOnLongClickListener false
-            touchHelper.startDrag(this@EntryViewHolder)
-            @Suppress("DEPRECATION")
-            binding.draggableArea.performHapticFeedback(
-                HapticFeedbackConstants.LONG_PRESS,
-                HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING,
-            )
-            true
-        }
+        binding.draggableArea.setOnLongClickListener { onDragRequest(this) }
         binding.nameText.text = counter.name
         binding.countText.text = counter.getFormattedCount()
 
@@ -70,9 +50,4 @@ class EntryViewHolder(
             binding.decreaseButton?.isEnabled = false
         }
     }
-
-    fun showPickDateTutorial(onDismissListener: OnDismissListener? = null) {
-        Tutorial.PICK_DATE.show(activity, binding.increaseButton, onDismissListener)
-    }
-
 }
