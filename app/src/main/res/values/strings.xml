@@ -27,8 +27,8 @@
     <string name="just_now">Just now</string>
     <string name="goal_stats_averages">Goal reached: %1$s, lifetime: %2$s</string>
     <string name="goal_stats_lifetime_averages">Lifetime goal reached: %1$s</string>
-    <string name="stats_averages">Avg: %1$s, lifetime: %2$s</string>
-    <string name="stats_averages_multiline">Avg: %1$s\nLifetime: %2$s</string>
+    <string name="stats_averages">Avg: %1$s, lifetime: %2$s, first data: %3$s</string>
+    <string name="stats_averages_multiline">Avg: %1$s\nLifetime: %2$s\nFirst data: %3$s</string>
     <string name="stats_average_per_hour">%1$.2f times/hour</string>
     <string name="stats_average_every_hours">every %1$.2f hours</string>
     <string name="stats_average_per_day">%1$.2f times/day</string>

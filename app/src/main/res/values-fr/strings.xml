@@ -27,8 +27,8 @@
     <string name="just_now">A l\'instant</string>
     <string name="goal_stats_averages">Objectif atteint: %1$s, vie entière: %2$s</string>
     <string name="goal_stats_lifetime_averages">Objectif vie entière atteint: %1$s</string>
-    <string name="stats_averages">Moyenne: %1$s, vie entière: %2$s</string>
-    <string name="stats_averages_multiline">Moyenne: %1$s\nVie entière: %2$s</string>
+    <string name="stats_averages">Moyenne: %1$s, vie entière: %2$s, première entrée: %3$s</string>
+    <string name="stats_averages_multiline">Moyenne: %1$s\nVie entière: %2$s\nPremière entrée: %3$s</string>
     <string name="stats_average_per_hour">%1$.2f fois par heure</string>
     <string name="stats_average_every_hours">toutes les %1$.2f heures</string>
     <string name="stats_average_per_day">%1$.2f fois par jour</string>
