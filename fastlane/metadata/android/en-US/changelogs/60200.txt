@@ -1,0 +1,10 @@
+6.2:
+- When picking a date, show which dates already have entries
+
+6.1:
+- Add an option to hide the minus buttons and get a compact view
+- Add a setting to keep screen on while using the app
+
+6.0:
+- Show stats about goals completion
+- Add a setting to change the first hour of day

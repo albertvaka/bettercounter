@@ -25,8 +25,8 @@ android {
         applicationId = "org.kde.bettercounter"
         minSdk = 23
         targetSdk = 37
-        versionCode = 60100
-        versionName = "6.1.0"
+        versionCode = 60200
+        versionName = "6.2.0"
 
         javaCompileOptions {
             annotationProcessorOptions {
