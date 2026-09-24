@@ -6,6 +6,7 @@ import org.junit.Test
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.test.FirstHourOfDayTestBase
+import java.time.LocalDate
 import java.util.Calendar
 
 class ChartDataAggregationTest : FirstHourOfDayTestBase() {
@@ -34,6 +35,34 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
 
         val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
         assertEquals(0, maxCount)
+    }
+
+    @Test
+    fun `has entries by day returns each day with an entry`() {
+        val entries = listOf(
+            createEntry(2025, Calendar.JANUARY, 5, 0, 0),
+            createEntry(2025, Calendar.JANUARY, 5, 23, 59),
+            createEntry(2025, Calendar.JANUARY, 6, 12, 0),
+        )
+
+        assertEquals(
+            setOf(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 6)),
+            ChartDataAggregation.computeHasEntriesByDay(entries),
+        )
+    }
+
+    @Test
+    fun `has entries by day respects the configured first hour`() {
+        setFirstHourOfDay(4)
+        val entries = listOf(
+            createEntry(2025, Calendar.JANUARY, 5, 3, 59),
+            createEntry(2025, Calendar.JANUARY, 5, 4, 0),
+        )
+
+        assertEquals(
+            setOf(LocalDate.of(2025, 1, 4), LocalDate.of(2025, 1, 5)),
+            ChartDataAggregation.computeHasEntriesByDay(entries),
+        )
     }
 
     @Test

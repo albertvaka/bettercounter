@@ -9,13 +9,17 @@ abstract class FirstHourOfDayTestBase {
 
     @Before
     fun initializeFirstHourOfDay() {
+        setFirstHourOfDay(0)
+    }
+
+    protected fun setFirstHourOfDay(hour: Int) {
         @Suppress("UNCHECKED_CAST")
         val prefs = Proxy.newProxyInstance(
             SharedPreferences::class.java.classLoader,
             arrayOf(SharedPreferences::class.java),
         ) { _, method, _ ->
             when (method.name) {
-                "getInt" -> 0
+                "getInt" -> hour
                 else -> error("Unexpected SharedPreferences call: ${method.name}")
             }
         } as SharedPreferences
