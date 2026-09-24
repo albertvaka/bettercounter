@@ -2,11 +2,12 @@ package org.kde.bettercounter.extensions
 
 import org.junit.Assert
 import org.junit.Test
+import org.kde.bettercounter.test.FirstHourOfDayTestBase
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class CalendarExtensionTest {
+class CalendarExtensionTest : FirstHourOfDayTestBase() {
 
     @Test
     fun `week truncation respects the first day of the week in US locale`() {

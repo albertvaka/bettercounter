@@ -5,9 +5,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
+import org.kde.bettercounter.test.FirstHourOfDayTestBase
 import java.util.Calendar
 
-class ChartDataAggregationTest {
+class ChartDataAggregationTest : FirstHourOfDayTestBase() {
 
     private fun createEntry(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0): Entry {
         val cal = Calendar.getInstance().apply {

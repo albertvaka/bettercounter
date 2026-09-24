@@ -2,10 +2,11 @@ package org.kde.bettercounter.extensions
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.kde.bettercounter.test.FirstHourOfDayTestBase
 import java.time.temporal.ChronoUnit
 import java.util.Date
 
-class ChronoUnitExtensionTest {
+class ChronoUnitExtensionTest : FirstHourOfDayTestBase() {
 
     @Test
     fun `millis with less than one second diff`() {
