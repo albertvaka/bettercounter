@@ -2,7 +2,7 @@ package org.kde.bettercounter.extensions
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.kde.bettercounter.test.FirstHourOfDayTestBase
+import org.kde.bettercounter.FirstHourOfDayTestBase
 import java.time.temporal.ChronoUnit
 import java.util.Date
 

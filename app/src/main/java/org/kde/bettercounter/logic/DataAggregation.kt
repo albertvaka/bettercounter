@@ -1,4 +1,4 @@
-package org.kde.bettercounter.ui.chart
+package org.kde.bettercounter.logic
 
 import org.kde.bettercounter.extensions.addInterval
 import org.kde.bettercounter.extensions.copy
@@ -11,7 +11,7 @@ import org.kde.bettercounter.persistence.Interval
 import java.time.LocalDate
 import java.util.Calendar
 
-object ChartDataAggregation {
+object DataAggregation {
 
     // Gets called once per ChartAdapter and is reused for all its pages
     fun computeMaxCountForAllEntries(

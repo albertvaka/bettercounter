@@ -21,7 +21,7 @@ import org.kde.bettercounter.databinding.CompactFragmentEntryBinding
 import org.kde.bettercounter.databinding.FragmentEntryBinding
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Tutorial
-import org.kde.bettercounter.ui.chart.ChartDataAggregation
+import org.kde.bettercounter.logic.DataAggregation
 import java.util.Calendar
 import java.util.Collections
 import java.util.Date
@@ -204,7 +204,7 @@ class EntryListViewAdapter(
     private fun pickDate(counter: CounterSummary) {
         activity.lifecycleScope.launch {
             val entries = viewModel.getAllEntriesSortedByDate(counter.name).first()
-            val calendarDecorator = CalendarDecorator(ChartDataAggregation.computeHasEntriesByDay(entries))
+            val calendarDecorator = CalendarDecorator(DataAggregation.computeHasEntriesByDay(entries))
             if (!activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) ||
                 activity.supportFragmentManager.isStateSaved
             ) {

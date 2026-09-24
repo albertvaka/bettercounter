@@ -18,6 +18,7 @@ import org.kde.bettercounter.extensions.count
 import org.kde.bettercounter.extensions.plusInterval
 import org.kde.bettercounter.extensions.toCalendar
 import org.kde.bettercounter.extensions.truncated
+import org.kde.bettercounter.logic.DataAggregation
 import org.kde.bettercounter.persistence.CounterSummary
 import org.kde.bettercounter.persistence.Interval
 import org.kde.bettercounter.ui.main.MainActivityViewModel
@@ -49,12 +50,12 @@ class ChartsAdapter(
 
     val maxCountFlow = allEntriesFlow
         .map { entries ->
-            ChartDataAggregation.computeMaxCountForAllEntries(entries, interval)
+            DataAggregation.computeMaxCountForAllEntries(entries, interval)
         }.shareIn(coroutineScope, SharingStarted.Eagerly, 1)
 
     val lifetimeGoalReachedFlow = allEntriesFlow
         .map { entries ->
-            ChartDataAggregation.computeGoalReached(counter.goal, counter.interval, Interval.LIFETIME, entries)
+            DataAggregation.computeGoalReached(counter.goal, counter.interval, Interval.LIFETIME, entries)
         }.shareIn(coroutineScope, SharingStarted.Eagerly, 1)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChartHolder {
@@ -81,12 +82,12 @@ class ChartsAdapter(
         coroutineScope.launch {
             combine(maxCountFlow, lifetimeGoalReachedFlow, entriesFlow, ::Triple)
                 .collect { (maxCount, lifetimeGoalReached, entries) ->
-                val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(
+                val buckets = DataAggregation.computeBucketsForIntervalEntries(
                     intervalEntries = entries,
                     interval = interval,
                     rangeStart = rangeStart,
                 )
-                val periodGoalReached = ChartDataAggregation.computeGoalReached(
+                val periodGoalReached = DataAggregation.computeGoalReached(
                     goal = counter.goal,
                     counterInterval = counter.interval,
                     displayInterval = interval,

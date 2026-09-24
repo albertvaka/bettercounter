@@ -1,15 +1,15 @@
-package org.kde.bettercounter.ui.chart
+package org.kde.bettercounter.logic
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.kde.bettercounter.persistence.Entry
 import org.kde.bettercounter.persistence.Interval
-import org.kde.bettercounter.test.FirstHourOfDayTestBase
+import org.kde.bettercounter.FirstHourOfDayTestBase
 import java.time.LocalDate
 import java.util.Calendar
 
-class ChartDataAggregationTest : FirstHourOfDayTestBase() {
+class DataAggregationTest : FirstHourOfDayTestBase() {
 
     private fun createEntry(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0): Entry {
         val cal = Calendar.getInstance().apply {
@@ -30,10 +30,10 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
     fun `empty entries returns empty aggregation`() {
         val entries = emptyList<Entry>()
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 1)
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
         assertEquals(emptyList<Int>(), buckets)
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
         assertEquals(0, maxCount)
     }
 
@@ -47,7 +47,7 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
 
         assertEquals(
             setOf(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 6)),
-            ChartDataAggregation.computeHasEntriesByDay(entries),
+            DataAggregation.computeHasEntriesByDay(entries),
         )
     }
 
@@ -60,8 +60,11 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
 
         assertEquals(
-            setOf(LocalDate.of(2025, 1, 4), LocalDate.of(2025, 1, 5)),
-            ChartDataAggregation.computeHasEntriesByDay(entries),
+            setOf(
+                LocalDate.of(2025, 1, 4),
+                LocalDate.of(2025, 1, 5)
+            ),
+            DataAggregation.computeHasEntriesByDay(entries),
         )
     }
 
@@ -72,10 +75,10 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 5)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
         assertEquals(1, buckets[10])
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
         assertEquals(1, maxCount)
     }
 
@@ -88,10 +91,10 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 5)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
         assertEquals(3, buckets[10]) // Hour 10 should have 3 entries
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
         assertEquals(3, maxCount)
     }
 
@@ -107,12 +110,12 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 5)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
         assertEquals(3, buckets[10])
         assertEquals(2, buckets[15])
         assertEquals(1, buckets[20])
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
         assertEquals(3, maxCount)
     }
 
@@ -124,10 +127,10 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 5, 10, 0)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.HOUR, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.HOUR, selectedRangeStart)
         assertEquals(60, buckets.size)
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.HOUR)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.HOUR)
         assertEquals(1, maxCount) // Each minute has max 1 entry
     }
 
@@ -140,10 +143,10 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 5)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
         assertEquals(24, buckets.size)
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
         assertEquals(1, maxCount)
     }
 
@@ -156,10 +159,10 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 6)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.WEEK, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.WEEK, selectedRangeStart)
         assertEquals(7, buckets.size)
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.WEEK)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.WEEK)
         assertEquals(1, maxCount)
     }
 
@@ -172,10 +175,10 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 1)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.MONTH, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.MONTH, selectedRangeStart)
         assertEquals(31, buckets.size)
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.MONTH)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.MONTH)
         assertEquals(1, maxCount)
     }
 
@@ -186,7 +189,7 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2024, Calendar.FEBRUARY, 1)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.MONTH, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.MONTH, selectedRangeStart)
         assertEquals(29, buckets.size)
     }
 
@@ -197,7 +200,7 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.FEBRUARY, 1)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.MONTH, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.MONTH, selectedRangeStart)
         assertEquals(28, buckets.size)
     }
 
@@ -210,13 +213,12 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 1)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.YEAR, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.YEAR, selectedRangeStart)
         assertEquals(12, buckets.size)
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.YEAR)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.YEAR)
         assertEquals(1, maxCount)
     }
-
 
     @Test
     fun `all entries in single bucket - HOUR interval`() {
@@ -229,10 +231,10 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 5, 10, 0)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.HOUR, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.HOUR, selectedRangeStart)
         assertEquals(5, buckets[0]) // All in minute 0
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
         assertEquals(5, maxCount)
     }
 
@@ -245,10 +247,10 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.MARCH, 1)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.MONTH, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.MONTH, selectedRangeStart)
         assertEquals(31, buckets.size) // March has 31 days
 
-        val maxCount = ChartDataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
+        val maxCount = DataAggregation.computeMaxCountForAllEntries(entries, Interval.DAY)
         assertEquals(1, maxCount)
     }
 
@@ -259,7 +261,7 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 5, 10, 0)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.HOUR, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.HOUR, selectedRangeStart)
         assertEquals(60, buckets.size)
         assertEquals(1, buckets[0]) // Entry in minute 0
     }
@@ -271,7 +273,7 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 5, 10, 0)
 
-        ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.HOUR, selectedRangeStart)
+        DataAggregation.computeBucketsForIntervalEntries(entries, Interval.HOUR, selectedRangeStart)
         assertTrue(false) // Should not reach here
     }
 
@@ -284,7 +286,7 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
         )
         val selectedRangeStart = createCalendar(2025, Calendar.JANUARY, 5)
 
-        val buckets = ChartDataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
+        val buckets = DataAggregation.computeBucketsForIntervalEntries(entries, Interval.DAY, selectedRangeStart)
         // Entries at 10:00 and 10:59 should both be in hour 10 bucket
         assertEquals(2, buckets[10])
         assertEquals(1, buckets[11])
@@ -293,25 +295,25 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
     @Test
     fun `goal reached - invalid input`() {
         val entries = listOf(createEntry(2025, Calendar.DECEMBER, 1, 10, 0))
-        assertEquals(-1, ChartDataAggregation.computeGoalReached(
+        assertEquals(-1, DataAggregation.computeGoalReached(
             goal = -1,
             counterInterval = Interval.DAY,
             displayInterval = Interval.WEEK,
             entries = entries,
         ))
-        assertEquals(-1, ChartDataAggregation.computeGoalReached(
+        assertEquals(-1, DataAggregation.computeGoalReached(
             goal = 3,
             counterInterval = Interval.WEEK,
             displayInterval = Interval.WEEK,
             entries = entries,
         ))
-        assertEquals(-1, ChartDataAggregation.computeGoalReached(
+        assertEquals(-1, DataAggregation.computeGoalReached(
             goal = 3,
             counterInterval = Interval.DAY,
             displayInterval = Interval.WEEK,
             entries = emptyList(),
         ))
-        assertEquals(-1, ChartDataAggregation.computeGoalReached(
+        assertEquals(-1, DataAggregation.computeGoalReached(
             goal = 3,
             counterInterval = Interval.LIFETIME,
             displayInterval = Interval.WEEK,
@@ -332,7 +334,7 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
             createEntry(2025, Calendar.DECEMBER, 3, 17, 0),  // wednesday
             createEntry(2025, Calendar.DECEMBER, 3, 18, 0),  // wednesday
         )
-        val goalReached = ChartDataAggregation.computeGoalReached(
+        val goalReached = DataAggregation.computeGoalReached(
             goal = 3,
             counterInterval = Interval.DAY,
             displayInterval = Interval.WEEK,
@@ -352,7 +354,7 @@ class ChartDataAggregationTest : FirstHourOfDayTestBase() {
             createEntry(2025, Calendar.DECEMBER, 1, 12, 20),
             createEntry(2025, Calendar.DECEMBER, 1, 12, 30),
         )
-        val goalReached = ChartDataAggregation.computeGoalReached(
+        val goalReached = DataAggregation.computeGoalReached(
             goal = 2,
             counterInterval = Interval.HOUR,
             displayInterval = Interval.WEEK,

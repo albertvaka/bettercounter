@@ -1,4 +1,4 @@
-package org.kde.bettercounter.test
+package org.kde.bettercounter
 
 import android.content.SharedPreferences
 import org.junit.Before
