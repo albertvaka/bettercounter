@@ -17,19 +17,30 @@ import java.util.Locale
 object AverageStats {
 
     fun getLifetimeAverageString(context: Context, counter: CounterSummary, averageMode: AverageMode): String {
+        val average = getLifetimeAverage(counter, averageMode)
+            ?: return context.getString(R.string.stats_average_n_a)
+
+        return when (counter.interval) {
+            Interval.DAY -> formatAveragePerHour(context, average)
+            else -> formatAveragePerDay(context, average)
+        }
+    }
+
+    // Returns entries per hour for DAY counters, entries per day otherwise, or null if not available
+    internal fun getLifetimeAverage(counter: CounterSummary, averageMode: AverageMode): Float? {
         if (counter.totalCount <= 1) {
-            return context.getString(R.string.stats_average_n_a)
+            return null
         }
 
         val (startDate, endDate) = getLifetimeRange(counter, averageMode)
-        val numEntries = when (averageMode) {
-            AverageMode.FIRST_TO_NOW -> counter.totalCount
-            AverageMode.FIRST_TO_LAST -> counter.totalCount - 1
+        val unit = when (counter.interval) {
+            Interval.DAY -> ChronoUnit.HOURS
+            else -> ChronoUnit.DAYS
         }
 
-        return when (counter.interval) {
-            Interval.DAY -> getAverageStringPerHour(context, numEntries, startDate, endDate)
-            else -> getAverageStringPerDay(context,numEntries, startDate, endDate)
+        return when (averageMode) {
+            AverageMode.FIRST_TO_NOW -> counter.totalCount.toFloat() / unit.count(startDate, endDate)
+            AverageMode.FIRST_TO_LAST -> getAverageBetweenFirstAndLastEntry(counter.totalCount, unit, startDate, endDate)
         }
     }
 
@@ -41,31 +52,56 @@ object AverageStats {
         rangeEnd: Calendar,
         averageMode: AverageMode
     ): String {
+        val average = getPeriodAverage(counter, intervalEntries, rangeStart, rangeEnd, averageMode)
+            ?: return context.getString(R.string.stats_average_n_a)
+
+        return when (counter.interval) {
+            Interval.DAY, Interval.HOUR -> formatAveragePerHour(context, average)
+            else -> formatAveragePerDay(context, average)
+        }
+    }
+
+    // Returns entries per hour for DAY and HOUR counters, entries per day otherwise, or null if not available
+    internal fun getPeriodAverage(
+        counter: CounterSummary,
+        intervalEntries: Int,
+        rangeStart: Calendar,
+        rangeEnd: Calendar,
+        averageMode: AverageMode
+    ): Float? {
         if (intervalEntries == 0) {
-            return context.getString(R.string.stats_average_n_a)
+            return null
         }
 
         val (startDate, endDate) = getIntervalRange(counter, rangeStart, rangeEnd, averageMode)
-        val numEntries = when (averageMode) {
-            AverageMode.FIRST_TO_NOW -> intervalEntries
+        val unit = when (counter.interval) {
+            Interval.DAY, Interval.HOUR -> ChronoUnit.HOURS
+            else -> ChronoUnit.DAYS
+        }
+
+        return when (averageMode) {
+            AverageMode.FIRST_TO_NOW -> intervalEntries.toFloat() / unit.count(startDate, endDate)
             AverageMode.FIRST_TO_LAST -> {
+                // If there are entries outside the range, we measure from/to the range limit instead of
+                // from/to an entry, so all the entries in the range count.
                 val isFromRangeLimit = endDate == rangeEnd.lastInstant() || startDate == rangeStart.time
                 if (isFromRangeLimit) {
-                    intervalEntries
+                    intervalEntries.toFloat() / unit.count(startDate, endDate)
                 } else {
-                    intervalEntries - 1
+                    getAverageBetweenFirstAndLastEntry(intervalEntries, unit, startDate, endDate)
                 }
             }
         }
+    }
 
-        if (numEntries == 0) {
-            return context.getString(R.string.stats_average_n_a)
+    // The time we measure starts at the first entry, so that entry doesn't count. That time is also
+    // one unit less than what ChronoUnit.count() returns, since count() includes both ends.
+    private fun getAverageBetweenFirstAndLastEntry(numEntries: Int, unit: ChronoUnit, firstEntry: Date, lastEntry: Date): Float? {
+        if (numEntries <= 1) {
+            return null
         }
-
-        return when (counter.interval) {
-            Interval.DAY, Interval.HOUR -> getAverageStringPerHour(context, numEntries, startDate, endDate)
-            else -> getAverageStringPerDay(context, numEntries, startDate, endDate)
-        }
+        val elapsedUnits = maxOf(1, unit.count(firstEntry, lastEntry) - 1)
+        return (numEntries - 1).toFloat() / elapsedUnits
     }
 
     fun getGoalStatsString(
@@ -131,9 +167,7 @@ object AverageStats {
         return Pair(startDate, endDate)
     }
 
-    private fun getAverageStringPerDay(context: Context, count: Int, startDate: Date, endDate: Date): String {
-        val days = ChronoUnit.DAYS.count(startDate, endDate)
-        val avgPerDay = count.toFloat() / days
+    private fun formatAveragePerDay(context: Context, avgPerDay: Float): String {
         return if (avgPerDay > 1) {
             context.getString(R.string.stats_average_per_day, avgPerDay)
         } else {
@@ -141,9 +175,7 @@ object AverageStats {
         }
     }
 
-    private fun getAverageStringPerHour(context: Context, count: Int, startDate: Date, endDate: Date): String {
-        val hours = ChronoUnit.HOURS.count(startDate, endDate)
-        val avgPerHour = count.toFloat() / hours
+    private fun formatAveragePerHour(context: Context, avgPerHour: Float): String {
         return if (avgPerHour > 1) {
             context.getString(R.string.stats_average_per_hour, avgPerHour)
         } else {
