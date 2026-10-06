@@ -84,7 +84,7 @@ object AverageStats {
             AverageMode.FIRST_TO_LAST -> {
                 // If there are entries outside the range, we measure from/to the range limit instead of
                 // from/to an entry, so all the entries in the range count.
-                val isFromRangeLimit = endDate == rangeEnd.lastInstant() || startDate == rangeStart.time
+                val isFromRangeLimit = counter.leastRecent!! < rangeStart.time || counter.mostRecent!! > rangeEnd.lastInstant()
                 if (isFromRangeLimit) {
                     intervalEntries.toFloat() / unit.count(startDate, endDate)
                 } else {

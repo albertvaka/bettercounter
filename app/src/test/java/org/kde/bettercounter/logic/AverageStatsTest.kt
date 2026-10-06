@@ -94,6 +94,15 @@ class AverageStatsTest : FirstHourOfDayTestBase() {
     }
 
     @Test
+    fun `an entry exactly at the start of the range does not mean there are entries before the range`() {
+        // 3 entries on the 6th, 8th and 10th at 00:00, with the first one exactly at the range start.
+        // There are no entries before the range, so it's like any other counter with entries only
+        // inside the range: 2 entries after the first one, in 4 days.
+        val counter = weeklyCounter(leastRecent = date(6), mostRecent = date(10))
+        assertEquals(0.5f, average(counter, intervalEntries = 3)!!, 0.0001f)
+    }
+
+    @Test
     fun `a single entry only inside the range has no average`() {
         val counter = weeklyCounter(leastRecent = date(8, 12), mostRecent = date(8, 12))
         assertEquals(null, average(counter, intervalEntries = 1))
