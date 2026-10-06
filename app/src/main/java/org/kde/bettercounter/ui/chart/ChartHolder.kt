@@ -9,6 +9,7 @@ import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import org.kde.bettercounter.R
 import org.kde.bettercounter.databinding.FragmentChartBinding
 import org.kde.bettercounter.extensions.count
+import org.kde.bettercounter.extensions.lastInstant
 import org.kde.bettercounter.extensions.max
 import org.kde.bettercounter.extensions.min
 import org.kde.bettercounter.persistence.AverageMode
@@ -158,7 +159,7 @@ class ChartHolder(
         val numEntries = when (averageMode) {
             AverageMode.FIRST_TO_NOW -> intervalEntries
             AverageMode.FIRST_TO_LAST -> {
-                val isFromRangeLimit = endDate == rangeEnd.time || startDate == rangeStart.time
+                val isFromRangeLimit = endDate == rangeEnd.lastInstant() || startDate == rangeStart.time
                 if (isFromRangeLimit) {
                     intervalEntries
                 } else {
@@ -235,7 +236,7 @@ class ChartHolder(
         }
 
         val startDate = max(rangeStart.time, firstEntryDate)
-        val endDate = min(rangeEnd.time, lastEntryDate)
+        val endDate = min(rangeEnd.lastInstant(), lastEntryDate)
         return Pair(startDate, endDate)
     }
 

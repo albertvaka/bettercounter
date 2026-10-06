@@ -3,7 +3,9 @@ package org.kde.bettercounter.extensions
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.kde.bettercounter.FirstHourOfDayTestBase
+import org.kde.bettercounter.persistence.Interval
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
 import java.util.Date
 
 class ChronoUnitExtensionTest : FirstHourOfDayTestBase() {
@@ -86,5 +88,39 @@ class ChronoUnitExtensionTest : FirstHourOfDayTestBase() {
         val to = Date(1732403495000) // 23 November 2024 23:11:35 UTC
         val count = ChronoUnit.YEARS.count(from, to)
         assertEquals(2, count)
+    }
+
+    private fun daysInRange(year: Int, month: Int, day: Int, interval: Interval): Int {
+        val rangeStart = Calendar.getInstance().apply {
+            clear()
+            set(year, month, day)
+        }
+        val rangeEnd = rangeStart.plusInterval(interval, 1)
+        return ChronoUnit.DAYS.count(rangeStart.time, rangeEnd.lastInstant())
+    }
+
+    @Test
+    fun `range of a 31 day month is 31 days`() {
+        assertEquals(31, daysInRange(2023, Calendar.OCTOBER, 1, Interval.MONTH))
+    }
+
+    @Test
+    fun `range of a 30 day month is 30 days`() {
+        assertEquals(30, daysInRange(2023, Calendar.NOVEMBER, 1, Interval.MONTH))
+    }
+
+    @Test
+    fun `range of february is 28 days`() {
+        assertEquals(28, daysInRange(2023, Calendar.FEBRUARY, 1, Interval.MONTH))
+    }
+
+    @Test
+    fun `range of february in a leap year is 29 days`() {
+        assertEquals(29, daysInRange(2024, Calendar.FEBRUARY, 1, Interval.MONTH))
+    }
+
+    @Test
+    fun `range of a week is 7 days`() {
+        assertEquals(7, daysInRange(2023, Calendar.OCTOBER, 2, Interval.WEEK))
     }
 }

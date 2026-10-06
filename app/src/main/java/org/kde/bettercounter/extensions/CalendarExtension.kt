@@ -5,6 +5,7 @@ import org.kde.bettercounter.persistence.Interval
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 fun Calendar.truncated(field: Int): Calendar {
@@ -53,6 +54,9 @@ fun Calendar.plusInterval(interval: Interval, times: Int): Calendar {
     cal.addInterval(interval, times)
     return cal
 }
+
+// For a range end (the first instant of the next period), returns the last instant of the current period
+fun Calendar.lastInstant(): Date = Date(timeInMillis - 1)
 
 fun Calendar.addInterval(interval: Interval, times: Int) {
     when (interval) {
