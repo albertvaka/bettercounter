@@ -28,13 +28,13 @@ interface EntryDao {
     @Query("SELECT date FROM entry WHERE name = (:name) ORDER BY date DESC LIMIT 1")
     suspend fun getLastDate(name: String): Date?
 
-    @Query("SELECT COUNT(*) FROM entry WHERE name = (:name) AND date >= (:since) AND date <= (:until)")
+    @Query("SELECT COUNT(*) FROM entry WHERE name = (:name) AND date >= (:since) AND date < (:until)")
     suspend fun getCountInRange(name: String, since: Date, until: Date): Int
 
     @Query("UPDATE entry set name = (:newName) WHERE name = (:oldName)")
     suspend fun renameAllEntries(oldName: String, newName: String): Int
 
-    @Query("SELECT * FROM entry WHERE name = (:name) AND date >= (:since) AND date <= (:until) ORDER BY date ASC")
+    @Query("SELECT * FROM entry WHERE name = (:name) AND date >= (:since) AND date < (:until) ORDER BY date ASC")
     suspend fun getAllEntriesInRangeSortedByDate(name: String, since: Date, until: Date): List<Entry>
 
     @Query("SELECT * FROM entry WHERE name = (:name) ORDER BY date ASC")
