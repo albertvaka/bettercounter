@@ -27,12 +27,12 @@ object AverageStats {
     }
 
     // Returns entries per hour for DAY counters, entries per day otherwise, or null if not available
-    internal fun getLifetimeAverage(counter: CounterSummary, averageMode: AverageMode): Float? {
+    internal fun getLifetimeAverage(counter: CounterSummary, averageMode: AverageMode, now: Date = Date()): Float? {
         if (counter.totalCount <= 1) {
             return null
         }
 
-        val (startDate, endDate) = getLifetimeRange(counter, averageMode)
+        val (startDate, endDate) = getLifetimeRange(counter, averageMode, now)
         val unit = when (counter.interval) {
             Interval.DAY -> ChronoUnit.HOURS
             else -> ChronoUnit.DAYS
@@ -67,13 +67,14 @@ object AverageStats {
         intervalEntries: Int,
         rangeStart: Calendar,
         rangeEnd: Calendar,
-        averageMode: AverageMode
+        averageMode: AverageMode,
+        now: Date = Date(),
     ): Float? {
         if (intervalEntries == 0) {
             return null
         }
 
-        val (startDate, endDate) = getIntervalRange(counter, rangeStart, rangeEnd, averageMode)
+        val (startDate, endDate) = getIntervalRange(counter, rangeStart, rangeEnd, averageMode, now)
         val unit = when (counter.interval) {
             Interval.DAY, Interval.HOUR -> ChronoUnit.HOURS
             else -> ChronoUnit.DAYS
@@ -138,11 +139,11 @@ object AverageStats {
         }
     }
 
-    private fun getLifetimeRange(counter: CounterSummary, averageMode: AverageMode): Pair<Date, Date> {
+    private fun getLifetimeRange(counter: CounterSummary, averageMode: AverageMode, now: Date = Date()): Pair<Date, Date> {
         val startDate = counter.leastRecent!!
         val endDate = when (averageMode) {
-            AverageMode.FIRST_TO_NOW ->  counter.latestBetweenNowAndMostRecentEntry()
-            AverageMode.FIRST_TO_LAST -> counter.mostRecent ?: Date()
+            AverageMode.FIRST_TO_NOW ->  counter.latestBetweenNowAndMostRecentEntry(now)
+            AverageMode.FIRST_TO_LAST -> counter.mostRecent ?: now
         }
         return Pair(startDate, endDate)
     }
@@ -151,14 +152,15 @@ object AverageStats {
         counter: CounterSummary,
         rangeStart: Calendar,
         rangeEnd: Calendar,
-        averageMode: AverageMode
+        averageMode: AverageMode,
+        now: Date = Date(),
     ): Pair<Date, Date> {
         val firstEntryDate = when (averageMode) {
-            AverageMode.FIRST_TO_NOW -> min(counter.leastRecent!!, Date())
+            AverageMode.FIRST_TO_NOW -> min(counter.leastRecent!!, now)
             AverageMode.FIRST_TO_LAST -> counter.leastRecent!!
         }
         val lastEntryDate = when (averageMode) {
-            AverageMode.FIRST_TO_NOW -> max(counter.mostRecent!!, Date())
+            AverageMode.FIRST_TO_NOW -> max(counter.mostRecent!!, now)
             AverageMode.FIRST_TO_LAST -> counter.mostRecent!!
         }
 

@@ -13,8 +13,7 @@ class CounterSummary(
     val leastRecent: Date?,
     val mostRecent: Date?,
 ) {
-    fun latestBetweenNowAndMostRecentEntry(): Date {
-        val now = Calendar.getInstance().time
+    fun latestBetweenNowAndMostRecentEntry(now: Date = Calendar.getInstance().time): Date {
         val lastEntry = mostRecent
         return if (lastEntry != null && lastEntry > now) lastEntry else now
     }
