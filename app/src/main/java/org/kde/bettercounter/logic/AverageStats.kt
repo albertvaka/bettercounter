@@ -28,7 +28,7 @@ object AverageStats {
 
     // Returns entries per hour for DAY counters, entries per day otherwise, or null if not available
     internal fun getLifetimeAverage(counter: CounterSummary, averageMode: AverageMode, now: Date = Date()): Float? {
-        if (counter.totalCount <= 1) {
+        if (counter.totalCount == 0) {
             return null
         }
 

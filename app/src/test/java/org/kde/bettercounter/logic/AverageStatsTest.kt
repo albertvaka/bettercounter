@@ -203,8 +203,10 @@ class AverageStatsTest : FirstHourOfDayTestBase() {
     }
 
     @Test
-    fun `lifetime average of a single entry is not available - first to now`() {
+    fun `lifetime average of a single entry has an average - first to now`() {
+        // 1 entry on the 8th, and now is the 12th at 18:00, which is 5 days.
         val counter = weeklyCounter(leastRecent = date(8, 12), mostRecent = date(8, 12), totalCount = 1)
-        assertEquals(null, lifetimeAverage(counter, AverageMode.FIRST_TO_NOW))
+        val now = date(12, 18)
+        assertEquals(0.2f, lifetimeAverage(counter, AverageMode.FIRST_TO_NOW, now)!!, 0.0001f)
     }
 }
