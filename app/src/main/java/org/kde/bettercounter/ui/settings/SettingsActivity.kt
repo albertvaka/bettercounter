@@ -8,6 +8,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -16,6 +20,7 @@ import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
 import org.kde.bettercounter.databinding.ActivitySettingsBinding
+import org.kde.bettercounter.databinding.DialogResetAllBinding
 import org.kde.bettercounter.extensions.setKeepScreenOn
 import org.kde.bettercounter.persistence.AverageMode
 import org.kde.bettercounter.persistence.FirstHourOfDay
@@ -79,6 +84,9 @@ class SettingsActivity : AppCompatActivity() {
             builder.show()
         }
         updateFirstHourOfDayText()
+
+        // Bulk reset is intentionally available only from Settings.
+        binding.buttonResetAllCounters.setOnClickListener { showResetAllConfirmation() }
 
         // Average calculation mode
         when (viewModel.getAverageCalculationMode()) {
@@ -180,6 +188,65 @@ class SettingsActivity : AppCompatActivity() {
             if (viewModel.getAutoExportFileUri() == null) {
                 viewModel.setAutoExportOnSave(false)
                 binding.switchAutoExport.isChecked = false
+            }
+        }
+    }
+
+    private val resetAllExportFilePicker: ActivityResultLauncher<CreateFileParams> = registerForActivityResult(
+        CreateFileResultContract()
+    ) { uri: Uri? ->
+        // Canceling document creation leaves all measurements untouched.
+        if (uri != null) performResetAll(uri)
+    }
+
+    private fun showResetAllConfirmation() {
+        if (!viewModel.hasCounters()) {
+            Snackbar.make(binding.root, R.string.no_counters, Snackbar.LENGTH_LONG).show()
+            return
+        }
+
+        val dialogBinding = DialogResetAllBinding.inflate(layoutInflater)
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.reset_all_counters)
+            .setView(dialogBinding.root)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.reset_all) { _, _ ->
+                if (dialogBinding.exportBeforeReset.isChecked) {
+                    resetAllExportFilePicker.launch(
+                        CreateFileParams("text/csv", "bettercounter-before-reset.csv")
+                    )
+                } else {
+                    performResetAll()
+                }
+            }
+            .show()
+    }
+
+    private fun performResetAll(exportUri: Uri? = null) {
+        val progressDialog = MaterialAlertDialogBuilder(this)
+            .setMessage(
+                if (exportUri == null) R.string.reset_all_progress
+                else R.string.reset_all_export_progress
+            )
+            .setCancelable(false)
+            .create()
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    viewModel.resetAllCounters(exportUri)
+                }
+                Snackbar.make(binding.root, R.string.reset_all_done, Snackbar.LENGTH_LONG).show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Snackbar.make(
+                    binding.root,
+                    if (exportUri == null) R.string.reset_all_error else R.string.export_error,
+                    Snackbar.LENGTH_LONG
+                ).show()
+            } finally {
+                progressDialog.dismiss()
             }
         }
     }
