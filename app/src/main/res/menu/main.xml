@@ -9,7 +9,6 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
     <item android:id="@+id/export_csv" android:title="@string/export_csv" />
     <item android:id="@+id/import_csv" android:title="@string/import_csv" />
-    <item android:id="@+id/reset_all_counters" android:title="@string/reset_all_counters" />
     <item
         android:id="@+id/show_minus_button"
         android:title="@string/show_minus_button"
