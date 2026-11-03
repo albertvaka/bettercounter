@@ -30,10 +30,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.kde.bettercounter.R
 import org.kde.bettercounter.boilerplate.CreateFileParams
 import org.kde.bettercounter.boilerplate.CreateFileResultContract
@@ -42,7 +40,6 @@ import org.kde.bettercounter.boilerplate.OpenFileResultContract
 import org.kde.bettercounter.boilerplate.hideKeyboard
 import org.kde.bettercounter.boilerplate.isKeyboardVisible
 import org.kde.bettercounter.databinding.ActivityMainBinding
-import org.kde.bettercounter.databinding.DialogResetAllBinding
 import org.kde.bettercounter.databinding.ProgressDialogBinding
 import org.kde.bettercounter.extensions.dpToPx
 import org.kde.bettercounter.extensions.setKeepScreenOn
@@ -303,9 +300,6 @@ class MainActivity : AppCompatActivity() {
             R.id.import_csv -> {
                 importFilePicker.launch(OpenFileParams("text/*"))
             }
-            R.id.reset_all_counters -> {
-                showResetAllConfirmation()
-            }
             R.id.settings -> {
                 activityLauncherWithCountersRefresh.launch(Intent(this, SettingsActivity::class.java))
             }
@@ -335,66 +329,6 @@ class MainActivity : AppCompatActivity() {
             else -> return super.onOptionsItemSelected(item)
         }
         return true
-    }
-
-    private val resetAllExportFilePicker: ActivityResultLauncher<CreateFileParams> = registerForActivityResult(
-        CreateFileResultContract()
-    ) { uri: Uri? ->
-        // If the user cancels the file picker, do not reset anything.
-        if (uri != null) performResetAll(uri)
-    }
-
-    private fun showResetAllConfirmation() {
-        if (viewModel.getCounterList().isEmpty()) {
-            Snackbar.make(binding.recycler, R.string.no_counters, Snackbar.LENGTH_LONG).show()
-            return
-        }
-
-        val dialogBinding = DialogResetAllBinding.inflate(layoutInflater)
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.reset_all_counters)
-            .setView(dialogBinding.root)
-            .setNegativeButton(R.string.cancel, null)
-            .setPositiveButton(R.string.reset_all) { _, _ ->
-                if (dialogBinding.exportBeforeReset.isChecked) {
-                    resetAllExportFilePicker.launch(
-                        CreateFileParams("text/csv", "bettercounter-before-reset.csv")
-                    )
-                } else {
-                    performResetAll()
-                }
-            }
-            .show()
-    }
-
-    private fun performResetAll(exportUri: Uri? = null) {
-        val progressDialog = MaterialAlertDialogBuilder(this)
-            .setMessage(
-                if (exportUri == null) R.string.reset_all_progress
-                else R.string.reset_all_export_progress
-            )
-            .setCancelable(false)
-            .create()
-        progressDialog.show()
-
-        lifecycleScope.launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    viewModel.resetAllCounters(exportUri)
-                }
-                hideBottomSheet()
-                Snackbar.make(binding.recycler, R.string.reset_all_done, Snackbar.LENGTH_LONG).show()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Snackbar.make(
-                    binding.recycler,
-                    if (exportUri == null) R.string.reset_all_error else R.string.export_error,
-                    Snackbar.LENGTH_LONG
-                ).show()
-            } finally {
-                progressDialog.dismiss()
-            }
-        }
     }
 
     private val importFilePicker: ActivityResultLauncher<OpenFileParams> = registerForActivityResult(
