@@ -2,7 +2,6 @@ package org.kde.bettercounter.ui.main
 
 import android.app.Application
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 import androidx.annotation.MainThread
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +30,6 @@ import org.kde.bettercounter.persistence.Tutorial
 import org.kde.bettercounter.ui.widget.WidgetProvider
 import java.io.InputStream
 import java.io.OutputStream
-import java.io.IOException
 import java.util.Calendar
 import java.util.Date
 
@@ -238,25 +236,6 @@ class MainActivityViewModel(val application: Application) {
             WidgetProvider.refreshWidget(application, name)
             exporter.autoExportIfEnabled()
         }
-    }
-
-    // Export and delete share the same lock as the UI's counter updates.
-    // A failed/cancelled export must never erase measurements.
-    suspend fun resetAllCounters(exportUri: Uri? = null) {
-        mutex.withLock {
-            if (exportUri != null) {
-                val stream = application.contentResolver.openOutputStream(exportUri)
-                    ?: throw IOException("Could not open the selected export file")
-                // exportAll closes the file before returning, including on errors.
-                exporter.exportAll(stream) { }
-            }
-            repo.removeAllEntries()
-            for ((name, summary) in summaryMap) {
-                summary.value = repo.getCounterSummary(name)
-            }
-        }
-        WidgetProvider.refreshWidgets(application)
-        exporter.autoExportIfEnabled()
     }
 
     fun deleteCounter(name: String) {
