@@ -141,6 +141,22 @@
                     android:layout_height="wrap_content"
                     android:text="@string/average_mode_first_to_now" />
             </RadioGroup>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/data_management"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/buttonResetAllCounters"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reset_all_counters"
+                android:textColor="?attr/colorError" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout> 
