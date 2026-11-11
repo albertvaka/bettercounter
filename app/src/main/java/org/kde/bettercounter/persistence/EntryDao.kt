@@ -51,4 +51,7 @@ interface EntryDao {
 
     @Query("DELETE FROM entry WHERE name = (:name)")
     suspend fun deleteAll(name: String)
+
+    @Query("DELETE FROM entry")
+    suspend fun deleteAllEntries()
 }

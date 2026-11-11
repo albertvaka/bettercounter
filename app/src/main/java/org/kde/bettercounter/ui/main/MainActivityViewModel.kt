@@ -118,8 +118,8 @@ class MainActivityViewModel(val application: Application) {
 
     fun incrementCounter(name: String, date: Date = Calendar.getInstance().time) {
         CoroutineScope(Dispatchers.IO).launch {
-            repo.addEntry(name, date)
             mutex.withLock {
+                repo.addEntry(name, date)
                 summaryMap[name]?.value = repo.getCounterSummary(name)
             }
             try {
@@ -133,9 +133,10 @@ class MainActivityViewModel(val application: Application) {
 
     fun decrementCounter(name: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val oldEntryDate = repo.removeEntry(name)
-            mutex.withLock {
+            val oldEntryDate = mutex.withLock {
+                val removedDate = repo.removeEntry(name)
                 summaryMap[name]?.value = repo.getCounterSummary(name)
+                removedDate
             }
             if (oldEntryDate != null) {
                 for (observer in counterObservers) {
@@ -232,8 +233,8 @@ class MainActivityViewModel(val application: Application) {
 
     fun resetCounter(name: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            repo.removeAllEntries(name)
             mutex.withLock {
+                repo.removeAllEntries(name)
                 summaryMap[name]?.value = repo.getCounterSummary(name)
             }
             WidgetProvider.refreshWidget(application, name)

@@ -128,6 +128,10 @@ class Repository(
         entryDao.deleteAll(name)
     }
 
+    suspend fun removeAllEntries() {
+        entryDao.deleteAllEntries()
+    }
+
     suspend fun getEntriesForRangeSortedByDate(name: String, since: Date, until: Date): List<Entry> {
         return entryDao.getAllEntriesInRangeSortedByDate(name, since, until)
     }
