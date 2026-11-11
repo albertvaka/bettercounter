@@ -122,7 +122,11 @@ class MainActivityViewModel(val application: Application) {
             mutex.withLock {
                 summaryMap[name]?.value = repo.getCounterSummary(name)
             }
-            WidgetProvider.refreshWidget(application, name)
+            try {
+                WidgetProvider.refreshWidget(application, name)
+            } catch (e: NoSuchElementException) {
+                Log.w(TAG, e)
+            }
             exporter.autoExportIfEnabled()
         }
     }
